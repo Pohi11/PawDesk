@@ -2,7 +2,7 @@
 
 ## 1. Observability API
 
-- [ ] 1.1 Add `app/observability.py` (request list and detail, metrics, eval reports) and their routes. Verify with `tests/test_observability_api.py`: list with cost and flag, whole-run detail, 404, cost per step, flag rate, reports listed.
+- [x] 1.1 Add `app/observability.py` (request list and detail, metrics, eval reports) and their routes. Verify with `tests/test_observability_api.py`: list with cost and flag, whole-run detail, 404, cost per step, flag rate, reports listed.
 - [ ] 1.2 Add the server-sent events stream. Verify with tests for progress then end, and for a resting request.
 - [ ] 1.3 Add demo samples and background submission with an injectable model client. Verify with tests for submitting the injection sample (processed to review with a scripted model) and an unknown sample (404, nothing stored).
 

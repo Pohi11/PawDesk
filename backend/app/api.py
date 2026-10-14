@@ -1,19 +1,22 @@
-"""HTTP routes for staff (spec: staff-approval).
+"""HTTP routes: staff actions (spec: staff-approval) and read-only observability (spec:
+observability-api).
 
 No sign-in yet: the staff member's name is taken from the request body. Authentication
 belongs to the deployment work, before this API is reachable by anyone else.
 """
 
 import uuid
+from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.approvals import NotWaiting, decide, review_queue
 from app.db import get_sessionmaker
 from app.enums import ApprovalAction
+from app.observability import RESULTS_DIR, eval_reports, list_requests, metrics, request_detail
 from app.orchestrator import process_request
 from app.transitions import TransitionConflict
 
@@ -23,6 +26,13 @@ Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max
 Reason = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
 ReplyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1500)]
 Sessions = Annotated[async_sessionmaker[AsyncSession], Depends(get_sessionmaker)]
+
+
+def get_results_dir() -> Path:
+    return RESULTS_DIR
+
+
+ResultsDir = Annotated[Path, Depends(get_results_dir)]
 
 
 class _Body(BaseModel):
@@ -41,6 +51,34 @@ class EditAndApproveBody(_Body):
 class RejectBody(_Body):
     staff_name: Name
     reason: Reason
+
+
+@router.get("/requests")
+async def requests(
+    sessions: Sessions, limit: Annotated[int, Query(ge=1, le=200)] = 50
+) -> list[dict[str, Any]]:
+    async with sessions() as session:
+        return await list_requests(session, limit)
+
+
+@router.get("/requests/{request_id}")
+async def request(request_id: uuid.UUID, sessions: Sessions) -> dict[str, Any]:
+    async with sessions() as session:
+        try:
+            return await request_detail(session, request_id)
+        except LookupError as exc:
+            raise HTTPException(status_code=404, detail="booking request not found") from exc
+
+
+@router.get("/metrics")
+async def get_metrics(sessions: Sessions) -> dict[str, Any]:
+    async with sessions() as session:
+        return await metrics(session)
+
+
+@router.get("/evals")
+async def evals(results_dir: ResultsDir) -> list[dict[str, Any]]:
+    return eval_reports(results_dir)
 
 
 @router.get("/reviews")
