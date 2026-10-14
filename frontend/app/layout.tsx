@@ -25,6 +25,7 @@ const NAV = [
   { href: "/reviews", label: "Review queue" },
   { href: "/metrics", label: "Metrics" },
   { href: "/evals", label: "Evals" },
+  { href: "/build", label: "How it was built" },
 ] as const;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
