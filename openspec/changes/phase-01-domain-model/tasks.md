@@ -15,7 +15,7 @@
 ## 3. Booking domain schema
 
 - [x] 3.1 Add `app/enums.py` (Species, Service, SizeClass, plus later enums) and ORM models for facilities, owners, pets, vaccine rules, vaccine records, kennels, and reservations. Verify with `uv run ruff check` and that the models import.
-- [ ] 3.2 Initialize Alembic with the async template and write the first migration: the `btree_gist` extension, all booking-domain tables, the generated `size_class` column, the reservation exclusion constraint, and every CHECK and unique constraint. Verify that a fresh test session runs the downgrade/upgrade round trip.
+- [x] 3.2 Initialize Alembic with the async template and write the first migration: the `btree_gist` extension, all booking-domain tables, the generated `size_class` column, the reservation exclusion constraint, and every CHECK and unique constraint. Verify that a fresh test session runs the downgrade/upgrade round trip.
 - [ ] 3.3 Add the facility time-zone validator. Verify with `tests/test_booking_domain.py`, covering every booking-domain scenario (owner/species/weight rejection, size-class boundaries and recompute, invalid time zone, per-service rules, duplicate rule, vaccine record dates, kennel size class, overlap/back-to-back/different-kennel/zero-night reservations, one reservation per request).
 
 ## 4. Lifecycle guard
