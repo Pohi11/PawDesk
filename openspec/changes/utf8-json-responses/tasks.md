@@ -2,7 +2,7 @@
 
 ## 1. Pin the path
 
-- [ ] 1.1 Add regression tests for non-ASCII model text: an orchestration test where the resolver proposes an offer with an en dash sent as raw UTF-8, read back from the saved step and its span, and a cassette test that records and replays an en dash. Verify both pass on the current code, which shows the model client, resolver, and database keep the text.
+- [x] 1.1 Add regression tests for non-ASCII model text: an orchestration test where the resolver proposes an offer with an en dash sent as raw UTF-8, read back from the saved step and its span, and a cassette test that records and replays an en dash. Verify both pass on the current code, which shows the model client, resolver, and database keep the text.
 
 ## 2. Declare the charset
 
