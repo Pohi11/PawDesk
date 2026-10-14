@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-10-14T23:27:49+00:00",
+ "generated_at": "2026-10-14T23:27:58+00:00",
  "reports": {
   "backend": "2026-10-14T17:58:07.256171-05:00",
   "frontend": "2026-10-14T23:27:35.307Z",
   "e2e": "2026-10-14T23:27:40.032Z"
  },
  "totals": {
-  "changes": 15,
-  "requirements": 125,
-  "verified": 125,
+  "changes": 16,
+  "requirements": 126,
+  "verified": 126,
   "tests": {
    "backend": 858,
    "frontend": 39,
@@ -1821,6 +1821,60 @@
      "capability": "run-dashboard",
      "kind": "modified",
      "name": "The backend is reached only through an allowlisted proxy"
+    }
+   ],
+   "decisions": []
+  },
+  {
+   "id": "2026-10-14-path-step-tooltips",
+   "slug": "path-step-tooltips",
+   "title": "Path step tooltips",
+   "date": "2026-10-14",
+   "archived_at": null,
+   "why": "The run view's path shows nine steps with a status each (\"Done\", \"Skipped\", \"Working\"), but not what a step is for or what it found. A reader has to know the architecture already, or open the inspector and read raw JSON. The path should explain itself at a glance:\n- **What the step does,** in one sentence, for someone seeing the desk for the first time.\n- **What it found in this run,** in one line: what intake read, which vaccine failed, which kennel was free, who approved.",
+   "what_changes": "- **Hovering or focusing a step** in the path shows a tooltip with what the step does and, once it has run, a short summary of its result for this request.\n- **Steps that haven't run, or were skipped,** say so and why, where the request shows it.\n- **The summary is built from the request already loaded.** No new requests and no new API fields. It updates live with the run.\n- **Steps become buttons:** keyboard users can tab to a step, read the same tooltip, and open it in the inspector with Enter.",
+   "tasks": [
+    {
+     "title": "1. Summaries",
+     "items": [
+      {
+       "id": "1.1",
+       "done": true,
+       "text": "Add `lib/step-summary.ts` with `stepSummary(id, status, detail)`. Verify with spec-tagged unit tests: every step's description, results for a clean run, an expired vaccine, no free kennel, a skipped resolver, a review by staff, waiting and running steps, and missing fields falling back to plain text."
+      }
+     ]
+    },
+    {
+     "title": "2. Path",
+     "items": [
+      {
+       "id": "2.1",
+       "done": true,
+       "text": "Give the path a custom step node (a button), the tooltip outside React Flow, and Escape to hide it, and pass the request detail from the run view. Verify with an end-to-end test that hovers and focuses a step on the clean sample's run, then lint, type check, and build."
+      },
+      {
+       "id": "2.2",
+       "done": true,
+       "text": "Try it for real in a browser on runs with different outcomes. Verify with screenshots of the tooltip near the graph's edges and at phone width."
+      }
+     ]
+    },
+    {
+     "title": "3. Integration",
+     "items": [
+      {
+       "id": "3.1",
+       "done": true,
+       "text": "Run every suite and the coverage check, then regenerate the walkthrough."
+      }
+     ]
+    }
+   ],
+   "requirements": [
+    {
+     "capability": "run-dashboard",
+     "kind": "added",
+     "name": "Path steps explain themselves"
     }
    ],
    "decisions": []
@@ -8887,6 +8941,78 @@
        "id": "lib/demo.test.ts::a failed generation says so",
        "status": "passed",
        "seconds": 0.0023443
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "Path steps explain themselves",
+     "text": "Hovering or focusing a step in the run view's path SHALL show a tooltip with what the step does and, once the step has run, a one-line summary of its result for this request. A step that is skipped or has not run SHALL say so. The summary SHALL come only from the request detail already loaded, and SHALL update as the run does.",
+     "scenarios": [
+      {
+       "name": "A finished step",
+       "steps": [
+        "**WHEN** the visitor hovers the Compliance step of a request whose Bordetella record expired before the stay",
+        "**THEN** the tooltip says what the compliance check does, and that Bordetella expired"
+       ]
+      },
+      {
+       "name": "A step that did not run",
+       "steps": [
+        "**WHEN** the visitor hovers the Staff review step of a request sent without review",
+        "**THEN** the tooltip says what staff review is for, and that this request did not need it"
+       ]
+      },
+      {
+       "name": "Keyboard",
+       "steps": [
+        "**WHEN** the visitor tabs to a step",
+        "**THEN** the same tooltip is shown and announced as the step's description, Escape hides it, and Enter opens the step in the inspector"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "frontend",
+       "id": "lib/step-summary.test.ts::every step says what it does, whatever its status",
+       "status": "passed",
+       "seconds": 0.0055689
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/step-summary.test.ts::a clean run says what each step found",
+       "status": "passed",
+       "seconds": 0.0005211
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/step-summary.test.ts::a failing vaccine and a full kennel are named",
+       "status": "passed",
+       "seconds": 0.000454
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/step-summary.test.ts::the resolver, the reply, and staff review report this run",
+       "status": "passed",
+       "seconds": 0.000513
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/step-summary.test.ts::skipped and unchecked steps say why",
+       "status": "passed",
+       "seconds": 0.0004104
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/step-summary.test.ts::missing or odd fields fall back to plain text, never the message",
+       "status": "passed",
+       "seconds": 0.0006529
+      },
+      {
+       "suite": "e2e",
+       "id": "demo.spec.ts::hovering or focusing a step explains it and what it found",
+       "status": "passed",
+       "seconds": 1.77
       }
      ],
      "status": "verified"
