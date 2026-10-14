@@ -6,7 +6,7 @@
 
 ## 2. Resolver
 
-- [ ] 2.1 Add `resolution_scope()` (eligibility) and the prompt builder in `app/resolver.py` and `app/prompts/resolver.py`. Verify with `tests/test_resolver.py` for: full nights eligible, unknown pet, suspected injection, `unknown_expiry` not attempted; and a test that the customer's message text never appears in the prompt.
+- [x] 2.1 Add `resolution_scope()` (eligibility) and the prompt builder in `app/resolver.py` and `app/prompts/resolver.py`. Verify with `tests/test_resolver.py` for: full nights eligible, unknown pet, suspected injection, `unknown_expiry` not attempted; and a test that the customer's message text never appears in the prompt.
 - [ ] 2.2 Implement the four tools with bound context and validated arguments. Verify with database tests: alternative dates three days later, an expired bordetella window, kennel sizes with medium full and large free, an invalid date range, a smaller kennel refused.
 - [ ] 2.3 Implement the loop with the stuck guard, the step limits, unknown-tool and invalid-argument handling, and verification of the proposal. Verify with scripted model turns: proposal after two calls, a repeated call stuck with no further model call, exactly 6 calls at the step limit, no proposal, `approve_booking` answered as unknown, verified and unverified options.
 
