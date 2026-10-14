@@ -21,4 +21,4 @@
 
 ## 5. Integration
 
-- [ ] 5.1 Run every check, including the end-to-end tests and the walkthrough check over three reports. Regenerate the walkthrough.
+- [x] 5.1 Run every check, including the end-to-end tests and the walkthrough check over three reports. Regenerate the walkthrough.
