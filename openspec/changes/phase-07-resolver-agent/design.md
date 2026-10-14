@@ -88,6 +88,7 @@ Each option is stored as `{..., verified: bool, remaining_problems: [...]}`, whe
 ### D7. Orchestration and durability
 - `STEPS[State.RESOLVING] = _resolve`.
 - The step loads the saved results, runs eligibility and then (maybe) the loop inside a `resolve` span, and saves `resolution` with `resolving → drafting` in one transaction (decision record 0009).
+- No session is held while the model works, as in extraction. The loop receives a session factory, and each tool call and the final verification open a short session of their own. A single session held across up to six model calls would leave a connection idle in an open transaction for the whole run.
 - The new step name `resolution` needs a migration for the step CHECK constraint.
 - **Failures:** `LLMError` → `failed` (failed step `resolving`), and the next run retries. A crash mid-loop repeats the loop (cost, not correctness, the same trade-off as extraction).
 - **Finished** now means `drafting` and beyond.

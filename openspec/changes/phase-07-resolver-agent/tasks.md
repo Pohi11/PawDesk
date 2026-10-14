@@ -16,7 +16,7 @@
 
 ## 4. Decision and real runs
 
-- [ ] 4.1 Write [decision record 0010](../../../docs/decisions/0010-bounded-proposal-only-resolver.md). Verify it exists and that design D1 links to it.
+- [x] 4.1 Write [decision record 0010](../../../docs/decisions/0010-bounded-proposal-only-resolver.md). Verify it exists and that design D1 links to it.
 - [ ] 4.2 Real runs from the command line: a Biscuit boarding request whose nights are full for every medium kennel (fill them with reservations in the dev database), and the existing Moose request left in `resolving` (expired bordetella). Verify by recording each outcome, the proposal and its verification, turns, tool calls, and cost.
 
 ## 5. Integration
