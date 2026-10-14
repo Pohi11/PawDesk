@@ -61,7 +61,7 @@ Cases live in `evals/comparison_cases.json`: an id, the owner's email, the messa
 - **Execution:** cases run one at a time, with both architectures on each case, to avoid rate-limit interference.
 
 ### D5. The conclusion
-It is recorded in [decision record 0015](../../../docs/decisions/0015-hybrid-over-autonomous-measured.md), written after the run, from the measured numbers only.
+It is recorded in [decision record 0015](../../../../docs/decisions/0015-hybrid-over-autonomous-measured.md), written after the run, from the measured numbers only.
 
 ## Risks / Trade-offs
 

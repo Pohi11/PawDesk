@@ -13,7 +13,7 @@
 ## 3. Real run and conclusion
 
 - [x] 3.1 Run the comparison for real over the whole set. Verify by committing the report and recording the numbers.
-- [x] 3.2 Write [decision record 0015](../../../docs/decisions/0015-hybrid-over-autonomous-measured.md) from the measured results. Verify it exists and that design D5 links to it.
+- [x] 3.2 Write [decision record 0015](../../../../docs/decisions/0015-hybrid-over-autonomous-measured.md) from the measured results. Verify it exists and that design D5 links to it.
 
 ## 4. Integration
 
