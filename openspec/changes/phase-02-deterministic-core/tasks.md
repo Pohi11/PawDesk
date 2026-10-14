@@ -7,8 +7,8 @@
 
 ## 2. Vaccine compliance (pure)
 
-- [ ] 2.1 Write `tests/test_compliance.py`: the boundary table (expiry Mar 5/6/8/9/10 for a Mar 6–9 stay; given Mar 7), day service on the expiry date, booster and unknown-expiry combinations, the precedence order, every outcome rule, extra records ignored, and end-before-start rejected. Verify that it collects and fails against a stub.
-- [ ] 2.2 Implement `app/compliance.py` (value types, `check()`). Verify that `tests/test_compliance.py` passes in full.
+- [x] 2.1 Write `tests/test_compliance.py`: the boundary table (expiry Mar 5/6/8/9/10 for a Mar 6–9 stay; given Mar 7), day service on the expiry date, booster and unknown-expiry combinations, the precedence order, every outcome rule, extra records ignored, and end-before-start rejected. Verify that it collects and fails against a stub.
+- [x] 2.2 Implement `app/compliance.py` (value types, `check()`). Verify that `tests/test_compliance.py` passes in full.
 
 ## 3. Compliance loader
 
