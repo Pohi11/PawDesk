@@ -6,7 +6,7 @@ from textwrap import dedent
 
 import pytest
 
-from scripts.walkthrough import Sources, build, main, problems
+from scripts.walkthrough import Sources, build, humanize, main, problems
 
 spec = pytest.mark.spec
 MARKER = "PRIVATE-MARKER-7f3a"
@@ -284,3 +284,9 @@ def test_requirements_of_an_unarchived_change_must_be_covered_too(repo, capsys):
     assert problems(sources(repo), build(sources(repo))) == [
         "untested (pending change): beta: Beta works"
     ]
+
+
+def test_titles_read_naturally():
+    assert humanize("phase-03-llm-tracing") == "Phase 3 · LLM tracing"
+    assert humanize("phase-09b-build-walkthrough") == "Phase 9b · Build walkthrough"
+    assert humanize("certificate-benchmark-v2") == "Certificate benchmark v2"

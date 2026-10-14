@@ -14,6 +14,7 @@ docs/private/ are never opened.
 import argparse
 import json
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -98,12 +99,48 @@ def delta_requirements(markdown: str) -> dict[str, list[str]]:
     return grouped
 
 
+ACRONYMS = {"llm": "LLM", "api": "API", "sse": "SSE"}
+
+
+def _words(text: str) -> str:
+    words = text.split("-")
+    words = [ACRONYMS.get(w, w) for w in words]
+    first = words[0] if words[0].isupper() else words[0].capitalize()
+    return " ".join([first, *words[1:]])
+
+
 def humanize(slug: str) -> str:
     phase = re.match(r"phase-(\d+)([a-z]?)-(.*)", slug)
     if phase:
         number, suffix, rest = phase.groups()
-        return f"Phase {int(number)}{suffix} · {rest.replace('-', ' ').capitalize()}"
-    return slug.replace("-", " ").capitalize()
+        return f"Phase {int(number)}{suffix} · {_words(rest)}"
+    return _words(slug)
+
+
+def archived_at(folder: Path) -> str | None:
+    """When the change was archived: the commit that first added files at this path. Several
+    changes can be archived on one day, and only the commit order says which came first."""
+    try:
+        out = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(folder),
+                "log",
+                "--no-renames",
+                "--diff-filter=A",
+                "--format=%cI",
+                "--",
+                ".",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=30,
+        ).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return min(out) if out else None
 
 
 # --- Sources ----------------------------------------------------------------------------
@@ -126,6 +163,7 @@ def changes(src: Sources) -> list[dict[str, Any]]:
                 "slug": slug,
                 "title": humanize(slug),
                 "date": date,
+                "archived_at": archived_at(folder),
                 "why": section(proposal, "Why"),
                 "what_changes": section(proposal, "What Changes"),
                 "tasks": _tasks(tasks),
@@ -133,7 +171,8 @@ def changes(src: Sources) -> list[dict[str, Any]]:
                 "decisions": sorted(set(DECISION_LINK.findall(proposal + design + tasks))),
             }
         )
-    return sorted(result, key=lambda c: (c["date"], c["id"]))
+    # Commit order where git knows it; otherwise the date in the folder name.
+    return sorted(result, key=lambda c: (c["archived_at"] or f"{c['date']}T99", c["id"]))
 
 
 def _tasks(markdown: str) -> list[dict[str, Any]]:

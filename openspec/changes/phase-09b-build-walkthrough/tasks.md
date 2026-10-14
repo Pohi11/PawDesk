@@ -7,7 +7,7 @@
 
 ## 2. Pages
 
-- [ ] 2.1 Add `lib/walkthrough.ts` (anchors and links) with unit tests for stable, distinct anchors and change-to-requirement links. Add `react-markdown`, then build `/build`, `/build/specs`, and `/build/decisions`, plus a nav link. Verify that lint, the type check, the tests, and the build pass.
+- [x] 2.1 Add `lib/walkthrough.ts` (anchors and links) with unit tests for stable, distinct anchors and change-to-requirement links. Add `react-markdown`, then build `/build`, `/build/specs`, and `/build/decisions`, plus a nav link. Verify that lint, the type check, the tests, and the build pass.
 
 ## 3. Decision and real data
 
