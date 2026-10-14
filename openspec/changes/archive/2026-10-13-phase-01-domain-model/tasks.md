@@ -4,13 +4,13 @@
 
 - [x] 1.1 Add `sqlalchemy[asyncio]`, `alembic`, and `pytest-asyncio` to the backend. Verify with `uv sync` and `uv run python -c "import sqlalchemy, alembic"`.
 - [x] 1.2 Add `app/db.py`: an async engine and session factory built from `DATABASE_URL`, rewriting the scheme to `postgresql+psycopg://`. Verify with `tests/test_db.py::test_engine_executes_select_1`.
-- [x] 1.3 Write [decision record 0003](../../../docs/decisions/0003-async-database-access.md) (async database access). Verify the file exists and that design D1 links to it.
+- [x] 1.3 Write [decision record 0003](../../../../docs/decisions/0003-async-database-access.md) (async database access). Verify the file exists and that design D1 links to it.
 
 ## 2. Test infrastructure and traceability
 
 - [x] 2.1 Add the `pawdesk_test` database fixture. It creates the database if missing, runs `alembic downgrade base` then `alembic upgrade head`, and gives each test a session inside a transaction that is rolled back afterward. Verify with `tests/test_isolation.py`: a row committed in one test is absent in the next.
 - [x] 2.2 Register the `spec(capability, requirement)` pytest marker and add a `conftest.py` hook that writes it into JUnit XML properties. Verify that `uv run pytest --junitxml=…` output contains the marker properties for a marked test.
-- [x] 2.3 Write [decision record 0004](../../../docs/decisions/0004-spec-test-traceability.md) (spec-to-test traceability). Verify the file exists and that design D13 links to it.
+- [x] 2.3 Write [decision record 0004](../../../../docs/decisions/0004-spec-test-traceability.md) (spec-to-test traceability). Verify the file exists and that design D13 links to it.
 
 ## 3. Booking domain schema
 
