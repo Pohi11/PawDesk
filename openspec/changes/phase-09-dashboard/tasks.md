@@ -16,8 +16,8 @@
 ## 3. Decision and real run
 
 - [x] 3.1 Write [decision record 0013](../../../docs/decisions/0013-live-updates-sse-from-database.md). Verify it exists and that design D1 links to it.
-- [ ] 3.2 Real demo in a browser: submit the clean and injection samples from the demo page, watch both live, approve the flagged one from the review page. Verify with screenshots and by recording the outcomes.
+- [x] 3.2 Real demo in a browser: submit the clean and injection samples from the demo page, watch both live, approve the flagged one from the review page. Verify with screenshots and by recording the outcomes.
 
 ## 4. Integration
 
-- [ ] 4.1 Run the backend suite, the frontend tests, lint, type check, build, `alembic check`, and the spec-coverage check over both JUnit reports. Verify all pass and every requirement in this change has a linked test.
+- [x] 4.1 Run the backend suite, the frontend tests, lint, type check, build, `alembic check`, and the spec-coverage check over both JUnit reports. Verify all pass and every requirement in this change has a linked test.
