@@ -21,7 +21,7 @@
 
 ## 5. Integration
 
-- [ ] 5.1 Run the full suite, lint, and the spec-coverage check. Verify that `uv run pytest` and ruff pass, and that every requirement in this change has at least one test with a matching `spec` marker.
+- [x] 5.1 Run the full suite, lint, and the spec-coverage check. Verify that `uv run pytest` and ruff pass, and that every requirement in this change has at least one test with a matching `spec` marker.
 
 ## Workflow follow-up
 
