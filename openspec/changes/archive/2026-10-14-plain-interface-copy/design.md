@@ -4,7 +4,7 @@
 
 - **Where the copy lives.** The dashboard's text is spread across about fifteen files: page intros in `app/*/page.tsx`, labels and state names in `components/ui.tsx`, outcome sentences in `lib/story.ts`, eval and comparison labels in `app/evals/page.tsx` and `lib/comparison.ts`. The Try page also shows each demo sample's `title` and `expect`, which come from `backend/app/demo.py`.
 - **What tests pin it.** The end-to-end demo test matches several strings exactly, such as "Send and watch it run" and "Waiting for you: message contains instruction-like text." `lib/story.test.ts` matches the outcome sentences. The README's GIF is built from the end-to-end test's frames, so new wording means a new GIF.
-- **Traceability.** Frontend tests carry `[spec <capability>: <requirement>]` in their names ([0012](../../../docs/decisions/0012-frontend-test-traceability.md)), and backend tests use the `spec` marker ([0004](../../../docs/decisions/0004-spec-test-traceability.md)).
+- **Traceability.** Frontend tests carry `[spec <capability>: <requirement>]` in their names ([0012](../../../../docs/decisions/0012-frontend-test-traceability.md)), and backend tests use the `spec` marker ([0004](../../../../docs/decisions/0004-spec-test-traceability.md)).
 - **Generated text.** The build walkthrough renders specs and decision records. Decision records are never rewritten, so their text stays out of scope.
 
 ## Goals / Non-Goals
@@ -22,7 +22,7 @@
 
 ### D1. The rules: a guide for judgment, a list for the build
 
-The rules are adapted from the MIT-licensed checklist at github.com/hardikpandya/stop-slop and split by who can apply them:
+Decision record [0018](../../../../docs/decisions/0018-plain-voice-for-interface-copy.md) records this choice. The rules are adapted from the MIT-licensed checklist at github.com/hardikpandya/stop-slop and split by who can apply them:
 
 | Rule | Applied by |
 |---|---|
