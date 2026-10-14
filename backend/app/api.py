@@ -5,18 +5,31 @@ No sign-in yet: the staff member's name is taken from the request body. Authenti
 belongs to the deployment work, before this API is reachable by anyone else.
 """
 
+import asyncio
+import json
 import uuid
+from collections.abc import AsyncIterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.approvals import NotWaiting, decide, review_queue
 from app.db import get_sessionmaker
 from app.enums import ApprovalAction
-from app.observability import RESULTS_DIR, eval_reports, list_requests, metrics, request_detail
+from app.observability import (
+    RESULTS_DIR,
+    eval_reports,
+    is_resting,
+    list_requests,
+    metrics,
+    request_detail,
+    snapshot,
+)
 from app.orchestrator import process_request
 from app.transitions import TransitionConflict
 
@@ -33,6 +46,19 @@ def get_results_dir() -> Path:
 
 
 ResultsDir = Annotated[Path, Depends(get_results_dir)]
+
+
+@dataclass(frozen=True)
+class StreamTiming:
+    poll_seconds: float = 0.5
+    limit_seconds: float = 300.0
+
+
+def get_stream_timing() -> StreamTiming:
+    return StreamTiming()
+
+
+Timing = Annotated[StreamTiming, Depends(get_stream_timing)]
 
 
 class _Body(BaseModel):
@@ -68,6 +94,43 @@ async def request(request_id: uuid.UUID, sessions: Sessions) -> dict[str, Any]:
             return await request_detail(session, request_id)
         except LookupError as exc:
             raise HTTPException(status_code=404, detail="booking request not found") from exc
+
+
+@router.get("/requests/{request_id}/events")
+async def events(request_id: uuid.UUID, sessions: Sessions, timing: Timing) -> StreamingResponse:
+    """Server-sent events: a snapshot now and whenever the state or a span changes, until
+    the request is resting with nothing running (decision record 0013).
+
+    The run may be happening in another process (the command line), so the stream reads
+    the database, which every process writes to, rather than listening in memory.
+    """
+    async with sessions() as session:
+        try:
+            await snapshot(session, request_id)  # 404 before the stream starts
+        except LookupError as exc:
+            raise HTTPException(status_code=404, detail="booking request not found") from exc
+
+    async def stream() -> AsyncIterator[str]:
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timing.limit_seconds
+        last = None
+        while True:
+            async with sessions() as session:
+                snap = await snapshot(session, request_id)
+            data = json.dumps(snap, sort_keys=True)
+            if data != last:
+                yield f"event: snapshot\ndata: {data}\n\n"
+                last = data
+            if is_resting(snap) or loop.time() >= deadline:
+                break
+            await asyncio.sleep(timing.poll_seconds)
+        yield "event: end\ndata: {}\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @router.get("/metrics")

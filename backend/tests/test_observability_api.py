@@ -1,12 +1,13 @@
 """Spec: observability-api, through the FastAPI app against a real database."""
 
+import asyncio
 import json
 from decimal import Decimal
 
 import httpx
 import pytest
 
-from app.api import get_results_dir
+from app.api import StreamTiming, get_results_dir, get_stream_timing
 from app.db import get_sessionmaker
 from app.documents import attach_certificate
 from app.llm import RetryPolicy, make_client
@@ -192,3 +193,72 @@ async def test_real_results_folder_is_readable(api):
     reports = (await api.get("/evals")).json()
 
     assert {r["kind"] for r in reports} >= {"intake", "records"}
+
+
+# --- Run progress streams as server-sent events -----------------------------------------
+
+
+def parse_events(text: str) -> list[tuple[str, dict]]:
+    events = []
+    for block in text.strip().split("\n\n"):
+        fields = dict(line.split(": ", 1) for line in block.splitlines())
+        events.append((fields["event"], json.loads(fields["data"])))
+    return events
+
+
+@pytest.fixture
+def fast_stream():
+    app.dependency_overrides[get_stream_timing] = lambda: StreamTiming(0.02, 10.0)
+    yield
+
+
+@spec("observability-api", "Run progress streams as server-sent events")
+async def test_progress_then_end(api, committed, desk, tracer, fast_stream):
+    async with committed() as s:
+        request = BookingRequest(
+            facility_id=desk.facility_id, owner_id=desk.owner_id, raw_message="Can Biscuit board?"
+        )
+        s.add(request)
+        await s.flush()
+        await attach_certificate(s, request.id, PNG)
+        await s.commit()
+    settings = fake_settings()
+
+    async def process():
+        await asyncio.sleep(0.1)  # let the stream open first
+        await process_request(
+            request.id,
+            sessions=committed,
+            tracer=tracer,
+            today=TODAY,
+            client=make_client(settings, transport=httpx.MockTransport(FakeModel(delay=0.2))),
+            settings=settings,
+            policy=RetryPolicy(max_attempts=1),
+        )
+
+    response, _ = await asyncio.gather(api.get(f"/requests/{request.id}/events"), process())
+
+    assert response.headers["content-type"].startswith("text/event-stream")
+    events = parse_events(response.text)
+    snapshots = [data for kind, data in events if kind == "snapshot"]
+    assert events[-1][0] == "end"
+    assert snapshots[0]["status"] == "received"
+    assert any(any(s["status"] == "running" for s in snap["spans"]) for snap in snapshots)
+    assert snapshots[-1]["status"] == "sent"
+    assert "input" not in snapshots[-1]["spans"][0]  # light snapshots, no payloads
+
+
+@spec("observability-api", "Run progress streams as server-sent events")
+async def test_resting_request_gets_one_snapshot(api, run, fast_stream):
+    request_id = await run()
+
+    events = parse_events((await api.get(f"/requests/{request_id}/events")).text)
+
+    assert [kind for kind, _ in events] == ["snapshot", "end"]
+    assert events[0][1]["status"] == "sent"
+
+
+async def test_events_for_unknown_request_is_404(api):
+    response = await api.get("/requests/00000000-0000-0000-0000-000000000000/events")
+
+    assert response.status_code == 404
