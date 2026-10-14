@@ -112,8 +112,8 @@ export function RunView({ initial }: { initial: RequestDetail }) {
           </span>
         }
       >
-        <RunGraph statuses={statuses} onSelect={selectNode} />
-        <p className="mt-2 text-sm text-faint">Select a step to see exactly what it was given and what it returned.</p>
+        <RunGraph statuses={statuses} detail={detail} onSelect={selectNode} />
+        <p className="mt-2 text-sm text-faint">Point at a step for a summary, or select it to see exactly what it was given and what it returned.</p>
       </Panel>
 
       <div className="grid gap-6 lg:grid-cols-5">
