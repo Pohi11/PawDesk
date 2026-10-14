@@ -32,7 +32,7 @@ Stay dates are calendar `date`s in the facility's time zone:
 - Kennel nights are `[start, end)`.
 - `expires_on` is the last valid day, inclusive.
 
-Converting an instant to a date happens once, at the boundary, using the facility's time zone. This affects the records-extraction and reply steps too, so it is recorded as [decision record 0005](../../../docs/decisions/0005-stay-date-semantics.md).
+Converting an instant to a date happens once, at the boundary, using the facility's time zone. This affects the records-extraction and reply steps too, so it is recorded as [decision record 0005](../../../../docs/decisions/0005-stay-date-semantics.md).
 - *Alternatives:* treating `expires_on` as the first invalid day (the opposite of how certificates are read), or storing stays as timestamps (that adds check-in hours and time-zone arithmetic to every comparison, for no benefit at day granularity).
 
 ### D2. Plain value types at the boundary of the pure check
