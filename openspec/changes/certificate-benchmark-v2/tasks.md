@@ -8,7 +8,7 @@
 ## 2. Evaluation
 
 - [x] 2.1 Add a version argument to `scripts/eval_records.py` (default `v2`) and a pure `build_report()` that records the benchmark version. Verify with `tests/test_records_eval.py` (report names `v2`; the default is v2).
-- [ ] 2.2 Run `uv run python -m scripts.eval_records` against the real model on v2. Verify that the report is written and that the measured totals are recorded (not estimated).
+- [x] 2.2 Run `uv run python -m scripts.eval_records` against the real model on v2. Verify that the report is written and that the measured totals are recorded (not estimated).
 
 ## 3. Integration
 
