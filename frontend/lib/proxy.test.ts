@@ -63,3 +63,32 @@ specTest("run-dashboard", REQ, "a refused path never contacts the backend", asyn
   expect([refused.status, deleted.status]).toEqual([404, 404]);
   expect(fetchMock).not.toHaveBeenCalled();
 });
+
+specTest("run-dashboard", REQ, "demo previews and certificate images are allowed", () => {
+  expect(allowedPath("GET", ["demo", "generate"])).toBe("demo/generate");
+  expect(allowedPath("GET", ["demo", "generated", "42", "certificate.png"])).toBe(
+    "demo/generated/42/certificate.png",
+  );
+  expect(allowedPath("GET", ["demo", "samples", "injection", "certificate.png"])).toBe(
+    "demo/samples/injection/certificate.png",
+  );
+  expect(allowedPath("GET", ["demo", "generated", "x", "certificate.png"])).toBeNull();
+  expect(allowedPath("GET", ["demo", "generated", "42", "..", "certificate.png"])).toBeNull();
+  expect(allowedPath("POST", ["demo", "generate"])).toBeNull();
+});
+
+specTest("run-dashboard", REQ, "certificate images pass through unchanged", async () => {
+  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 255, 7]);
+  const fetchMock = vi.fn(async () => new Response(png, { headers: { "content-type": "image/png" } }));
+  vi.stubGlobal("fetch", fetchMock);
+
+  const response = await GET(
+    new NextRequest("http://dash/api/demo/generated/42/certificate.png"),
+    ctx(["demo", "generated", "42", "certificate.png"]),
+  );
+
+  expect(response.headers.get("content-type")).toBe("image/png");
+  expect(new Uint8Array(await response.arrayBuffer())).toEqual(png);
+  const [url] = fetchMock.mock.calls[0] as unknown as [URL];
+  expect(url.pathname).toBe("/demo/generated/42/certificate.png");
+});
