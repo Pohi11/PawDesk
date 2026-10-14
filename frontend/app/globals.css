@@ -1,19 +1,63 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #18181b;
-}
+/*
+ * PawDesk tokens. Color carries meaning, never decoration:
+ *   signal orange  only where a person must act
+ *   kennel green   done, sent, passed
+ *   violet / blue / amber   model, code, and tool steps
+ */
+@theme {
+  --color-paper: #eef1ec;
+  --color-surface: #ffffff;
+  --color-ink: #1a2338;
+  --color-muted: #5f6b7a;
+  --color-faint: #8b95a3;
+  --color-rule: #d5dbd3;
+  --color-wash: #f6f8f5;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-kennel: #1f6f55;
+  --color-kennel-soft: #dcefe6;
+  --color-signal: #e4621b;
+  --color-signal-soft: #fde7da;
+  --color-model: #5847c2;
+  --color-model-soft: #e8e5fa;
+  --color-code: #2d5da8;
+  --color-code-soft: #e1eaf7;
+  --color-tool: #b7791f;
+  --color-tool-soft: #f6ead6;
+  --color-error: #c42b3e;
+  --color-error-soft: #f9dfe3;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "tnum" 1;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-code);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

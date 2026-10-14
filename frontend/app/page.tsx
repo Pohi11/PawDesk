@@ -1,98 +1,81 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { Loading, PageHeader, Stat, StatusBadge } from "@/components/ui";
+import { Loading, StateTag } from "@/components/ui";
 import { backendJson } from "@/lib/backend";
-import { formatCost } from "@/lib/format";
-import type { Metrics, RequestRow } from "@/lib/types";
+import { formatCost, formatService, formatStay } from "@/lib/format";
+import type { RequestRow } from "@/lib/types";
 
 export default function Home() {
   return (
-    <>
-      <PageHeader title="Requests">
-        Every booking request PawDesk has handled, newest first. Open one to see its run: which
-        steps ran, what each model was asked and answered, and what it cost.
-      </PageHeader>
-      {/* Live data: streamed in at request time behind Suspense (Cache Components). */}
-      <Suspense fallback={<Loading label="Loading requests…" />}>
-        <Overview />
-      </Suspense>
-    </>
+    <Suspense fallback={<Loading label="Loading requests" />}>
+      <Desk />
+    </Suspense>
   );
 }
 
-async function Overview() {
-  const [metrics, rows] = await Promise.all([
-    backendJson<Metrics>("/metrics"),
-    backendJson<RequestRow[]>("/requests?limit=50"),
-  ]);
-  const flagRate = metrics.flag_rate.rate;
+async function Desk() {
+  const rows = await backendJson<RequestRow[]>("/requests?limit=50");
+  const waiting = rows.filter((r) => r.status === "needs_review").length;
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Stat label="Requests" value={rows.length} hint="most recent 50" />
-        <Stat
-          label="Avg cost per request"
-          value={formatCost(metrics.cost.average_per_request_usd)}
-          hint={`total ${formatCost(metrics.cost.total_usd)}`}
-        />
-        <Stat
-          label="Median run"
-          value={metrics.run_seconds.p50 === null ? "—" : `${metrics.run_seconds.p50.toFixed(1)} s`}
-          hint={metrics.run_seconds.p95 === null ? undefined : `p95 ${metrics.run_seconds.p95.toFixed(1)} s`}
-        />
-        <Stat
-          label="Flagged for review"
-          value={flagRate === null ? "—" : `${Math.round(flagRate * 100)}%`}
-          hint={`${metrics.flag_rate.flagged} of ${metrics.flag_rate.drafted} drafted`}
-        />
-      </div>
+    <>
+      <section className="mb-12 flex flex-wrap items-end justify-between gap-6">
+        <div className="max-w-2xl">
+          <h1 className="text-4xl leading-[1.05] font-extrabold sm:text-5xl">
+            {waiting === 0
+              ? "Nothing is waiting for you."
+              : `${waiting} ${waiting === 1 ? "request is" : "requests are"} waiting for you.`}
+          </h1>
+          <p className="mt-3 text-lg text-muted">
+            {waiting === 0
+              ? "Every request so far was decided by the checks or already handled by staff."
+              : "Each one needs a person before anything is sent. The rest were decided by the checks."}
+          </p>
+        </div>
+        {waiting > 0 ? (
+          <Link href="/reviews" className="rounded-full bg-signal px-5 py-2.5 font-medium text-white hover:brightness-110">
+            Open the review queue
+          </Link>
+        ) : (
+          <Link href="/demo" className="rounded-full bg-ink px-5 py-2.5 font-medium text-white hover:brightness-125">
+            Try a request
+          </Link>
+        )}
+      </section>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500">
-            <tr>
-              <th className="px-4 py-2">Received</th>
-              <th className="px-4 py-2">Owner</th>
-              <th className="px-4 py-2">Pet</th>
-              <th className="px-4 py-2">Service</th>
-              <th className="px-4 py-2">Dates</th>
-              <th className="px-4 py-2">State</th>
-              <th className="px-4 py-2 text-right">Cost</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100">
-            {rows.map((row) => (
-              <tr key={row.id} className="hover:bg-zinc-50">
-                <td className="px-4 py-2 text-zinc-500">
-                  <Link href={`/requests/${row.id}`} className="hover:underline">
-                    {new Date(row.created_at).toLocaleString()}
-                  </Link>
-                </td>
-                <td className="px-4 py-2">{row.owner}</td>
-                <td className="px-4 py-2">{row.pet ?? <span className="text-zinc-400">unknown</span>}</td>
-                <td className="px-4 py-2">{row.service ?? "—"}</td>
-                <td className="px-4 py-2 tabular-nums">
-                  {row.start_date ? `${row.start_date} → ${row.end_date}` : "—"}
-                </td>
-                <td className="px-4 py-2">
-                  <StatusBadge status={row.status} />
-                  {row.flagged && <span className="ml-2 text-xs text-amber-700">flagged</span>}
-                </td>
-                <td className="px-4 py-2 text-right tabular-nums">{formatCost(row.cost_usd)}</td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-zinc-500">
-                  No requests yet. <Link href="/demo" className="underline">Submit a demo request</Link>.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      {rows.length === 0 ? (
+        <p className="text-muted">
+          No requests yet. <Link href="/demo" className="text-code underline">Send one from the demo</Link>{" "}
+          and watch it run.
+        </p>
+      ) : (
+        <ol className="divide-y divide-rule overflow-hidden rounded-2xl bg-surface ring-1 ring-rule">
+          {rows.map((row) => (
+            <li key={row.id}>
+              <Link
+                href={`/requests/${row.id}`}
+                className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-5 py-4 hover:bg-wash sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto_5rem]"
+              >
+                <div className="min-w-0">
+                  <div className="truncate font-display text-lg font-semibold">
+                    {row.pet ?? <span className="text-muted">Pet not on file</span>}
+                  </div>
+                  <div className="truncate text-sm text-muted">{row.owner}</div>
+                </div>
+                <div className="hidden text-sm sm:block">
+                  <div>{formatService(row.service)}</div>
+                  <div className="text-muted">{formatStay(row.start_date, row.end_date)}</div>
+                </div>
+                <div className="justify-self-end">
+                  <StateTag status={row.status} />
+                </div>
+                <div className="hidden text-right text-sm text-faint sm:block">{formatCost(row.cost_usd)}</div>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
   );
 }

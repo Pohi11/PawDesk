@@ -2,28 +2,31 @@ import Link from "next/link";
 
 import type { RequirementStatus } from "@/lib/walkthrough";
 
+const PAGES = [
+  { href: "/build", label: "Method and changes" },
+  { href: "/build/specs", label: "Requirements and tests" },
+  { href: "/build/decisions", label: "Decisions" },
+];
+
 export function BuildNav() {
   return (
-    <nav className="mb-6 flex gap-4 border-b border-zinc-200 pb-2 text-sm">
-      <Link href="/build" className="text-zinc-700 hover:text-zinc-950">
-        Method &amp; timeline
-      </Link>
-      <Link href="/build/specs" className="text-zinc-700 hover:text-zinc-950">
-        Specs &amp; tests
-      </Link>
-      <Link href="/build/decisions" className="text-zinc-700 hover:text-zinc-950">
-        Decisions
-      </Link>
+    <nav className="mb-10 flex flex-wrap gap-2">
+      {PAGES.map((p) => (
+        <Link key={p.href} href={p.href} className="rounded-full px-4 py-1.5 text-sm ring-1 ring-rule hover:bg-surface">
+          {p.label}
+        </Link>
+      ))}
     </nav>
   );
 }
 
-const STATUS: Record<RequirementStatus, string> = {
-  verified: "bg-emerald-100 text-emerald-800",
-  failing: "bg-red-100 text-red-800",
-  untested: "bg-amber-100 text-amber-800",
+const STATUS: Record<RequirementStatus, { label: string; style: string }> = {
+  verified: { label: "Proven", style: "bg-kennel-soft text-kennel" },
+  failing: { label: "Failing", style: "bg-error-soft text-error" },
+  untested: { label: "No test", style: "bg-signal-soft text-signal" },
 };
 
 export function RequirementBadge({ status }: { status: RequirementStatus }) {
-  return <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS[status]}`}>{status}</span>;
+  const { label, style } = STATUS[status];
+  return <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${style}`}>{label}</span>;
 }

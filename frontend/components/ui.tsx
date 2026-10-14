@@ -1,96 +1,119 @@
-// Small presentational pieces shared by server and client components (no hooks).
+// Shared presentational pieces (no hooks), usable from server and client components.
 
 import type { ReactNode } from "react";
 
 import type { NodeStatus } from "@/lib/graph";
 import type { SpanKind } from "@/lib/types";
 
-export const KIND_STYLE: Record<SpanKind, { label: string; dot: string; border: string }> = {
-  llm: { label: "model", dot: "bg-violet-500", border: "#8b5cf6" },
-  code: { label: "code", dot: "bg-sky-500", border: "#0ea5e9" },
-  tool: { label: "tool", dot: "bg-amber-500", border: "#f59e0b" },
-  human: { label: "human", dot: "bg-emerald-500", border: "#10b981" },
+export const KIND_STYLE: Record<SpanKind, { label: string; dot: string; color: string; soft: string }> = {
+  llm: { label: "Model", dot: "bg-model", color: "#5847c2", soft: "#e8e5fa" },
+  code: { label: "Code", dot: "bg-code", color: "#2d5da8", soft: "#e1eaf7" },
+  tool: { label: "Tool", dot: "bg-tool", color: "#b7791f", soft: "#f6ead6" },
+  human: { label: "Person", dot: "bg-signal", color: "#e4621b", soft: "#fde7da" },
 };
 
-export const NODE_STATUS_STYLE: Record<NodeStatus, { fill: string; text: string }> = {
-  waiting: { fill: "#f4f4f5", text: "#71717a" },
-  running: { fill: "#dbeafe", text: "#1d4ed8" },
-  ok: { fill: "#dcfce7", text: "#15803d" },
-  error: { fill: "#fee2e2", text: "#b91c1c" },
-  skipped: { fill: "#fafafa", text: "#a1a1aa" },
+export const NODE_STATUS_LABEL: Record<NodeStatus, string> = {
+  waiting: "Not yet",
+  running: "Working",
+  ok: "Done",
+  error: "Failed",
+  skipped: "Not needed",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  received: "bg-zinc-100 text-zinc-700",
-  extracting: "bg-blue-100 text-blue-800",
-  checking: "bg-blue-100 text-blue-800",
-  resolving: "bg-blue-100 text-blue-800",
-  drafting: "bg-blue-100 text-blue-800",
-  ready: "bg-sky-100 text-sky-800",
-  approved: "bg-sky-100 text-sky-800",
-  needs_review: "bg-amber-100 text-amber-800",
-  rejected: "bg-zinc-200 text-zinc-800",
-  sent: "bg-emerald-100 text-emerald-800",
-  failed: "bg-red-100 text-red-800",
+// What each request state means to the person at the desk.
+const STATE: Record<string, { label: string; tone: "work" | "act" | "done" | "fail" | "quiet" }> = {
+  received: { label: "Received", tone: "quiet" },
+  extracting: { label: "Reading", tone: "work" },
+  checking: { label: "Checking", tone: "work" },
+  resolving: { label: "Finding options", tone: "work" },
+  drafting: { label: "Writing reply", tone: "work" },
+  ready: { label: "Approved by checks", tone: "work" },
+  approved: { label: "Approved", tone: "work" },
+  needs_review: { label: "Waiting for you", tone: "act" },
+  rejected: { label: "Declined", tone: "quiet" },
+  sent: { label: "Sent", tone: "done" },
+  failed: { label: "Failed", tone: "fail" },
 };
 
-export function StatusBadge({ status }: { status: string }) {
+const TONE = {
+  work: "bg-code-soft text-code",
+  act: "bg-signal text-white",
+  done: "bg-kennel-soft text-kennel",
+  fail: "bg-error-soft text-error",
+  quiet: "bg-wash text-muted ring-1 ring-rule",
+} as const;
+
+export function stateLabel(status: string): string {
+  return STATE[status]?.label ?? status.replace("_", " ");
+}
+
+/** A request's state as a kennel ID tag: a small tag with a punched hole. */
+export function StateTag({ status }: { status: string }) {
+  const { label, tone } = STATE[status] ?? { label: status, tone: "quiet" as const };
   return (
     <span
-      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[status] ?? "bg-zinc-100 text-zinc-700"}`}
+      className={`inline-flex items-center gap-1.5 rounded-r-full rounded-l-md py-0.5 pr-2.5 pl-1.5 text-xs font-medium whitespace-nowrap ${TONE[tone]}`}
     >
-      {status.replace("_", " ")}
+      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-paper ring-1 ring-black/10" />
+      {label}
     </span>
   );
 }
 
 export function KindDot({ kind }: { kind: SpanKind }) {
-  return <span className={`inline-block h-2 w-2 rounded-full ${KIND_STYLE[kind].dot}`} />;
+  return <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${KIND_STYLE[kind].dot}`} />;
 }
 
-export function Card({
+export function Panel({
   title,
+  aside,
   children,
   className = "",
 }: {
   title?: ReactNode;
+  aside?: ReactNode;
   children: ReactNode;
   className?: string;
 }) {
   return (
-    <section className={`rounded-xl border border-zinc-200 bg-white p-4 shadow-sm ${className}`}>
-      {title && <h2 className="mb-3 text-sm font-semibold text-zinc-700">{title}</h2>}
+    <section className={`rounded-2xl bg-surface p-5 ring-1 ring-rule ${className}`}>
+      {(title || aside) && (
+        <div className="mb-4 flex items-baseline justify-between gap-4">
+          {title && <h2 className="text-lg font-semibold">{title}</h2>}
+          {aside && <div className="text-sm text-muted">{aside}</div>}
+        </div>
+      )}
       {children}
     </section>
   );
 }
 
-export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
+export function Figure({ label, value, note }: { label: string; value: ReactNode; note?: string }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-      <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</div>
-      <div className="mt-1 text-2xl font-semibold tabular-nums">{value}</div>
-      {hint && <div className="mt-1 text-xs text-zinc-500">{hint}</div>}
+    <div>
+      <div className="text-sm text-muted">{label}</div>
+      <div className="font-display text-3xl font-semibold">{value}</div>
+      {note && <div className="mt-0.5 text-sm text-faint">{note}</div>}
     </div>
   );
 }
 
-export function PageHeader({ title, children }: { title: string; children?: ReactNode }) {
+export function PageTitle({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="mb-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      {children && <p className="mt-1 max-w-3xl text-sm text-zinc-600">{children}</p>}
-    </div>
+    <header className="mb-8 max-w-2xl">
+      <h1 className="text-4xl font-bold">{title}</h1>
+      {children && <p className="mt-2 text-base leading-relaxed text-muted">{children}</p>}
+    </header>
   );
 }
 
-export function Loading({ label = "Loading…" }: { label?: string }) {
-  return <p className="animate-pulse text-sm text-zinc-500">{label}</p>;
+export function Loading({ label = "Loading" }: { label?: string }) {
+  return <p className="text-sm text-muted motion-safe:animate-pulse">{label}</p>;
 }
 
 export function Json({ value }: { value: unknown }) {
   return (
-    <pre className="max-h-80 overflow-auto rounded-lg bg-zinc-950 p-3 font-mono text-xs leading-relaxed text-zinc-100">
+    <pre className="max-h-80 overflow-auto rounded-lg bg-ink p-3 font-mono text-xs leading-relaxed text-white/90">
       {JSON.stringify(value, null, 2)}
     </pre>
   );
