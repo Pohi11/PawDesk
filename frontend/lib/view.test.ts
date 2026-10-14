@@ -181,7 +181,7 @@ specTest("run-dashboard", OPERATORS, "the span inspector shows tokens, dollars, 
 specTest("run-dashboard", OPERATORS, "submitting a demo sample opens its live run view", async () => {
   const fetchMock = vi.fn(async () => Response.json({ id: "abc" }, { status: 202 }));
 
-  const path = await submitDemo("injection", undefined, fetchMock as unknown as typeof fetch);
+  const path = await submitDemo({ sample: "injection" }, undefined, fetchMock as unknown as typeof fetch);
 
   expect(path).toBe("/requests/abc");
   const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];

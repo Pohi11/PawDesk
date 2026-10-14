@@ -668,6 +668,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "openai" },
+    { name = "pillow" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -677,7 +678,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "pillow" },
     { name = "playwright" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -692,6 +692,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.143.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "openai", specifier = ">=3.29.0" },
+    { name = "pillow", specifier = ">=12.3.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.6" },
     { name = "pydantic", specifier = ">=2.13" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
@@ -701,7 +702,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pillow", specifier = ">=12.3.0" },
     { name = "playwright", specifier = ">=1.64.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
