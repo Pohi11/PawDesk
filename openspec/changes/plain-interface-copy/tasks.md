@@ -2,7 +2,7 @@
 
 ## 1. Rules and checks
 
-- [ ] 1.1 Add `docs/style/copy-rules.json` (the banned list from design D2), `docs/style/interface-copy.md` (the guide with PawDesk examples and the three exceptions), and decision record `docs/decisions/0018-plain-voice-for-interface-copy.md`. Verify the JSON parses and every link in the guide and the record resolves.
+- [x] 1.1 Add `docs/style/copy-rules.json` (the banned list from design D2), `docs/style/interface-copy.md` (the guide with PawDesk examples and the three exceptions), and decision record `docs/decisions/0018-plain-voice-for-interface-copy.md`. Verify the JSON parses and every link in the guide and the record resolves.
 - [ ] 1.2 Add `frontend/tests/copy.test.ts` (syntax-tree scan, design D3), with fixture tests for each scenario: a banned word reported with file, line, and word; `justify-self-end` ignored; an em dash in a sentence reported; a lone "—" allowed. Leave the "current dashboard passes" test marked as expected to fail until task 2.3. Verify with `pnpm test`, which runs the fixture tests and lists today's findings.
 
 ## 2. Rewrite
