@@ -13,7 +13,13 @@ from scripts.seed import SeedRefused, run, seed, table_counts
 spec = pytest.mark.spec
 TODAY = date(2027, 3, 1)
 # Written by real runs (run-tracing, booking-orchestration), never by seed data.
-RUN_TABLES = {"traces", "spans", "booking_step_results", "booking_documents"}
+RUN_TABLES = {
+    "traces",
+    "spans",
+    "booking_step_results",
+    "booking_documents",
+    "outbound_messages",
+}
 
 
 @spec("seed-data", "Seeding loads a known synthetic dataset")

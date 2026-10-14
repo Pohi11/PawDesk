@@ -60,3 +60,4 @@ class Step(StrEnum):
     CHECKS = "checks"
     ROUTE = "route"
     RESOLUTION = "resolution"
+    REPLY = "reply"

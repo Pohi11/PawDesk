@@ -18,6 +18,7 @@ from app.models import (
     BookingRequest,
     BookingStepResult,
     BookingTransition,
+    OutboundMessage,
     Reservation,
     Span,
     Trace,
@@ -45,6 +46,11 @@ BORDETELLA = {
     "administered_on": "2026-09-01",
     "expires_on": "2027-09-01",
 }
+REPLY = {
+    "subject": "Biscuit's stay",
+    "body": "Hi Test, Biscuit's stay is confirmed for March 10 to March 14. The Test Lodge team",
+}
+ONE_DAY_REPLY = REPLY | {"body": "Hi Test, Biscuit is confirmed for March 10. The Test Lodge team"}
 CERTIFICATE = {
     "pet_name": "Biscuit",
     "records": [BORDETELLA],
@@ -55,7 +61,15 @@ CERTIFICATE = {
 
 
 # A request with nothing to resolve never reaches the resolution step.
-CLEAR_PATH = {Step.INTAKE, Step.RECORDS, Step.CHECKS, Step.ROUTE}
+CLEAR_PATH = {Step.INTAKE, Step.RECORDS, Step.CHECKS, Step.ROUTE, Step.REPLY}
+CLEAR_STATES = [
+    State.EXTRACTING,
+    State.CHECKING,
+    State.DRAFTING,
+    State.READY,
+    State.APPROVED,
+    State.SENT,
+]
 
 
 class FakeModel:
@@ -65,13 +79,16 @@ class FakeModel:
     answer of each kind repeats. By default the resolver replies with text and no tool
     call, so it escalates."""
 
-    def __init__(self, intake=INTENT, records=CERTIFICATE, resolver="No proposal.", delay=0.0):
+    def __init__(
+        self, intake=INTENT, records=CERTIFICATE, resolver="No proposal.", reply=REPLY, delay=0.0
+    ):
         self.answers = {
             "intake": _listed(intake),
             "records": _listed(records),
             "resolver": _listed(resolver),
+            "reply": _listed(reply),
         }
-        self.calls = {"intake": 0, "records": 0, "resolver": 0}
+        self.calls = {"intake": 0, "records": 0, "resolver": 0, "reply": 0}
         self.requests: list[httpx.Request] = []
         self.delay = delay
 
@@ -82,6 +99,8 @@ class FakeModel:
     async def __call__(self, request: httpx.Request) -> httpx.Response:
         if b'"tools"' in request.content:
             kind = "resolver"
+        elif b"reply_draft" in request.content:
+            kind = "reply"
         elif b"vaccine_certificate" in request.content:
             kind = "records"
         else:
@@ -249,7 +268,7 @@ async def test_certificate_for_another_pet(committed, submit, process):
     results = await saved(committed, request_id)
     mismatch = results[Step.CHECKS]["pet"]["mismatch"]
     assert mismatch == "certificate names 'Max', booking is for 'Biscuit'"
-    assert state == State.DRAFTING
+    assert state == State.NEEDS_REVIEW
     assert mismatch in results[Step.ROUTE]["reasons"]
 
 
@@ -258,25 +277,25 @@ async def test_no_kennel_needed_for_grooming(committed, submit, process):
     request_id = await submit()
     grooming = INTENT | {"service": "grooming", "end_date": START.isoformat()}
 
-    state = await process(request_id, FakeModel(intake=grooming))
+    state = await process(request_id, FakeModel(intake=grooming, reply=ONE_DAY_REPLY))
 
     checks = (await saved(committed, request_id))[Step.CHECKS]
     assert checks["capacity"]["status"] == "not_needed"
     assert "capacity" not in {s.name for s in await spans_of(committed, request_id)}
-    assert state == State.DRAFTING
+    assert state == State.SENT
 
 
 # --- Routing is decided by code with reasons -------------------------------------------
 
 
 @spec("booking-orchestration", "Routing is decided by code with reasons")
-async def test_everything_clear_goes_to_drafting(committed, submit, process):
+async def test_everything_clear_routes_to_drafting(committed, submit, process):
     request_id = await submit()
 
     state = await process(request_id, FakeModel())
 
     results = await saved(committed, request_id)
-    assert state == State.DRAFTING
+    assert state == State.SENT
     assert results[Step.ROUTE] == {"target": "drafting", "reasons": []}
     assert results[Step.CHECKS]["capacity"] == {
         "status": "found",
@@ -303,7 +322,7 @@ async def test_several_problems_are_all_listed(committed, desk, submit, process)
     state = await process(request_id, FakeModel(records=expiring))
 
     reasons = (await saved(committed, request_id))[Step.ROUTE]["reasons"]
-    assert state == State.DRAFTING
+    assert state == State.NEEDS_REVIEW
     assert reasons == [
         "vaccine bordetella: expires_during_stay",
         "capacity: no free medium kennel for the stay",
@@ -317,7 +336,7 @@ async def test_no_pet_matched(committed, submit, process):
     state = await process(request_id, FakeModel(intake=INTENT | {"pet_name": "Rex"}))
 
     results = await saved(committed, request_id)
-    assert state == State.DRAFTING
+    assert state == State.NEEDS_REVIEW
     assert (results[Step.CHECKS]["compliance"], results[Step.CHECKS]["capacity"]) == (None, None)
     assert PET_UNKNOWN in results[Step.ROUTE]["reasons"]
     assert "compliance" not in {s.name for s in await spans_of(committed, request_id)}
@@ -328,9 +347,9 @@ async def test_no_certificate_but_records_on_file_cover_the_stay(committed, subm
     request_id = await submit(certificate=None)
     grooming = INTENT | {"service": "grooming", "end_date": START.isoformat()}
 
-    state = await process(request_id, FakeModel(intake=grooming))
+    state = await process(request_id, FakeModel(intake=grooming, reply=ONE_DAY_REPLY))
 
-    assert state == State.DRAFTING
+    assert state == State.SENT
 
 
 @spec("booking-orchestration", "Routing is decided by code with reasons")
@@ -355,7 +374,7 @@ async def test_traced_run(committed, submit, process):
     spans = await spans_of(committed, request_id)
     by_name = {s.name: s for s in spans}
     roots = {s.name for s in spans if s.parent_span_id is None}
-    assert roots == {"extract", "check", "route"}
+    assert roots == {"extract", "check", "route", "reply"}
     assert by_name["intake"].parent_span_id == by_name["extract"].id
     assert by_name["records"].parent_span_id == by_name["extract"].id
     assert {by_name["compliance"].parent_span_id, by_name["capacity"].parent_span_id} == {
@@ -396,8 +415,8 @@ async def test_crash_after_extraction_resumes_without_model_calls(committed, sub
     second = FakeModel()
     state = await process(request_id, second)
 
-    assert state == State.DRAFTING
-    assert second.total_calls == 0
+    assert state == State.SENT
+    assert (second.calls["intake"], second.calls["records"]) == (0, 0)
     assert set(await saved(committed, request_id)) == CLEAR_PATH
 
 
@@ -419,14 +438,10 @@ async def test_crash_during_extraction_repeats_only_extraction(committed, submit
                 )
             )
         )
-    assert state == State.DRAFTING
+    assert state == State.SENT
     assert (second.calls["intake"], second.calls["records"]) == (1, 1)
     assert sorted(steps) == sorted(CLEAR_PATH)  # exactly one result per step
-    assert await states(committed, request_id) == [
-        State.EXTRACTING,
-        State.CHECKING,
-        State.DRAFTING,
-    ]
+    assert await states(committed, request_id) == CLEAR_STATES
 
 
 @spec("booking-orchestration", "A crashed run resumes without repeating finished work")
@@ -438,7 +453,7 @@ async def test_finished_request_is_left_alone(committed, submit, process):
     again = FakeModel()
     state = await process(request_id, again)
 
-    assert state == State.DRAFTING
+    assert state == State.SENT
     assert again.total_calls == 0
     assert (await states(committed, request_id), await trace_count(committed, request_id)) == (
         before
@@ -503,15 +518,9 @@ async def test_retry_after_failure(committed, submit, process):
     state = await process(request_id, FakeModel())
 
     request = await request_row(committed, request_id)
-    assert state == State.DRAFTING
+    assert state == State.SENT
     assert (request.failed_step, request.last_error) == (None, None)
-    assert await states(committed, request_id) == [
-        State.EXTRACTING,
-        State.FAILED,
-        State.EXTRACTING,
-        State.CHECKING,
-        State.DRAFTING,
-    ]
+    assert await states(committed, request_id) == [State.EXTRACTING, State.FAILED, *CLEAR_STATES]
 
 
 @spec("booking-orchestration", "Step failures are recorded and retried")
@@ -599,13 +608,17 @@ async def test_resolution_saved_with_the_move(committed, desk, submit, process):
 
     results = await saved(committed, request_id)
     resolution = results[Step.RESOLUTION]
-    assert state == State.DRAFTING
+    assert state == State.NEEDS_REVIEW
     assert results[Step.ROUTE]["target"] == "resolving"
     assert resolution["outcome"] == "proposed"
     assert resolution["proposal"]["options"] == [
         EARLIER | {"verified": True, "remaining_problems": []}
     ]
-    assert (await states(committed, request_id))[-2:] == [State.RESOLVING, State.DRAFTING]
+    assert (await states(committed, request_id))[-3:] == [
+        State.RESOLVING,
+        State.DRAFTING,
+        State.NEEDS_REVIEW,
+    ]
 
     spans = await spans_of(committed, request_id)
     by_name = {s.name: s for s in spans}
@@ -623,7 +636,7 @@ async def test_not_attempted_still_moves_on(committed, submit, process):
     state = await process(request_id, model)
 
     resolution = (await saved(committed, request_id))[Step.RESOLUTION]
-    assert state == State.DRAFTING
+    assert state == State.NEEDS_REVIEW
     assert resolution["outcome"] == "not_attempted"
     assert "certificate names 'Max'" in resolution["reason"]
     assert model.calls["resolver"] == 0
@@ -644,12 +657,13 @@ async def test_model_unavailable_during_resolution_then_retried(committed, desk,
     retry = FakeModel(resolver=FIND_AND_PROPOSE)
     state = await process(request_id, retry)
 
-    assert state == State.DRAFTING
+    assert state == State.NEEDS_REVIEW
     assert (retry.calls["intake"], retry.calls["records"]) == (0, 0)  # saved, not redone
-    assert (await states(committed, request_id))[-3:] == [
+    assert (await states(committed, request_id))[-4:] == [
         State.FAILED,
         State.RESOLVING,
         State.DRAFTING,
+        State.NEEDS_REVIEW,
     ]
 
 
@@ -668,3 +682,130 @@ async def test_message_text_never_reaches_the_resolver(committed, desk, submit, 
     assert model.calls["resolver"] >= 1
     assert all(INJECTION.encode() not in r.content for r in by_kind["resolver"])
     assert any(INJECTION.encode() in r.content for r in by_kind["other"])  # intake saw it
+
+
+# --- Drafting, automatic approval, and sending ------------------------------------------
+
+
+async def outbound(committed, request_id) -> list[OutboundMessage]:
+    async with committed() as s:
+        rows = await s.scalars(
+            select(OutboundMessage).where(OutboundMessage.booking_request_id == request_id)
+        )
+        return list(rows)
+
+
+async def reservations_for(committed, request_id) -> list[Reservation]:
+    async with committed() as s:
+        rows = await s.scalars(
+            select(Reservation).where(Reservation.booking_request_id == request_id)
+        )
+        return list(rows)
+
+
+@spec("booking-orchestration", "Clean requests are approved and sent without waiting")
+@spec("booking-reply", "Flagged replies wait for a person")
+async def test_clean_boarding_request_runs_to_sent(committed, desk, submit, process):
+    request_id = await submit()
+
+    state = await process(request_id, FakeModel())
+
+    [message] = await outbound(committed, request_id)
+    [reservation] = await reservations_for(committed, request_id)
+    reply = (await saved(committed, request_id))[Step.REPLY]
+    assert state == State.SENT
+    assert await states(committed, request_id) == CLEAR_STATES
+    assert (reply["situation"], reply["flags"], reply["target"]) == ("confirmed", [], "ready")
+    assert (message.kind, message.body) == ("reply", REPLY["body"])
+    assert (reservation.kennel_id, reservation.start_date, reservation.end_date) == (
+        desk.kennel_id,
+        START,
+        END,
+    )
+
+
+@spec("booking-orchestration", "Clean requests are approved and sent without waiting")
+async def test_kennel_taken_before_sending(committed, desk, submit, process):
+    request_id = await submit()
+    with pytest.raises(Crash):
+        await process(request_id, FakeModel(), crash_after=crash_after(State.DRAFTING))
+    await fill_kennel(committed, desk)  # someone else takes the only kennel meanwhile
+
+    state = await process(request_id, FakeModel())
+
+    request = await request_row(committed, request_id)
+    assert state == request.status == State.FAILED
+    assert request.failed_step == State.APPROVED
+    assert "no free medium kennel at send time" in request.last_error
+    assert await reservations_for(committed, request_id) == []
+    assert await outbound(committed, request_id) == []
+
+
+@spec("booking-orchestration", "Clean requests are approved and sent without waiting")
+async def test_waiting_request_is_left_alone(committed, submit, process):
+    request_id = await submit()
+    await process(request_id, FakeModel(intake=INTENT | {"pet_name": "Rex"}))
+    before = await states(committed, request_id)
+    assert before[-1] == State.NEEDS_REVIEW
+
+    again = FakeModel()
+    state = await process(request_id, again)
+
+    assert state == State.NEEDS_REVIEW
+    assert again.total_calls == 0
+    assert await states(committed, request_id) == before
+
+
+@spec("booking-reply", "Flagged replies wait for a person")
+async def test_resolved_request_waits_with_the_resolution_as_reason(
+    committed, desk, submit, process
+):
+    await fill_kennel(committed, desk)
+    request_id = await submit()
+
+    await process(request_id, FakeModel(resolver=FIND_AND_PROPOSE))
+
+    reply = (await saved(committed, request_id))[Step.REPLY]
+    assert reply["target"] == "needs_review"
+    assert reply["situation"] == "alternatives"
+    assert reply["flags"][0] == "came through resolving: proposed (proposed)"
+
+
+@spec("booking-reply", "Flagged replies wait for a person")
+async def test_failed_promise_check_waits(committed, submit, process):
+    request_id = await submit()
+    priced = REPLY | {"body": REPLY["body"] + " It's $45 per night."}
+
+    state = await process(request_id, FakeModel(reply=priced))
+
+    reply = (await saved(committed, request_id))[Step.REPLY]
+    assert state == State.NEEDS_REVIEW
+    assert reply["flags"] == ["reply: mentions a price: '$45'"]
+    assert await outbound(committed, request_id) == []
+
+
+@spec("booking-reply", "The reply is drafted from structured facts only")
+async def test_message_text_never_reaches_the_reply_model(committed, submit, process):
+    request_id = await submit(message=f"Can Biscuit board March 10 to 14? {INJECTION}")
+    model = FakeModel(intake=INTENT | {"special_notes": INJECTION})
+
+    await process(request_id, model)
+
+    replies = [r for r in model.requests if b"reply_draft" in r.content]
+    assert len(replies) == 1
+    assert INJECTION.encode() not in replies[0].content
+    assert (await saved(committed, request_id))[Step.REPLY]["situation"] == "confirmed"
+
+
+@spec("booking-orchestration", "Step failures are recorded and retried")
+async def test_reply_model_failure_fails_drafting_and_retries(committed, submit, process):
+    request_id = await submit()
+    await process(request_id, FakeModel(reply=503))
+    request = await request_row(committed, request_id)
+    assert (request.status, request.failed_step) == (State.FAILED, State.DRAFTING)
+
+    retry = FakeModel()
+    state = await process(request_id, retry)
+
+    assert state == State.SENT
+    assert (retry.calls["intake"], retry.calls["reply"]) == (0, 1)
