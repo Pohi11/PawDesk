@@ -183,14 +183,18 @@ async def complete(
             attempts.append(entry)
             retry_after: float | None = None
             try:
-                response = await client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    timeout=settings.llm_timeout_seconds,
-                    extra_body=extra_body,
-                    **params,
-                )
-            except APITimeoutError:
+                # Two limits: httpx's timeout only bounds the gap between bytes, and a provider
+                # that trickles keep-alive bytes never trips it. asyncio.timeout is the
+                # wall-clock deadline for the whole attempt.
+                async with asyncio.timeout(settings.llm_timeout_seconds):
+                    response = await client.chat.completions.create(
+                        model=model,
+                        messages=messages,
+                        timeout=settings.llm_timeout_seconds,
+                        extra_body=extra_body,
+                        **params,
+                    )
+            except (APITimeoutError, TimeoutError):
                 outcome, error = AttemptOutcome.RETRYABLE, "timeout"
             except APIConnectionError:
                 outcome, error = AttemptOutcome.RETRYABLE, "connection error"

@@ -1,0 +1,1720 @@
+{
+  "prompt_version": "records-v1",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "run_at": "2026-10-14T15:43:45.117250+00:00",
+  "trace_id": "01a13b15-7802-71e1-a175-eda8577a19ae",
+  "total_cost_usd": "0.0304266960",
+  "benchmark": {
+    "seed": 2027,
+    "certificates": 36,
+    "reference_stay": {
+      "service": "boarding",
+      "start": "2027-03-10",
+      "end": "2027-03-13"
+    }
+  },
+  "summary": {
+    "total": {
+      "certificates": 36,
+      "vaccine_recall": "114/114",
+      "vaccine_precision": "114/114",
+      "given_accuracy": "109/114",
+      "expiry_accuracy": "109/114",
+      "invented_expiries": 0,
+      "pet_name_accuracy": "30/36",
+      "decision_agreement": "36/36",
+      "silent_disagreements": 0,
+      "sent_to_review": 8,
+      "errors": 0
+    },
+    "by_variant": {
+      "alias": {
+        "certificates": 6,
+        "vaccine_recall": "21/21",
+        "vaccine_precision": "21/21",
+        "given_accuracy": "21/21",
+        "expiry_accuracy": "21/21",
+        "invented_expiries": 0,
+        "pet_name_accuracy": "6/6",
+        "decision_agreement": "6/6",
+        "silent_disagreements": 0,
+        "sent_to_review": 0,
+        "errors": 0
+      },
+      "blur": {
+        "certificates": 6,
+        "vaccine_recall": "18/18",
+        "vaccine_precision": "18/18",
+        "given_accuracy": "14/18",
+        "expiry_accuracy": "15/18",
+        "invented_expiries": 0,
+        "pet_name_accuracy": "4/6",
+        "decision_agreement": "6/6",
+        "silent_disagreements": 0,
+        "sent_to_review": 4,
+        "errors": 0
+      },
+      "clean": {
+        "certificates": 6,
+        "vaccine_recall": "14/14",
+        "vaccine_precision": "14/14",
+        "given_accuracy": "14/14",
+        "expiry_accuracy": "13/14",
+        "invented_expiries": 0,
+        "pet_name_accuracy": "6/6",
+        "decision_agreement": "6/6",
+        "silent_disagreements": 0,
+        "sent_to_review": 0,
+        "errors": 0
+      },
+      "handwriting": {
+        "certificates": 6,
+        "vaccine_recall": "18/18",
+        "vaccine_precision": "18/18",
+        "given_accuracy": "18/18",
+        "expiry_accuracy": "18/18",
+        "invented_expiries": 0,
+        "pet_name_accuracy": "5/6",
+        "decision_agreement": "6/6",
+        "silent_disagreements": 0,
+        "sent_to_review": 1,
+        "errors": 0
+      },
+      "missing_expiry": {
+        "certificates": 6,
+        "vaccine_recall": "20/20",
+        "vaccine_precision": "20/20",
+        "given_accuracy": "19/20",
+        "expiry_accuracy": "19/20",
+        "invented_expiries": 0,
+        "pet_name_accuracy": "5/6",
+        "decision_agreement": "6/6",
+        "silent_disagreements": 0,
+        "sent_to_review": 1,
+        "errors": 0
+      },
+      "rotate": {
+        "certificates": 6,
+        "vaccine_recall": "23/23",
+        "vaccine_precision": "23/23",
+        "given_accuracy": "23/23",
+        "expiry_accuracy": "23/23",
+        "invented_expiries": 0,
+        "pet_name_accuracy": "4/6",
+        "decision_agreement": "6/6",
+        "silent_disagreements": 0,
+        "sent_to_review": 2,
+        "errors": 0
+      }
+    }
+  },
+  "certificates": [
+    {
+      "id": "cert-01",
+      "layout": "card",
+      "variant": "missing_expiry",
+      "actual": {
+        "pet_name": null,
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-03-25",
+            "expires_on": "2027-03-26"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-07-30",
+            "expires_on": null
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-05-23",
+            "expires_on": "2026-11-21"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 2,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": false,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-02",
+      "layout": "card",
+      "variant": "blur",
+      "actual": {
+        "pet_name": null,
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-01-11",
+            "expires_on": "2026-01-11"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2024-01-04",
+            "expires_on": "2027-01-04"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2025-05-01",
+            "expires_on": "2025-11-01"
+          },
+          {
+            "label": "Canine Influenza",
+            "vaccine": "canine_influenza",
+            "administered_on": "2025-06-22",
+            "expires_on": "2026-06-22"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: pet name 'Waffles' is handwritten and slightly unclear",
+          "ambiguous: document bears a 'SYNTHETIC TEST DOCUMENT — NOT A REAL RECORD' watermark",
+          "ambiguous: DHPP due year is faint (read as 2027)"
+        ]
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 1,
+        "expiry_correct": 1,
+        "invented_expiries": 0,
+        "pet_name_correct": false,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-03",
+      "layout": "tag",
+      "variant": "alias",
+      "actual": {
+        "pet_name": "Pepper",
+        "records": [
+          {
+            "label": "Rabies 1-Year",
+            "vaccine": "rabies",
+            "administered_on": "2026-04-25",
+            "expires_on": "2029-04-24"
+          },
+          {
+            "label": "DAPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-07-16",
+            "expires_on": "2027-07-16"
+          },
+          {
+            "label": "Bordetella bronchiseptica",
+            "vaccine": "bordetella",
+            "administered_on": "2026-05-12",
+            "expires_on": "2026-11-10"
+          },
+          {
+            "label": "CIV H3N2/H3N8",
+            "vaccine": "canine_influenza",
+            "administered_on": "2026-05-21",
+            "expires_on": "2026-11-23"
+          },
+          {
+            "label": "Lepto",
+            "vaccine": "leptospirosis",
+            "administered_on": "2026-11-05",
+            "expires_on": "2027-11-05"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 5,
+        "extracted_records": 5,
+        "matched": 5,
+        "given_correct": 5,
+        "expiry_correct": 5,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-04",
+      "layout": "tag",
+      "variant": "clean",
+      "actual": {
+        "pet_name": "Olive",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-11-30",
+            "expires_on": "2028-11-29"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-06-09",
+            "expires_on": "2029-06-08"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "compliant",
+        "extracted_decision": "compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-05",
+      "layout": "tag",
+      "variant": "missing_expiry",
+      "actual": {
+        "pet_name": "Fig",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-08-20",
+            "expires_on": "2027-08-20"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-04-07",
+            "expires_on": null
+          },
+          {
+            "label": "FeLV",
+            "vaccine": "felv",
+            "administered_on": "2025-06-24",
+            "expires_on": "2026-06-24"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "needs_review",
+        "extracted_decision": "needs_review",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-06",
+      "layout": "tag",
+      "variant": "rotate",
+      "actual": {
+        "pet_name": "Moose",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2027-01-01",
+            "expires_on": "2027-03-14"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-06-24",
+            "expires_on": "2026-06-24"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-05-10",
+            "expires_on": "2027-03-12"
+          },
+          {
+            "label": "Leptospirosis",
+            "vaccine": "leptospirosis",
+            "administered_on": "2025-08-01",
+            "expires_on": "2027-02-18"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 4,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-07",
+      "layout": "table",
+      "variant": "blur",
+      "actual": {
+        "pet_name": "Juno",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-05-22",
+            "expires_on": "2026-05-22"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-03-08",
+            "expires_on": "2029-03-07"
+          },
+          {
+            "label": "FeLV",
+            "vaccine": "felv",
+            "administered_on": "2026-09-27",
+            "expires_on": "2026-12-15"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "low confidence (0.62)",
+          "ambiguous: rabies 'date given' and 'expires' both read as 05/22/2026, which is unusual; low-resolution image makes the year digits uncertain",
+          "ambiguous: FeLV expiry (12/15/2026) is much shorter than a typical interval, but it is what is printed",
+          "ambiguous: small/blurry text; some digits could be misread"
+        ]
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 2,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-08",
+      "layout": "table",
+      "variant": "alias",
+      "actual": {
+        "pet_name": "Pumpkin",
+        "records": [
+          {
+            "label": "Rabies (Feline, 1 yr)",
+            "vaccine": "rabies",
+            "administered_on": "2025-10-22",
+            "expires_on": "2026-10-22"
+          },
+          {
+            "label": "Feline Distemper (FVRCP)",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-03-06",
+            "expires_on": "2027-03-13"
+          },
+          {
+            "label": "FeLV vaccine",
+            "vaccine": "felv",
+            "administered_on": "2025-08-28",
+            "expires_on": "2026-08-28"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-09",
+      "layout": "table",
+      "variant": "blur",
+      "actual": {
+        "pet_name": null,
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-09-19",
+            "expires_on": "2027-09-19"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-08-03",
+            "expires_on": "2026-12-16"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: patient name printed as \"Fig\" in the Patient field rather than a labeled pet-name field",
+          "ambiguous: document is watermarked \"SYNTHETIC TEST DOCUMENT — NOT A REAL RECORD\""
+        ]
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": false,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-10",
+      "layout": "tag",
+      "variant": "handwriting",
+      "actual": {
+        "pet_name": "Moose",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-08-23",
+            "expires_on": "2029-08-22"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-07-10",
+            "expires_on": "2026-07-10"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-12-22",
+            "expires_on": "2027-06-22"
+          },
+          {
+            "label": "Leptospirosis",
+            "vaccine": "leptospirosis",
+            "administered_on": "2025-04-25",
+            "expires_on": "2026-04-25"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 4,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-11",
+      "layout": "card",
+      "variant": "alias",
+      "actual": {
+        "pet_name": "Tater",
+        "records": [
+          {
+            "label": "Rabies 1-Year",
+            "vaccine": "rabies",
+            "administered_on": "2026-05-14",
+            "expires_on": "2029-05-13"
+          },
+          {
+            "label": "DA2PP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-09-26",
+            "expires_on": "2027-03-14"
+          },
+          {
+            "label": "Kennel Cough (Bordetella)",
+            "vaccine": "bordetella",
+            "administered_on": "2026-12-14",
+            "expires_on": "2027-06-14"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "compliant",
+        "extracted_decision": "compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-12",
+      "layout": "card",
+      "variant": "missing_expiry",
+      "actual": {
+        "pet_name": "Pickle",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-08-10",
+            "expires_on": "2027-08-09"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-06-09",
+            "expires_on": "2026-06-09"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-08-08",
+            "expires_on": null
+          },
+          {
+            "label": "Leptospirosis",
+            "vaccine": "leptospirosis",
+            "administered_on": "2025-11-07",
+            "expires_on": "2027-03-13"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-13",
+      "layout": "card",
+      "variant": "alias",
+      "actual": {
+        "pet_name": "Tofu",
+        "records": [
+          {
+            "label": "Rabies 3-Year",
+            "vaccine": "rabies",
+            "administered_on": "2025-09-16",
+            "expires_on": "2026-09-16"
+          },
+          {
+            "label": "FVRCP combo",
+            "vaccine": "fvrcp",
+            "administered_on": "2025-05-04",
+            "expires_on": "2028-05-03"
+          },
+          {
+            "label": "Feline Leukemia (FeLV)",
+            "vaccine": "felv",
+            "administered_on": "2026-05-06",
+            "expires_on": "2027-05-06"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-14",
+      "layout": "table",
+      "variant": "handwriting",
+      "actual": {
+        "pet_name": "Fig",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-08-27",
+            "expires_on": "2026-08-27"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2025-10-05",
+            "expires_on": "2026-10-05"
+          },
+          {
+            "label": "FeLV",
+            "vaccine": "felv",
+            "administered_on": "2025-08-22",
+            "expires_on": "2026-08-22"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-15",
+      "layout": "tag",
+      "variant": "blur",
+      "actual": {
+        "pet_name": "Juniper",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-02-23",
+            "expires_on": "2029-02-22"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-01-06",
+            "expires_on": "2027-03-12"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2025-09-20",
+            "expires_on": "2026-09-20"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-16",
+      "layout": "table",
+      "variant": "clean",
+      "actual": {
+        "pet_name": "Miso",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-11-21",
+            "expires_on": "2026-11-21"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-11-03",
+            "expires_on": "2027-11-03"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-17",
+      "layout": "tag",
+      "variant": "blur",
+      "actual": {
+        "pet_name": "Juno",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-06-16",
+            "expires_on": "2026-06-16"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2027-01-16",
+            "expires_on": "2030-01-15"
+          },
+          {
+            "label": "FeLV",
+            "vaccine": "felv",
+            "administered_on": "2027-02-05",
+            "expires_on": "2027-03-13"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-18",
+      "layout": "tag",
+      "variant": "handwriting",
+      "actual": {
+        "pet_name": "Maple",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-07-31",
+            "expires_on": "2028-07-30"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-10-19",
+            "expires_on": "2027-10-19"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2025-08-30",
+            "expires_on": "2026-08-30"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-19",
+      "layout": "card",
+      "variant": "clean",
+      "actual": {
+        "pet_name": "Olive",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-01-07",
+            "expires_on": "2029-01-06"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-01-20",
+            "expires_on": "2029-01-19"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "compliant",
+        "extracted_decision": "compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-20",
+      "layout": "table",
+      "variant": "handwriting",
+      "actual": {
+        "pet_name": "Nugget",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-07-09",
+            "expires_on": "2027-07-09"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-12-28",
+            "expires_on": "2026-12-28"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2025-09-28",
+            "expires_on": "2027-03-14"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-21",
+      "layout": "card",
+      "variant": "rotate",
+      "actual": {
+        "pet_name": "Rosie",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-01-12",
+            "expires_on": "2027-01-12"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-10-24",
+            "expires_on": "2027-10-24"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-03-11",
+            "expires_on": "2026-09-09"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-22",
+      "layout": "table",
+      "variant": "rotate",
+      "actual": {
+        "pet_name": null,
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2027-01-05",
+            "expires_on": "2027-02-24"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-12-04",
+            "expires_on": "2026-12-04"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-01-06",
+            "expires_on": "2027-01-06"
+          },
+          {
+            "label": "Canine Influenza",
+            "vaccine": "canine_influenza",
+            "administered_on": "2025-05-05",
+            "expires_on": "2026-05-05"
+          },
+          {
+            "label": "Leptospirosis",
+            "vaccine": "leptospirosis",
+            "administered_on": "2025-04-07",
+            "expires_on": "2026-04-07"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: rabies expiry 24 Feb 2027 is only about 7 weeks after its 05 Jan 2027 administration date, unlike the ~1-year intervals on the other rows"
+        ]
+      },
+      "score": {
+        "truth_records": 5,
+        "extracted_records": 5,
+        "matched": 5,
+        "given_correct": 5,
+        "expiry_correct": 5,
+        "invented_expiries": 0,
+        "pet_name_correct": false,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-23",
+      "layout": "tag",
+      "variant": "clean",
+      "actual": {
+        "pet_name": "Rosie",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-11-10",
+            "expires_on": "2026-11-10"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-08-15",
+            "expires_on": "2027-02-09"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-09-26",
+            "expires_on": "2027-02-26"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-24",
+      "layout": "card",
+      "variant": "handwriting",
+      "actual": {
+        "pet_name": null,
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-01-26",
+            "expires_on": "2027-03-12"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-12-17",
+            "expires_on": "2027-12-17"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-01-07",
+            "expires_on": "2026-12-23"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: rabies due date month partially obscured by watermark (reads Mar, could be May)",
+          "ambiguous: pet name field is blank on the certificate; 'Bramble' appears in the patient line"
+        ]
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": false,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-25",
+      "layout": "card",
+      "variant": "rotate",
+      "actual": {
+        "pet_name": "Bramble",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-10-12",
+            "expires_on": "2026-11-23"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-10-20",
+            "expires_on": "2026-10-20"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2025-07-08",
+            "expires_on": "2026-07-08"
+          },
+          {
+            "label": "Canine Influenza",
+            "vaccine": "canine_influenza",
+            "administered_on": "2025-07-11",
+            "expires_on": "2027-03-13"
+          },
+          {
+            "label": "Leptospirosis",
+            "vaccine": "leptospirosis",
+            "administered_on": "2025-05-22",
+            "expires_on": "2027-03-12"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 5,
+        "extracted_records": 5,
+        "matched": 5,
+        "given_correct": 5,
+        "expiry_correct": 5,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-26",
+      "layout": "tag",
+      "variant": "alias",
+      "actual": {
+        "pet_name": "Olive",
+        "records": [
+          {
+            "label": "Rabies (Feline, 1 yr)",
+            "vaccine": "rabies",
+            "administered_on": "2027-01-12",
+            "expires_on": "2027-03-12"
+          },
+          {
+            "label": "FVRCP combo",
+            "vaccine": "fvrcp",
+            "administered_on": "2025-04-27",
+            "expires_on": "2026-04-27"
+          },
+          {
+            "label": "Feline Leukemia (FeLV)",
+            "vaccine": "felv",
+            "administered_on": "2025-06-29",
+            "expires_on": "2026-06-29"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-27",
+      "layout": "table",
+      "variant": "alias",
+      "actual": {
+        "pet_name": "Moose",
+        "records": [
+          {
+            "label": "Rabies 1-Year",
+            "vaccine": "rabies",
+            "administered_on": "2025-08-20",
+            "expires_on": "2026-08-20"
+          },
+          {
+            "label": "DAPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-03-19",
+            "expires_on": "2027-03-19"
+          },
+          {
+            "label": "Bordetella bronchiseptica",
+            "vaccine": "bordetella",
+            "administered_on": "2026-03-14",
+            "expires_on": "2027-03-14"
+          },
+          {
+            "label": "CIV H3N2/H3N8",
+            "vaccine": "canine_influenza",
+            "administered_on": "2025-12-20",
+            "expires_on": "2026-12-20"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 4,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-28",
+      "layout": "table",
+      "variant": "missing_expiry",
+      "actual": {
+        "pet_name": "Miso",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-06-25",
+            "expires_on": null
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-07-27",
+            "expires_on": "2027-03-14"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "needs_review",
+        "extracted_decision": "needs_review",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-29",
+      "layout": "tag",
+      "variant": "missing_expiry",
+      "actual": {
+        "pet_name": "Bramble",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-04-19",
+            "expires_on": "2027-04-19"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-10-06",
+            "expires_on": "2026-10-06"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-03-29",
+            "expires_on": "2027-03-29"
+          },
+          {
+            "label": "Canine Influenza",
+            "vaccine": "canine_influenza",
+            "administered_on": "2025-10-16",
+            "expires_on": null
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: document is watermarked as a synthetic test document, not a real record"
+        ]
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 4,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-30",
+      "layout": "table",
+      "variant": "missing_expiry",
+      "actual": {
+        "pet_name": "Nugget",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-09-14",
+            "expires_on": "2027-03-14"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-05-08",
+            "expires_on": "2027-03-14"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2025-07-22",
+            "expires_on": null
+          },
+          {
+            "label": "Leptospirosis",
+            "vaccine": "leptospirosis",
+            "administered_on": "2026-08-15",
+            "expires_on": "2027-08-15"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 4,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "needs_review",
+        "extracted_decision": "needs_review",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-31",
+      "layout": "tag",
+      "variant": "rotate",
+      "actual": {
+        "pet_name": null,
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-09-06",
+            "expires_on": "2027-03-13"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2025-11-14",
+            "expires_on": "2027-03-14"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": false,
+        "truth_decision": "compliant",
+        "extracted_decision": "compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-32",
+      "layout": "card",
+      "variant": "clean",
+      "actual": {
+        "pet_name": "Pickle",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-05-20",
+            "expires_on": "2027-05-19"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-02-02",
+            "expires_on": "2027-02-12"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-06-26",
+            "expires_on": "2027-06-26"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-33",
+      "layout": "table",
+      "variant": "clean",
+      "actual": {
+        "pet_name": "Sprout",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-01-11",
+            "expires_on": "2026-12-01"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2026-09-29",
+            "expires_on": "2027-09-29"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-34",
+      "layout": "card",
+      "variant": "blur",
+      "actual": {
+        "pet_name": "Nugget",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2026-02-05",
+            "expires_on": "2027-02-05"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2026-12-12",
+            "expires_on": "2027-12-12"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-06-10",
+            "expires_on": "2026-12-09"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: low-resolution image; day digits read with moderate confidence"
+        ]
+      },
+      "score": {
+        "truth_records": 3,
+        "extracted_records": 3,
+        "matched": 3,
+        "given_correct": 3,
+        "expiry_correct": 3,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-35",
+      "layout": "card",
+      "variant": "handwriting",
+      "actual": {
+        "pet_name": "Juno",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-11-26",
+            "expires_on": "2028-11-25"
+          },
+          {
+            "label": "FVRCP",
+            "vaccine": "fvrcp",
+            "administered_on": "2025-05-13",
+            "expires_on": "2028-05-12"
+          }
+        ],
+        "outcome": "clear",
+        "issues": []
+      },
+      "score": {
+        "truth_records": 2,
+        "extracted_records": 2,
+        "matched": 2,
+        "given_correct": 2,
+        "expiry_correct": 2,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "compliant",
+        "extracted_decision": "compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    },
+    {
+      "id": "cert-36",
+      "layout": "table",
+      "variant": "rotate",
+      "actual": {
+        "pet_name": "Rosie",
+        "records": [
+          {
+            "label": "Rabies",
+            "vaccine": "rabies",
+            "administered_on": "2025-11-05",
+            "expires_on": "2027-03-14"
+          },
+          {
+            "label": "DHPP",
+            "vaccine": "dhpp",
+            "administered_on": "2025-08-08",
+            "expires_on": "2027-03-12"
+          },
+          {
+            "label": "Bordetella",
+            "vaccine": "bordetella",
+            "administered_on": "2026-10-08",
+            "expires_on": "2027-10-08"
+          },
+          {
+            "label": "Canine Influenza",
+            "vaccine": "canine_influenza",
+            "administered_on": "2027-01-29",
+            "expires_on": "2028-01-29"
+          }
+        ],
+        "outcome": "needs_review",
+        "issues": [
+          "ambiguous: document is watermarked 'SYNTHETIC TEST DOCUMENT — NOT A REAL RECORD'"
+        ]
+      },
+      "score": {
+        "truth_records": 4,
+        "extracted_records": 4,
+        "matched": 4,
+        "given_correct": 4,
+        "expiry_correct": 4,
+        "invented_expiries": 0,
+        "pet_name_correct": true,
+        "truth_decision": "not_compliant",
+        "extracted_decision": "not_compliant",
+        "decision_agrees": true,
+        "silent_disagreement": false
+      }
+    }
+  ]
+}

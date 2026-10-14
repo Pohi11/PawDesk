@@ -1,0 +1,1199 @@
+{
+  "seed": 2027,
+  "today": "2027-03-03",
+  "reference_stay": {
+    "service": "boarding",
+    "start": "2027-03-10",
+    "end": "2027-03-13"
+  },
+  "certificates": [
+    {
+      "id": "cert-01",
+      "file": "images/cert-01.png",
+      "layout": "card",
+      "variant": "missing_expiry",
+      "species": "dog",
+      "pet_name": "Clover",
+      "owner": "S. Calloway",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-03-26",
+          "expires_on": "2027-03-26"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-07-30",
+          "expires_on": null
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-05-23",
+          "expires_on": "2026-11-21"
+        }
+      ]
+    },
+    {
+      "id": "cert-02",
+      "file": "images/cert-02.png",
+      "layout": "card",
+      "variant": "blur",
+      "species": "dog",
+      "pet_name": "Waffles",
+      "owner": "J. Whitfield",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-07-17",
+          "expires_on": "2027-03-12"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-07-04",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2025-05-07",
+          "expires_on": "2025-11-05"
+        },
+        {
+          "label": "Canine Influenza",
+          "vaccine": "canine_influenza",
+          "administered_on": "2025-06-22",
+          "expires_on": "2026-06-22"
+        }
+      ]
+    },
+    {
+      "id": "cert-03",
+      "file": "images/cert-03.png",
+      "layout": "tag",
+      "variant": "alias",
+      "species": "dog",
+      "pet_name": "Pepper",
+      "owner": "P. Venkataraman",
+      "clinic": "Larkspur Pet Clinic",
+      "vet": "Dr. Felix Oduya",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies 1-Year",
+          "vaccine": "rabies",
+          "administered_on": "2026-04-25",
+          "expires_on": "2029-04-24"
+        },
+        {
+          "label": "DAPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-07-16",
+          "expires_on": "2027-07-16"
+        },
+        {
+          "label": "Bordetella bronchiseptica",
+          "vaccine": "bordetella",
+          "administered_on": "2026-05-12",
+          "expires_on": "2026-11-10"
+        },
+        {
+          "label": "CIV H3N2/H3N8",
+          "vaccine": "canine_influenza",
+          "administered_on": "2026-05-21",
+          "expires_on": "2026-11-23"
+        },
+        {
+          "label": "Lepto",
+          "vaccine": "leptospirosis",
+          "administered_on": "2026-11-05",
+          "expires_on": "2027-11-05"
+        }
+      ]
+    },
+    {
+      "id": "cert-04",
+      "file": "images/cert-04.png",
+      "layout": "tag",
+      "variant": "clean",
+      "species": "cat",
+      "pet_name": "Olive",
+      "owner": "M. Okafor",
+      "clinic": "Larkspur Pet Clinic",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-11-30",
+          "expires_on": "2028-11-29"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-06-09",
+          "expires_on": "2029-06-08"
+        }
+      ]
+    },
+    {
+      "id": "cert-05",
+      "file": "images/cert-05.png",
+      "layout": "tag",
+      "variant": "missing_expiry",
+      "species": "cat",
+      "pet_name": "Fig",
+      "owner": "P. Venkataraman",
+      "clinic": "Bramblewood Animal Hospital",
+      "vet": "Dr. Imogen Vale",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-08-20",
+          "expires_on": "2027-08-20"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-04-07",
+          "expires_on": null
+        },
+        {
+          "label": "FeLV",
+          "vaccine": "felv",
+          "administered_on": "2025-06-24",
+          "expires_on": "2026-06-24"
+        }
+      ]
+    },
+    {
+      "id": "cert-06",
+      "file": "images/cert-06.png",
+      "layout": "tag",
+      "variant": "rotate",
+      "species": "dog",
+      "pet_name": "Moose",
+      "owner": "J. Whitfield",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Priya Holloway",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2027-01-01",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-06-24",
+          "expires_on": "2026-06-24"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-05-10",
+          "expires_on": "2027-03-12"
+        },
+        {
+          "label": "Leptospirosis",
+          "vaccine": "leptospirosis",
+          "administered_on": "2025-08-01",
+          "expires_on": "2027-02-18"
+        }
+      ]
+    },
+    {
+      "id": "cert-07",
+      "file": "images/cert-07.png",
+      "layout": "table",
+      "variant": "blur",
+      "species": "cat",
+      "pet_name": "Juno",
+      "owner": "S. Calloway",
+      "clinic": "Cedar Bend Vet Care",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-05-22",
+          "expires_on": "2026-05-22"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-03-08",
+          "expires_on": "2029-03-07"
+        },
+        {
+          "label": "FeLV",
+          "vaccine": "felv",
+          "administered_on": "2026-09-27",
+          "expires_on": "2026-12-15"
+        }
+      ]
+    },
+    {
+      "id": "cert-08",
+      "file": "images/cert-08.png",
+      "layout": "table",
+      "variant": "alias",
+      "species": "cat",
+      "pet_name": "Pumpkin",
+      "owner": "S. Calloway",
+      "clinic": "Thistledown Animal Clinic",
+      "vet": "Dr. Priya Holloway",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies (Feline, 1 yr)",
+          "vaccine": "rabies",
+          "administered_on": "2025-10-22",
+          "expires_on": "2026-10-22"
+        },
+        {
+          "label": "Feline Distemper (FVRCP)",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-03-06",
+          "expires_on": "2027-03-13"
+        },
+        {
+          "label": "FeLV vaccine",
+          "vaccine": "felv",
+          "administered_on": "2025-08-28",
+          "expires_on": "2026-08-28"
+        }
+      ]
+    },
+    {
+      "id": "cert-09",
+      "file": "images/cert-09.png",
+      "layout": "table",
+      "variant": "blur",
+      "species": "cat",
+      "pet_name": "Fig",
+      "owner": "S. Calloway",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-09-19",
+          "expires_on": "2027-09-19"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-08-03",
+          "expires_on": "2026-12-16"
+        }
+      ]
+    },
+    {
+      "id": "cert-10",
+      "file": "images/cert-10.png",
+      "layout": "tag",
+      "variant": "handwriting",
+      "species": "dog",
+      "pet_name": "Moose",
+      "owner": "P. Venkataraman",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Ada Morrow",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-08-23",
+          "expires_on": "2029-08-22"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-07-10",
+          "expires_on": "2026-07-10"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-12-22",
+          "expires_on": "2027-06-22"
+        },
+        {
+          "label": "Leptospirosis",
+          "vaccine": "leptospirosis",
+          "administered_on": "2025-04-25",
+          "expires_on": "2026-04-25"
+        }
+      ]
+    },
+    {
+      "id": "cert-11",
+      "file": "images/cert-11.png",
+      "layout": "card",
+      "variant": "alias",
+      "species": "dog",
+      "pet_name": "Tater",
+      "owner": "S. Calloway",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Felix Oduya",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies 1-Year",
+          "vaccine": "rabies",
+          "administered_on": "2026-05-14",
+          "expires_on": "2029-05-13"
+        },
+        {
+          "label": "DA2PP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-09-26",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "Kennel Cough (Bordetella)",
+          "vaccine": "bordetella",
+          "administered_on": "2026-12-14",
+          "expires_on": "2027-06-14"
+        }
+      ]
+    },
+    {
+      "id": "cert-12",
+      "file": "images/cert-12.png",
+      "layout": "card",
+      "variant": "missing_expiry",
+      "species": "dog",
+      "pet_name": "Pickle",
+      "owner": "J. Whitfield",
+      "clinic": "Larkspur Pet Clinic",
+      "vet": "Dr. Imogen Vale",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-08-10",
+          "expires_on": "2029-08-09"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-06-09",
+          "expires_on": "2026-06-09"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-08-08",
+          "expires_on": null
+        },
+        {
+          "label": "Leptospirosis",
+          "vaccine": "leptospirosis",
+          "administered_on": "2025-11-07",
+          "expires_on": "2027-03-13"
+        }
+      ]
+    },
+    {
+      "id": "cert-13",
+      "file": "images/cert-13.png",
+      "layout": "card",
+      "variant": "alias",
+      "species": "cat",
+      "pet_name": "Tofu",
+      "owner": "A. Lindqvist",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Imogen Vale",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies 3-Year",
+          "vaccine": "rabies",
+          "administered_on": "2025-09-16",
+          "expires_on": "2026-09-16"
+        },
+        {
+          "label": "FVRCP combo",
+          "vaccine": "fvrcp",
+          "administered_on": "2025-05-04",
+          "expires_on": "2028-05-03"
+        },
+        {
+          "label": "Feline Leukemia (FeLV)",
+          "vaccine": "felv",
+          "administered_on": "2026-05-06",
+          "expires_on": "2027-05-06"
+        }
+      ]
+    },
+    {
+      "id": "cert-14",
+      "file": "images/cert-14.png",
+      "layout": "table",
+      "variant": "handwriting",
+      "species": "cat",
+      "pet_name": "Fig",
+      "owner": "J. Whitfield",
+      "clinic": "Cedar Bend Vet Care",
+      "vet": "Dr. Ada Morrow",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-08-27",
+          "expires_on": "2026-08-27"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2025-10-05",
+          "expires_on": "2026-10-05"
+        },
+        {
+          "label": "FeLV",
+          "vaccine": "felv",
+          "administered_on": "2025-08-22",
+          "expires_on": "2026-08-22"
+        }
+      ]
+    },
+    {
+      "id": "cert-15",
+      "file": "images/cert-15.png",
+      "layout": "tag",
+      "variant": "blur",
+      "species": "dog",
+      "pet_name": "Juniper",
+      "owner": "P. Venkataraman",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Priya Holloway",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-02-23",
+          "expires_on": "2029-02-22"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-01-06",
+          "expires_on": "2027-03-12"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2025-09-20",
+          "expires_on": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "cert-16",
+      "file": "images/cert-16.png",
+      "layout": "table",
+      "variant": "clean",
+      "species": "cat",
+      "pet_name": "Miso",
+      "owner": "M. Okafor",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-11-21",
+          "expires_on": "2026-11-21"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-11-03",
+          "expires_on": "2027-11-03"
+        }
+      ]
+    },
+    {
+      "id": "cert-17",
+      "file": "images/cert-17.png",
+      "layout": "tag",
+      "variant": "blur",
+      "species": "cat",
+      "pet_name": "Juno",
+      "owner": "P. Venkataraman",
+      "clinic": "Bramblewood Animal Hospital",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-06-16",
+          "expires_on": "2026-06-16"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2027-01-16",
+          "expires_on": "2030-01-15"
+        },
+        {
+          "label": "FeLV",
+          "vaccine": "felv",
+          "administered_on": "2027-02-05",
+          "expires_on": "2027-03-13"
+        }
+      ]
+    },
+    {
+      "id": "cert-18",
+      "file": "images/cert-18.png",
+      "layout": "tag",
+      "variant": "handwriting",
+      "species": "dog",
+      "pet_name": "Maple",
+      "owner": "S. Calloway",
+      "clinic": "Thistledown Animal Clinic",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-07-31",
+          "expires_on": "2028-07-30"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-10-19",
+          "expires_on": "2027-10-19"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2025-08-30",
+          "expires_on": "2026-08-30"
+        }
+      ]
+    },
+    {
+      "id": "cert-19",
+      "file": "images/cert-19.png",
+      "layout": "card",
+      "variant": "clean",
+      "species": "cat",
+      "pet_name": "Olive",
+      "owner": "S. Calloway",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Rafael Quint",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-01-07",
+          "expires_on": "2029-01-06"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-01-20",
+          "expires_on": "2029-01-19"
+        }
+      ]
+    },
+    {
+      "id": "cert-20",
+      "file": "images/cert-20.png",
+      "layout": "table",
+      "variant": "handwriting",
+      "species": "dog",
+      "pet_name": "Nugget",
+      "owner": "S. Calloway",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-07-09",
+          "expires_on": "2027-07-09"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-12-28",
+          "expires_on": "2026-12-28"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2025-09-28",
+          "expires_on": "2027-03-14"
+        }
+      ]
+    },
+    {
+      "id": "cert-21",
+      "file": "images/cert-21.png",
+      "layout": "card",
+      "variant": "rotate",
+      "species": "dog",
+      "pet_name": "Rosie",
+      "owner": "M. Okafor",
+      "clinic": "Bramblewood Animal Hospital",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-01-12",
+          "expires_on": "2027-01-12"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-10-24",
+          "expires_on": "2027-10-24"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-03-11",
+          "expires_on": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "cert-22",
+      "file": "images/cert-22.png",
+      "layout": "table",
+      "variant": "rotate",
+      "species": "dog",
+      "pet_name": "Maple",
+      "owner": "P. Venkataraman",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2027-01-05",
+          "expires_on": "2027-02-24"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-12-04",
+          "expires_on": "2026-12-04"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-01-06",
+          "expires_on": "2027-01-06"
+        },
+        {
+          "label": "Canine Influenza",
+          "vaccine": "canine_influenza",
+          "administered_on": "2025-05-05",
+          "expires_on": "2026-05-05"
+        },
+        {
+          "label": "Leptospirosis",
+          "vaccine": "leptospirosis",
+          "administered_on": "2025-04-07",
+          "expires_on": "2026-04-07"
+        }
+      ]
+    },
+    {
+      "id": "cert-23",
+      "file": "images/cert-23.png",
+      "layout": "tag",
+      "variant": "clean",
+      "species": "dog",
+      "pet_name": "Rosie",
+      "owner": "S. Calloway",
+      "clinic": "Bramblewood Animal Hospital",
+      "vet": "Dr. Imogen Vale",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-11-10",
+          "expires_on": "2026-11-10"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-08-15",
+          "expires_on": "2027-02-09"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-09-26",
+          "expires_on": "2027-02-26"
+        }
+      ]
+    },
+    {
+      "id": "cert-24",
+      "file": "images/cert-24.png",
+      "layout": "card",
+      "variant": "handwriting",
+      "species": "dog",
+      "pet_name": "Bramble",
+      "owner": "S. Calloway",
+      "clinic": "Cedar Bend Vet Care",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-01-26",
+          "expires_on": "2027-03-12"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-12-17",
+          "expires_on": "2027-12-17"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-01-07",
+          "expires_on": "2026-12-23"
+        }
+      ]
+    },
+    {
+      "id": "cert-25",
+      "file": "images/cert-25.png",
+      "layout": "card",
+      "variant": "rotate",
+      "species": "dog",
+      "pet_name": "Bramble",
+      "owner": "S. Calloway",
+      "clinic": "Thistledown Animal Clinic",
+      "vet": "Dr. Felix Oduya",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-10-12",
+          "expires_on": "2026-11-23"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-10-20",
+          "expires_on": "2026-10-20"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2025-07-08",
+          "expires_on": "2026-07-08"
+        },
+        {
+          "label": "Canine Influenza",
+          "vaccine": "canine_influenza",
+          "administered_on": "2025-07-11",
+          "expires_on": "2027-03-13"
+        },
+        {
+          "label": "Leptospirosis",
+          "vaccine": "leptospirosis",
+          "administered_on": "2025-05-22",
+          "expires_on": "2027-03-12"
+        }
+      ]
+    },
+    {
+      "id": "cert-26",
+      "file": "images/cert-26.png",
+      "layout": "tag",
+      "variant": "alias",
+      "species": "cat",
+      "pet_name": "Olive",
+      "owner": "J. Whitfield",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Felix Oduya",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies (Feline, 1 yr)",
+          "vaccine": "rabies",
+          "administered_on": "2027-01-12",
+          "expires_on": "2027-03-12"
+        },
+        {
+          "label": "FVRCP combo",
+          "vaccine": "fvrcp",
+          "administered_on": "2025-04-27",
+          "expires_on": "2026-04-27"
+        },
+        {
+          "label": "Feline Leukemia (FeLV)",
+          "vaccine": "felv",
+          "administered_on": "2025-06-29",
+          "expires_on": "2026-06-29"
+        }
+      ]
+    },
+    {
+      "id": "cert-27",
+      "file": "images/cert-27.png",
+      "layout": "table",
+      "variant": "alias",
+      "species": "dog",
+      "pet_name": "Moose",
+      "owner": "M. Okafor",
+      "clinic": "Thistledown Animal Clinic",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies 1-Year",
+          "vaccine": "rabies",
+          "administered_on": "2025-08-20",
+          "expires_on": "2026-08-20"
+        },
+        {
+          "label": "DAPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-03-19",
+          "expires_on": "2027-03-19"
+        },
+        {
+          "label": "Bordetella bronchiseptica",
+          "vaccine": "bordetella",
+          "administered_on": "2026-03-14",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "CIV H3N2/H3N8",
+          "vaccine": "canine_influenza",
+          "administered_on": "2025-12-20",
+          "expires_on": "2026-12-20"
+        }
+      ]
+    },
+    {
+      "id": "cert-28",
+      "file": "images/cert-28.png",
+      "layout": "table",
+      "variant": "missing_expiry",
+      "species": "cat",
+      "pet_name": "Miso",
+      "owner": "J. Whitfield",
+      "clinic": "Cedar Bend Vet Care",
+      "vet": "Dr. Priya Holloway",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-06-25",
+          "expires_on": null
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-07-27",
+          "expires_on": "2027-03-14"
+        }
+      ]
+    },
+    {
+      "id": "cert-29",
+      "file": "images/cert-29.png",
+      "layout": "tag",
+      "variant": "missing_expiry",
+      "species": "dog",
+      "pet_name": "Bramble",
+      "owner": "S. Calloway",
+      "clinic": "Thistledown Animal Clinic",
+      "vet": "Dr. Imogen Vale",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-04-19",
+          "expires_on": "2027-04-19"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-10-06",
+          "expires_on": "2026-10-06"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-03-29",
+          "expires_on": "2027-03-29"
+        },
+        {
+          "label": "Canine Influenza",
+          "vaccine": "canine_influenza",
+          "administered_on": "2025-10-16",
+          "expires_on": null
+        }
+      ]
+    },
+    {
+      "id": "cert-30",
+      "file": "images/cert-30.png",
+      "layout": "table",
+      "variant": "missing_expiry",
+      "species": "dog",
+      "pet_name": "Nugget",
+      "owner": "J. Whitfield",
+      "clinic": "Thistledown Animal Clinic",
+      "vet": "Dr. Imogen Vale",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-09-14",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-05-08",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2025-07-22",
+          "expires_on": null
+        },
+        {
+          "label": "Leptospirosis",
+          "vaccine": "leptospirosis",
+          "administered_on": "2026-08-15",
+          "expires_on": "2027-08-15"
+        }
+      ]
+    },
+    {
+      "id": "cert-31",
+      "file": "images/cert-31.png",
+      "layout": "tag",
+      "variant": "rotate",
+      "species": "cat",
+      "pet_name": "Fig",
+      "owner": "S. Calloway",
+      "clinic": "Bramblewood Animal Hospital",
+      "vet": "Dr. Priya Holloway",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-09-06",
+          "expires_on": "2027-03-13"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2025-11-14",
+          "expires_on": "2027-03-14"
+        }
+      ]
+    },
+    {
+      "id": "cert-32",
+      "file": "images/cert-32.png",
+      "layout": "card",
+      "variant": "clean",
+      "species": "dog",
+      "pet_name": "Pickle",
+      "owner": "J. Whitfield",
+      "clinic": "Bramblewood Animal Hospital",
+      "vet": "Dr. Felix Oduya",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-05-20",
+          "expires_on": "2029-05-19"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-02-02",
+          "expires_on": "2027-02-12"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-06-26",
+          "expires_on": "2027-06-26"
+        }
+      ]
+    },
+    {
+      "id": "cert-33",
+      "file": "images/cert-33.png",
+      "layout": "table",
+      "variant": "clean",
+      "species": "cat",
+      "pet_name": "Sprout",
+      "owner": "S. Calloway",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%m/%d/%Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-01-11",
+          "expires_on": "2026-12-01"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2026-09-29",
+          "expires_on": "2027-09-29"
+        }
+      ]
+    },
+    {
+      "id": "cert-34",
+      "file": "images/cert-34.png",
+      "layout": "card",
+      "variant": "blur",
+      "species": "dog",
+      "pet_name": "Nugget",
+      "owner": "J. Whitfield",
+      "clinic": "Maple Hollow Veterinary Clinic",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2026-02-05",
+          "expires_on": "2027-02-05"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2026-12-12",
+          "expires_on": "2027-12-12"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-06-10",
+          "expires_on": "2026-12-09"
+        }
+      ]
+    },
+    {
+      "id": "cert-35",
+      "file": "images/cert-35.png",
+      "layout": "card",
+      "variant": "handwriting",
+      "species": "cat",
+      "pet_name": "Juno",
+      "owner": "P. Venkataraman",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Tobias Wren",
+      "date_format": "%b %d, %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-11-26",
+          "expires_on": "2028-11-25"
+        },
+        {
+          "label": "FVRCP",
+          "vaccine": "fvrcp",
+          "administered_on": "2025-05-13",
+          "expires_on": "2028-05-12"
+        }
+      ]
+    },
+    {
+      "id": "cert-36",
+      "file": "images/cert-36.png",
+      "layout": "table",
+      "variant": "rotate",
+      "species": "dog",
+      "pet_name": "Rosie",
+      "owner": "P. Venkataraman",
+      "clinic": "Quillfeather Veterinary Group",
+      "vet": "Dr. Ada Morrow",
+      "date_format": "%d %b %Y",
+      "records": [
+        {
+          "label": "Rabies",
+          "vaccine": "rabies",
+          "administered_on": "2025-11-05",
+          "expires_on": "2027-03-14"
+        },
+        {
+          "label": "DHPP",
+          "vaccine": "dhpp",
+          "administered_on": "2025-08-08",
+          "expires_on": "2027-03-12"
+        },
+        {
+          "label": "Bordetella",
+          "vaccine": "bordetella",
+          "administered_on": "2026-10-08",
+          "expires_on": "2027-10-08"
+        },
+        {
+          "label": "Canine Influenza",
+          "vaccine": "canine_influenza",
+          "administered_on": "2027-01-29",
+          "expires_on": "2028-01-29"
+        }
+      ]
+    }
+  ]
+}
