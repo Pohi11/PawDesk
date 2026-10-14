@@ -29,14 +29,14 @@ See `proposal.md` for motivation and `specs/` for the required behavior.
 ## Decisions
 
 ### D1. A hybrid workflow: code decides the order, models only read
-The orchestrator is a plain async function that branches on the request's state. Model calls happen only inside the two reading steps. Every decision after that is code: compliance, capacity, and routing. The comparison with LLM-planned and fully agentic alternatives, and the reasoning, are recorded in [decision record 0008](../../../docs/decisions/0008-hybrid-workflow-over-agentic.md).
+The orchestrator is a plain async function that branches on the request's state. Model calls happen only inside the two reading steps. Every decision after that is code: compliance, capacity, and routing. The comparison with LLM-planned and fully agentic alternatives, and the reasoning, are recorded in [decision record 0008](../../../../docs/decisions/0008-hybrid-workflow-over-agentic.md).
 
 ### D2. Durable execution with step checkpoints
 - **Saving:** `booking_step_results(booking_request_id, step, output JSONB, created_at)` with a unique `(booking_request_id, step)`. A step's results and the following transition are written in **one transaction** (through `transition()` in the same session).
 - **Resuming:** processing reads the request's state and saved results. For each step it either loads the saved result or runs the step. So a crash *between* steps loses nothing, and a crash *inside* a step only repeats that step.
 - **Idempotency:** every step is idempotent. Reading steps have no side effects beyond spans (re-running only costs money). The checks are pure reads. The unique constraint makes a duplicate save impossible even if two runs race.
 
-This is the pattern later phases follow (resolver, reply, and approval steps), so it's recorded in [decision record 0009](../../../docs/decisions/0009-durable-execution-with-step-checkpoints.md).
+This is the pattern later phases follow (resolver, reply, and approval steps), so it's recorded in [decision record 0009](../../../../docs/decisions/0009-durable-execution-with-step-checkpoints.md).
 - *Alternatives:* a workflow engine such as Temporal (the right tool at scale, but a large operational dependency for one workflow); event sourcing (more history than needed; the transition log already records the moves).
 
 ### D3. Step layout

@@ -12,7 +12,7 @@
 
 ## 3. Decisions
 
-- [x] 3.1 Write [decision record 0008](../../../docs/decisions/0008-hybrid-workflow-over-agentic.md) (hybrid workflow over agentic) and [decision record 0009](../../../docs/decisions/0009-durable-execution-with-step-checkpoints.md) (durable execution). Verify both exist and that design D1/D2 link to them.
+- [x] 3.1 Write [decision record 0008](../../../../docs/decisions/0008-hybrid-workflow-over-agentic.md) (hybrid workflow over agentic) and [decision record 0009](../../../../docs/decisions/0009-durable-execution-with-step-checkpoints.md) (durable execution). Verify both exist and that design D1/D2 link to them.
 
 ## 4. Command line and real runs
 
