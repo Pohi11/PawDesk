@@ -3,7 +3,7 @@
 ## 1. Date semantics
 
 - [x] 1.1 Write [decision record 0005](../../../docs/decisions/0005-stay-date-semantics.md) (stay date semantics). Verify the file exists and that design D1 links to it.
-- [ ] 1.2 Add `facility_date()` in `app/dates.py`. Verify with `tests/test_dates.py`, covering the Chicago, Tokyo, and naive-datetime scenarios.
+- [x] 1.2 Add `facility_date()` in `app/dates.py`. Verify with `tests/test_dates.py`, covering the Chicago, Tokyo, and naive-datetime scenarios.
 
 ## 2. Vaccine compliance (pure)
 
