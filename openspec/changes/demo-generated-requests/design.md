@@ -14,7 +14,7 @@
 **Non-Goals:**
 - handwriting, blur, or rotation (the benchmark covers reading hard images);
 - storing generated requests before they're sent;
-- predicting the outcome (records on file can still cover a vaccine the card lacks).
+- predicting the whole outcome (capacity, intake, and the records model still decide the run).
 
 ## Decisions
 
@@ -36,11 +36,12 @@
   - valid for 1 year, or 3 years for some rabies records;
   - always expiring at least 30 days after checkout;
   - dogs sometimes also get one vaccine that isn't required, as real cards do.
-- **The scenario changes one required vaccine:**
+- **The scenario changes one required vaccine,** chosen only among vaccines where the real check (`vaccine_status`) over the pet's records on file plus the changed record gives the scenario's status. A current record on file would otherwise cover an expired one on the card, and the scenario would say one thing while the desk concluded another (found in the first real try-out). When no required vaccine qualifies, the pet, service, and stay are drawn again, up to 30 times, and then the scenario becomes `current`, which always holds because the card covers every vaccine.
+- **The changes:**
   - `expired`: expires 5 to 60 days before the start;
   - `expires_during_stay`: expires on a day from the start up to the day before checkout;
-  - `missing`: removed from the card.
-- **The plain description** says only what's on the card, e.g. "Bordetella expired on March 1, 2027." It doesn't predict the outcome.
+  - `missing`: removed from the card, and only for a vaccine with no record on file.
+- **The plain description** names the changed vaccine and its date, e.g. "Bordetella expired on Mar 1, 2027, before the stay."
 - **Clinic and vet** are drawn from fictional lists.
 
 ### D4. Drawing the card (`app/certificate_card.py`)
@@ -72,4 +73,4 @@ A generated request is stored like a sample (owner, message, the card attached) 
 ## Risks / Trade-offs
 
 - [The records model may note the "not a real record" footer as doubt, which sends the request to review] → It's honest behavior, and it has been measured before (benchmark watermark). It's acceptable for a demo, and visible in the run's reasons.
-- [Records on file can cover a vaccine missing from the card] → The scenario text describes the card, not the outcome, and the run shows what was used.
+- [Records on file decide which pets can show a failing scenario] → With the seeded records, failing scenarios fall on the dogs whose records on file leave a gap, and cats always get `current`. Variety across pets is lower for failing scenarios, but the scenario never contradicts the check.

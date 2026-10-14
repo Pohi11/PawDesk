@@ -6,9 +6,16 @@ import pytest
 from sqlalchemy import select
 
 from app.certificate_card import render
-from app.compliance import Outcome, VaccineEvidence, VaccineStatus, check, load_requirements
+from app.compliance import (
+    Outcome,
+    VaccineEvidence,
+    VaccineStatus,
+    check,
+    load_evidence,
+    load_requirements,
+)
 from app.demo import DEMO_TODAY
-from app.demo_generator import SCENARIOS, generate
+from app.demo_generator import SCENARIOS, VACCINE_LABEL, generate, printed
 from app.enums import Service, Species, Vaccine
 from app.models import Facility, Owner, Pet
 from scripts.seed import seed
@@ -62,14 +69,38 @@ async def test_card_names_the_pet_and_its_owner(seeded):
 
 
 @spec("demo-generator", "The certificate matches its request")
-async def test_scenario_dates_give_the_described_status(seeded):
+async def test_card_dates_match_the_scenario_text(seeded):
+    for s in SEEDS:
+        g = await generate(seeded, s)
+        labels = [r.label for r in g.records]
+        if g.scenario == "current":
+            assert all(
+                r.administered_on <= g.start_date <= g.end_date <= r.expires_on for r in g.records
+            ), s
+            continue
+        if g.scenario == "missing":
+            missing = g.scenario_text.removesuffix(" is not on the card or on file.")
+            assert missing in VACCINE_LABEL.values() and missing not in labels, s
+            continue
+        (record,) = [r for r in g.records if g.scenario_text.startswith(r.label + " ")]
+        assert printed(record.expires_on) in g.scenario_text, s
+        if g.scenario == "expired":
+            assert record.expires_on < g.start_date, s
+        else:
+            assert g.start_date <= record.expires_on < g.end_date, s
+
+
+@spec("demo-generator", "Scenarios hold with the records on file")
+async def test_scenario_holds_with_the_records_on_file(seeded):
+    """The desk checks the card together with the records on file, so the test does too."""
     facility_id = await seeded.scalar(select(Facility.id))
     for s in SEEDS:
         g = await generate(seeded, s)
         required = await load_requirements(
             seeded, facility_id, Service(g.service), Species(g.species)
         )
-        evidence = [
+        pet_id = await seeded.scalar(select(Pet.id).where(Pet.name == g.pet))
+        evidence = await load_evidence(seeded, pet_id) + [
             VaccineEvidence(Vaccine(r.vaccine), r.administered_on, r.expires_on) for r in g.records
         ]
 

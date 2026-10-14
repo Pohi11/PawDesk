@@ -38,7 +38,14 @@ The scenario SHALL be described in plain words with the request.
 
 #### Scenario: Scenario dates
 - **WHEN** requests are generated for each scenario
-- **THEN** checking each certificate's records alone against the stay gives `compliant` for `current`, and a failing status for the chosen vaccine otherwise (`expired`, `expires_during_stay`, or `missing`)
+- **THEN** the changed vaccine's dates on the card, or its absence, match the scenario's description
+
+### Requirement: Scenarios hold with the records on file
+The desk checks a card together with the pet's records on file, so the generator SHALL change only a vaccine for which that combined check gives the scenario's status. When no draw of pet, service, and stay allows it, the request SHALL use `current`.
+
+#### Scenario: A record on file would cover the card
+- **WHEN** requests are generated for seeds 1 to 80
+- **THEN** checking each card together with its pet's records on file gives `compliant` for `current`, and otherwise exactly one failing vaccine with that scenario's status
 
 ### Requirement: Certificates can be viewed before sending
 The API SHALL serve a generated request's certificate, and each fixed sample's certificate, as a PNG image. An unknown sample, or a sample without a certificate, SHALL get 404.
