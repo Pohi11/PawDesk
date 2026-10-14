@@ -40,14 +40,21 @@ export interface TraceDetail {
   spans: SpanDetail[];
 }
 
-export interface RequestDetail {
+/** The matched pet. Every field is null until intake matches the request to a pet on file. */
+export interface PetFields {
+  pet: string | null;
+  pet_id: string | null;
+  pet_species: string | null;
+  pet_breed: string | null;
+}
+
+export interface RequestDetail extends PetFields {
   id: string;
   status: string;
   failed_step: string | null;
   last_error: string | null;
   created_at: string;
   owner: string;
-  pet: string | null;
   raw_message: string;
   transitions: { from: string; to: string; actor: string; reason: string | null; at: string }[];
   steps: Record<string, Record<string, unknown>>;
@@ -62,12 +69,11 @@ export interface RequestDetail {
   traces: TraceDetail[];
 }
 
-export interface RequestRow {
+export interface RequestRow extends PetFields {
   id: string;
   status: string;
   created_at: string;
   owner: string;
-  pet: string | null;
   service: string | null;
   start_date: string | null;
   end_date: string | null;
