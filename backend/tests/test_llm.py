@@ -1,8 +1,10 @@
 """Spec: llm-client. No test here contacts the real provider."""
 
+import asyncio
 import base64
 import hashlib
 import json
+import time
 from decimal import Decimal
 
 import httpx
@@ -379,3 +381,40 @@ async def test_plain_request_has_no_routing_preferences(tracer):
         )
 
     assert "provider" not in json.loads(script.requests[0].content)
+
+
+@spec("llm-client", "Each attempt has a timeout")
+async def test_slow_attempt_is_cut_off_by_wall_clock(tracer):
+    """A provider that holds the connection open (e.g. trickling keep-alive bytes) never trips
+    an HTTP read timeout, so each attempt needs a wall-clock deadline of its own."""
+    calls = 0
+
+    async def slow(request):
+        nonlocal calls
+        calls += 1
+        await asyncio.sleep(2)
+        return ok()
+
+    waits: list[float] = []
+
+    async def fake_sleep(seconds):
+        waits.append(seconds)
+
+    settings = fake_settings(llm_timeout_seconds=0.2)
+    client = make_client(settings, transport=httpx.MockTransport(slow))
+    started = time.perf_counter()
+
+    async with tracer.start_trace("t"):
+        with pytest.raises(LLMError) as raised:
+            await complete(
+                [{"role": "user", "content": "hi"}],
+                name="slow",
+                client=client,
+                settings=settings,
+                policy=RetryPolicy(max_attempts=2, sleep=fake_sleep),
+            )
+
+    assert time.perf_counter() - started < 1.5
+    assert calls == 2
+    assert raised.value.attempts == 2
+    assert "timeout" in str(raised.value)
