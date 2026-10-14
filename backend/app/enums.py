@@ -31,3 +31,9 @@ class Vaccine(StrEnum):
     LEPTOSPIROSIS = "leptospirosis"
     FVRCP = "fvrcp"
     FELV = "felv"
+
+
+class ApprovalAction(StrEnum):
+    APPROVE = "approve"
+    EDIT_AND_APPROVE = "edit_and_approve"
+    REJECT = "reject"

@@ -141,8 +141,9 @@ class Reservation(UUIDPrimaryKey, Base):
     kennel_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("kennels.id"))
     pet_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("pets.id"), index=True)
     # At most one reservation per booking request, so a retried step can't double-book.
-    # The foreign key to booking_requests is added with that table (task 5.1).
-    booking_request_id: Mapped[uuid.UUID | None] = mapped_column(unique=True)
+    booking_request_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("booking_requests.id"), unique=True
+    )
     start_date: Mapped[date] = mapped_column(Date)
     end_date: Mapped[date] = mapped_column(Date)
     created_at: Mapped[datetime] = created_at_column()

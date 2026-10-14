@@ -13,7 +13,16 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from app.enums import Service, SizeClass, Species, Vaccine
-from app.models import Facility, Kennel, Owner, Pet, Reservation, VaccineRecord, VaccineRule
+from app.models import (
+    BookingRequest,
+    Facility,
+    Kennel,
+    Owner,
+    Pet,
+    Reservation,
+    VaccineRecord,
+    VaccineRule,
+)
 
 spec = pytest.mark.spec
 
@@ -307,8 +316,12 @@ async def test_second_reservation_for_same_request_is_rejected(session):
     facility = await make_facility(session)
     k1 = await make_kennel(session, facility, name="K1")
     k2 = await make_kennel(session, facility, name="K2")
-    pet = await make_pet(session)
-    request_id = uuid.uuid4()
+    owner = await make_owner(session)
+    pet = await make_pet(session, owner=owner)
+    request = BookingRequest(facility_id=facility.id, owner_id=owner.id, raw_message="Board?")
+    session.add(request)
+    await session.flush()
+    request_id = request.id
     await reserve(session, k1, pet, date(2027, 3, 6), date(2027, 3, 9), request_id)
 
     with pytest.raises(IntegrityError, match="uq_reservations_booking_request_id"):
