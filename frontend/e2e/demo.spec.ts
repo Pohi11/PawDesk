@@ -22,7 +22,7 @@ test(`${REQ} the clean sample runs live to sent`, async ({ page }) => {
   await sendSample(page, "Clean boarding request");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Biscuit");
-  await expect(page.getByText("Sent automatically", { exact: false })).toBeVisible();
+  await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
   await expect(page.getByText("Every check passed.")).toBeVisible();
   await frame(page, "02-clean-sent");
 
