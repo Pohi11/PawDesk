@@ -1,19 +1,36 @@
-"""HTTP routes for staff (spec: staff-approval).
+"""HTTP routes: staff actions (spec: staff-approval) and read-only observability (spec:
+observability-api).
 
 No sign-in yet: the staff member's name is taken from the request body. Authentication
 belongs to the deployment work, before this API is reachable by anyone else.
 """
 
+import asyncio
+import json
 import uuid
+from collections.abc import AsyncIterator
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.approvals import NotWaiting, decide, review_queue
 from app.db import get_sessionmaker
+from app.demo import DEMO_TODAY, SAMPLES, submit_sample
 from app.enums import ApprovalAction
+from app.observability import (
+    RESULTS_DIR,
+    eval_reports,
+    is_resting,
+    list_requests,
+    metrics,
+    request_detail,
+    snapshot,
+)
 from app.orchestrator import process_request
 from app.transitions import TransitionConflict
 
@@ -23,6 +40,37 @@ Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max
 Reason = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
 ReplyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1500)]
 Sessions = Annotated[async_sessionmaker[AsyncSession], Depends(get_sessionmaker)]
+
+
+def get_results_dir() -> Path:
+    return RESULTS_DIR
+
+
+ResultsDir = Annotated[Path, Depends(get_results_dir)]
+
+
+@dataclass(frozen=True)
+class StreamTiming:
+    poll_seconds: float = 0.5
+    limit_seconds: float = 300.0
+
+
+def get_stream_timing() -> StreamTiming:
+    return StreamTiming()
+
+
+Timing = Annotated[StreamTiming, Depends(get_stream_timing)]
+
+
+def get_llm_kwargs() -> dict[str, Any]:
+    """Extra model-client arguments for background runs; tests inject a scripted model."""
+    return {}
+
+
+LLMKwargs = Annotated[dict[str, Any], Depends(get_llm_kwargs)]
+MessageText = Annotated[
+    str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)
+]
 
 
 class _Body(BaseModel):
@@ -41,6 +89,96 @@ class EditAndApproveBody(_Body):
 class RejectBody(_Body):
     staff_name: Name
     reason: Reason
+
+
+class DemoBody(_Body):
+    sample: str
+    message: MessageText | None = None
+
+
+@router.get("/requests")
+async def requests(
+    sessions: Sessions, limit: Annotated[int, Query(ge=1, le=200)] = 50
+) -> list[dict[str, Any]]:
+    async with sessions() as session:
+        return await list_requests(session, limit)
+
+
+@router.get("/requests/{request_id}")
+async def request(request_id: uuid.UUID, sessions: Sessions) -> dict[str, Any]:
+    async with sessions() as session:
+        try:
+            return await request_detail(session, request_id)
+        except LookupError as exc:
+            raise HTTPException(status_code=404, detail="booking request not found") from exc
+
+
+@router.get("/requests/{request_id}/events")
+async def events(request_id: uuid.UUID, sessions: Sessions, timing: Timing) -> StreamingResponse:
+    """Server-sent events: a snapshot now and whenever the state or a span changes, until
+    the request is resting with nothing running (decision record 0013).
+
+    The run may be happening in another process (the command line), so the stream reads
+    the database, which every process writes to, rather than listening in memory.
+    """
+    async with sessions() as session:
+        try:
+            await snapshot(session, request_id)  # 404 before the stream starts
+        except LookupError as exc:
+            raise HTTPException(status_code=404, detail="booking request not found") from exc
+
+    async def stream() -> AsyncIterator[str]:
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timing.limit_seconds
+        last = None
+        while True:
+            async with sessions() as session:
+                snap = await snapshot(session, request_id)
+            data = json.dumps(snap, sort_keys=True)
+            if data != last:
+                yield f"event: snapshot\ndata: {data}\n\n"
+                last = data
+            if is_resting(snap) or loop.time() >= deadline:
+                break
+            await asyncio.sleep(timing.poll_seconds)
+        yield "event: end\ndata: {}\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@router.get("/metrics")
+async def get_metrics(sessions: Sessions) -> dict[str, Any]:
+    async with sessions() as session:
+        return await metrics(session)
+
+
+@router.get("/evals")
+async def evals(results_dir: ResultsDir) -> list[dict[str, Any]]:
+    return eval_reports(results_dir)
+
+
+@router.get("/demo/samples")
+async def demo_samples() -> list[dict[str, Any]]:
+    return [sample.to_json() for sample in SAMPLES.values()]
+
+
+@router.post("/demo/requests", status_code=202)
+async def demo_request(
+    body: DemoBody, sessions: Sessions, background: BackgroundTasks, llm_kwargs: LLMKwargs
+) -> dict[str, str]:
+    """Store the sample as a new request and answer at once; processing runs afterward."""
+    try:
+        request_id = await submit_sample(sessions, body.sample, body.message)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    background.add_task(
+        process_request, request_id, sessions=sessions, today=DEMO_TODAY, **llm_kwargs
+    )
+    return {"id": str(request_id)}
 
 
 @router.get("/reviews")
