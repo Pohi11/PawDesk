@@ -63,7 +63,7 @@ async def test_running_seed_twice_gives_the_same_counts(session):
     assert await table_counts(session) == first
 
 
-@spec("seed-data", "Seeding refuses non-local databases")
+@spec("seed-data", "Seeding refuses non-development databases")
 @pytest.mark.parametrize(
     "url",
     [

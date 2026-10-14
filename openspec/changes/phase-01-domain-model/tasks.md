@@ -41,7 +41,7 @@
 
 - [x] 8.1 Make the backend container run `alembic upgrade head` before uvicorn. Verify that `docker compose up --build` reports all services healthy and `/health/db` returns ok.
 - [x] 8.2 Update `README.md` with the migrate, seed, and test commands. Verify that each documented command runs as written.
-- [ ] 8.3 Run the full suite and lint. Verify that `uv run pytest` and `uv run ruff check . && uv run ruff format --check .` pass, and that every spec requirement in this change has at least one test carrying a matching `spec` marker.
+- [x] 8.3 Run the full suite and lint. Verify that `uv run pytest` and `uv run ruff check . && uv run ruff format --check .` pass, and that every spec requirement in this change has at least one test carrying a matching `spec` marker.
 
 ## Workflow follow-up
 

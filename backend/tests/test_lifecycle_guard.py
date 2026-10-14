@@ -115,6 +115,26 @@ def test_system_cannot_reject():
         check_transition(S.NEEDS_REVIEW, S.REJECTED, A.SYSTEM)
 
 
+@spec("booking-lifecycle", "Decided requests are sent by the system")
+@pytest.mark.parametrize("decided", [S.APPROVED, S.REJECTED])
+def test_system_sends_decided_requests(decided):
+    check_transition(decided, S.SENT, A.SYSTEM)
+
+
+@spec("booking-lifecycle", "Decided requests are sent by the system")
+@pytest.mark.parametrize("decided", [S.APPROVED, S.REJECTED])
+def test_staff_cannot_send(decided):
+    with pytest.raises(IllegalTransition):
+        check_transition(decided, S.SENT, A.STAFF)
+
+
+@spec("booking-lifecycle", "Decided requests are sent by the system")
+@pytest.mark.parametrize("undecided", [S.READY, S.NEEDS_REVIEW, S.DRAFTING])
+def test_undecided_requests_cannot_be_sent(undecided):
+    with pytest.raises(IllegalTransition):
+        check_transition(undecided, S.SENT, A.SYSTEM)
+
+
 @spec("booking-lifecycle", "Approval requires deterministic clearance or a person")
 def test_only_two_paths_lead_into_approved_plus_the_retry_exception():
     paths_into_approved = {
