@@ -79,7 +79,7 @@ specTest("run-dashboard", REQ, "every step says what it does, whatever its statu
   expect(ok("compliance", base, "waiting")).toBe("Not run yet.");
   expect(ok("intake", base, "running")).toBe("Working on it now.");
   expect(ok("review", base, "running")).toBe("Waiting for a person.");
-  expect(ok("send", base, "error")).toBe("Failed here. It can be retried.");
+  expect(ok("send", base, "error")).toBe("Failed here. Processing the request again resumes from this step.");
 });
 
 specTest("run-dashboard", REQ, "a clean run says what each step found", () => {
@@ -141,7 +141,7 @@ specTest("run-dashboard", REQ, "the resolver, the reply, and staff review report
   );
   expect(ok("resolver", proposed)).toBe("Found 2 options, all checked.");
   expect(ok("reply", proposed)).toBe("Drafted a reply offering the options. A person reviews it before it goes out.");
-  expect(ok("review", proposed)).toBe("Edited and approved by Dana.");
+  expect(ok("review", proposed)).toBe("Dana edited the reply and approved it.");
 
   const injection = withSteps(
     {
@@ -161,7 +161,7 @@ specTest("run-dashboard", REQ, "the resolver, the reply, and staff review report
   expect(ok("reply", injection)).toBe(
     "Drafted a holding reply while a person looks. A person reviews it before it goes out.",
   );
-  expect(ok("review", injection)).toBe("Declined by Sam.");
+  expect(ok("review", injection)).toBe("Sam declined the request.");
   expect(ok("send", injection)).toBe("Sent a polite decline.");
 
   const overpromised = withSteps({ reply: { situation: "confirmed", target: "needs_review", promise_issues: ["reserved"] } });

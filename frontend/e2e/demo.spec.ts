@@ -22,7 +22,7 @@ test(`${REQ} the clean sample runs live to sent`, async ({ page }) => {
   await sendSample(page, "Clean boarding request");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Biscuit");
-  await expect(page.getByText("Sent automatically", { exact: false })).toBeVisible();
+  await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
   await expect(page.getByText("Every check passed.")).toBeVisible();
   await frame(page, "02-clean-sent");
 
@@ -35,7 +35,7 @@ const TOOLTIPS = specTag("run-dashboard", "Path steps explain themselves");
 
 test(`${TOOLTIPS} hovering or focusing a step explains it and what it found`, async ({ page }) => {
   await sendSample(page, "Clean boarding request");
-  await expect(page.getByText("Sent automatically", { exact: false })).toBeVisible();
+  await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
   const tooltip = page.getByRole("tooltip");
 
   await page.getByRole("button", { name: "Compliance: Done" }).hover();
@@ -55,7 +55,7 @@ test(`${TOOLTIPS} hovering or focusing a step explains it and what it found`, as
   await page.keyboard.press("Escape");
   await expect(tooltip).toBeHidden();
   await page.keyboard.press("Enter");
-  await expect(page.getByText("Choose a step in the path")).toBeHidden(); // the inspector opened
+  await expect(page.getByText("Choose a step above or a bar in the timeline.")).toBeHidden(); // the inspector opened
 });
 
 test(`${REQ} the injection sample waits for review and is approved to sent`, async ({ page }) => {

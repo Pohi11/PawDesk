@@ -10,9 +10,9 @@ export default function DecisionsPage() {
   return (
     <>
       <PageTitle title="Decision records">
-        Each record states its context, the options considered, the decision, and its consequences.
-        Records are never rewritten: a changed decision gets a new record that supersedes the old
-        one.
+        Each record gives the context, the options considered, the decision, and its consequences. A
+        committed record stays as written, and a changed decision gets a new record that supersedes
+        it.
       </PageTitle>
       <BuildNav />
 

@@ -20,7 +20,7 @@ test(`${SHOWN} Biscuit's Beagle photo shows on the live run and the list`, async
   const photo = page.getByRole("img", { name: "Photo for Biscuit" });
   await expect(photo).toBeVisible();
   await expect(photo).toHaveAttribute("src", "/pets/beagle.jpg");
-  await expect(page.getByText("Sent automatically", { exact: false })).toBeVisible();
+  await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
 
   await page.goto("/");
   const row = page.locator(`a[href="${path}"]`);

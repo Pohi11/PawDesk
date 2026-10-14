@@ -1,0 +1,30 @@
+{
+  "about": "Words and phrases the dashboard's text and the demo samples must not use. Matched as whole words, ignoring case. The rules that need judgment are in interface-copy.md.",
+  "banned": [
+    "just",
+    "simply",
+    "really",
+    "actually",
+    "exactly",
+    "truly",
+    "genuinely",
+    "honestly",
+    "literally",
+    "seamlessly",
+    "effortlessly",
+    "deeply",
+    "fundamentally",
+    "crucially",
+    "importantly",
+    "robust",
+    "powerful",
+    "leverage",
+    "unlock",
+    "delve",
+    "game-changer",
+    "it's worth noting",
+    "at its core",
+    "here's",
+    "let's dive"
+  ]
+}

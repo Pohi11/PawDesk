@@ -30,8 +30,8 @@ async function Desk() {
           </h1>
           <p className="mt-3 text-lg text-muted">
             {waiting === 0
-              ? "Every request so far was decided by the checks or already handled by staff."
-              : "Each one needs a person before anything is sent. The rest were decided by the checks."}
+              ? "The checks or your staff have decided every request so far."
+              : "A person decides each one before anything goes out. The checks decided the rest."}
           </p>
         </div>
         {waiting > 0 ? (

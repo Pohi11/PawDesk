@@ -103,7 +103,7 @@ export function RunView({ initial }: { initial: RequestDetail }) {
       </div>
 
       <Panel
-        title="The desk's path"
+        title="Steps"
         aside={
           <span className="flex flex-wrap gap-x-4 gap-y-1">
             {(["llm", "code", "tool", "human"] as const).map((k) => (
@@ -115,7 +115,7 @@ export function RunView({ initial }: { initial: RequestDetail }) {
         }
       >
         <RunGraph statuses={statuses} detail={detail} onSelect={selectNode} />
-        <p className="mt-2 text-sm text-faint">Point at a step for a summary, or select it to see exactly what it was given and what it returned.</p>
+        <p className="mt-2 text-sm text-faint">Point at a step for a summary, or select it to see its input and output.</p>
       </Panel>
 
       <div className="grid gap-6 lg:grid-cols-5">
@@ -151,7 +151,7 @@ export function RunView({ initial }: { initial: RequestDetail }) {
           {selected ? (
             <Inspector span={selected} now={now} />
           ) : (
-            <p className="text-sm text-muted">Choose a step in the path or a bar in the timeline.</p>
+            <p className="text-sm text-muted">Choose a step above or a bar in the timeline.</p>
           )}
         </Panel>
       </div>
@@ -230,8 +230,8 @@ function Inspector({ span, now }: { span: SpanDetail; now: number }) {
         )}
       </dl>
       {span.error && <p className="rounded-lg bg-error-soft p-3 text-error">{span.error}</p>}
-      <Payload title="Given" value={span.input} open />
-      <Payload title="Returned" value={span.output} open />
+      <Payload title="Input" value={span.input} open />
+      <Payload title="Output" value={span.output} open />
       {Object.keys(span.attributes ?? {}).length > 0 && <Payload title="Attributes" value={span.attributes} />}
     </div>
   );
@@ -260,11 +260,11 @@ function Story({ detail }: { detail: RequestDetail }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
-        <Panel title="What they asked">
+        <Panel title="Message from the pet parent">
           <p className="whitespace-pre-wrap leading-relaxed">{detail.raw_message}</p>
         </Panel>
         {letter && (
-          <Panel title={detail.message ? "What was sent" : "Reply waiting to be sent"}>
+          <Panel title={detail.message ? "Sent reply" : "Draft reply"}>
             <p className="font-medium">{letter.subject}</p>
             <p className="mt-2 whitespace-pre-wrap leading-relaxed text-muted">{letter.body}</p>
           </Panel>
@@ -272,7 +272,7 @@ function Story({ detail }: { detail: RequestDetail }) {
       </div>
       <div className="space-y-6">
         {route && (
-          <Panel title="Why it went this way">
+          <Panel title="Routing reasons">
             {route.reasons?.length ? (
               <ul className="space-y-1.5">
                 {route.reasons.map((r) => (
@@ -287,14 +287,14 @@ function Story({ detail }: { detail: RequestDetail }) {
             )}
             {resolution?.proposal && (
               <div className="mt-5">
-                <p className="font-medium">Options found</p>
+                <p className="font-medium">Options the resolver found</p>
                 <p className="mt-1 text-sm text-muted">{resolution.proposal.summary}</p>
                 <ul className="mt-3 space-y-2">
                   {resolution.proposal.options.map((o, i) => (
                     <li key={i} className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg bg-wash px-3 py-2">
                       <span>{optionText(o)}</span>
                       <span className={`text-sm ${o.verified ? "text-kennel" : "text-error"}`}>
-                        {o.verified ? "Checked and works" : `Still blocked: ${o.remaining_problems?.join(", ")}`}
+                        {o.verified ? "Verified by the checks" : `Still blocked: ${o.remaining_problems?.join(", ")}`}
                       </span>
                     </li>
                   ))}
@@ -303,7 +303,7 @@ function Story({ detail }: { detail: RequestDetail }) {
             )}
           </Panel>
         )}
-        <Panel title="Every step it took">
+        <Panel title="State changes">
           <ol className="space-y-2 text-sm">
             {detail.transitions.map((t, i) => (
               <li key={i} className="grid grid-cols-[6.5rem_1fr] gap-3">
