@@ -11,7 +11,7 @@ import {
   Position,
   ReactFlow,
 } from "@xyflow/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { EDGES, NODES, type NodeId, type NodeStatus, type WorkflowNode } from "@/lib/graph";
 import { stepSummary } from "@/lib/step-summary";
@@ -32,6 +32,7 @@ const POSITION: Record<NodeId, { x: number; y: number }> = {
 };
 
 const TIP_WIDTH = 288;
+const STEP_SIZE = { width: 132, height: 50 };
 const HIDDEN_HANDLE = { opacity: 0, pointerEvents: "none" as const, border: 0, minWidth: 0, minHeight: 0 };
 
 type StepData = {
@@ -62,7 +63,7 @@ function Step({ data }: NodeProps<StepNode>) {
         onMouseLeave={() => onHide(120)}
         onFocus={(e) => onShow(step.id, e.currentTarget)}
         onBlur={() => onHide(0)}
-        className={`nodrag flex w-[132px] items-center gap-2 text-left focus-visible:outline-offset-4 ${status === "running" ? "motion-safe:animate-pulse" : ""}`}
+        className={`nodrag flex h-full w-full items-center gap-2 text-left focus-visible:outline-offset-4 ${status === "running" ? "motion-safe:animate-pulse" : ""}`}
         style={{
           padding: "10px 12px",
           fontSize: 13,
@@ -131,25 +132,41 @@ export function RunGraph({
   }, [tip]);
   useEffect(() => () => clearTimeout(hideTimer.current), []);
 
-  const nodes: StepNode[] = NODES.map((step) => {
-    const summary = stepSummary(step.id, statuses[step.id], detail);
-    return {
-      id: step.id,
-      type: "step",
-      position: POSITION[step.id],
-      draggable: false,
-      // React Flow ignores the pointer on nodes that can't be selected or dragged; steps are buttons.
-      style: { pointerEvents: "all" },
-      data: {
-        step,
-        status: statuses[step.id],
-        description: `${summary.does} ${summary.result}`,
-        onSelect,
-        onShow: show,
-        onHide: hide,
-      },
-    };
-  });
+  // The run view re-renders several times a second while live; a stable callback keeps the
+  // nodes below unchanged until the run itself changes.
+  const selectRef = useRef(onSelect);
+  useEffect(() => {
+    selectRef.current = onSelect;
+  }, [onSelect]);
+  const select = useCallback((id: NodeId) => selectRef.current(id), []);
+
+  const nodes = useMemo<StepNode[]>(
+    () =>
+      NODES.map((step) => {
+        const summary = stepSummary(step.id, statuses[step.id], detail);
+        return {
+          id: step.id,
+          type: "step",
+          position: POSITION[step.id],
+          // A fixed size: React Flow hides a replaced node until it measures it again, and a
+          // hidden button loses keyboard focus.
+          width: STEP_SIZE.width,
+          height: STEP_SIZE.height,
+          draggable: false,
+          // React Flow ignores the pointer on nodes that can't be selected or dragged; steps are buttons.
+          style: { pointerEvents: "all" },
+          data: {
+            step,
+            status: statuses[step.id],
+            description: `${summary.does} ${summary.result}`,
+            onSelect: select,
+            onShow: show,
+            onHide: hide,
+          },
+        };
+      }),
+    [statuses, detail, select, show, hide],
+  );
   const edges: Edge[] = EDGES.map(([source, target]) => {
     const done = statuses[target] === "ok" || statuses[target] === "running";
     return {
