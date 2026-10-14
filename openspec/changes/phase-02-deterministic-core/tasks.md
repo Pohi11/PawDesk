@@ -16,8 +16,8 @@
 
 ## 4. Kennel capacity
 
-- [ ] 4.1 Write `tests/test_capacity.py`: partly booked, back-to-back, exact size only, other facility ignored, deterministic choice, zero-night rejected, and the seeded full and free medium windows. Verify that it collects and fails against a stub.
-- [ ] 4.2 Implement `app/capacity.py` (`find_kennel()`, a single `NOT EXISTS` query). Verify that `tests/test_capacity.py` passes in full.
+- [x] 4.1 Write `tests/test_capacity.py`: partly booked, back-to-back, exact size only, other facility ignored, deterministic choice, zero-night rejected, and the seeded full and free medium windows. Verify that it collects and fails against a stub.
+- [x] 4.2 Implement `app/capacity.py` (`find_kennel()`, a single `NOT EXISTS` query). Verify that `tests/test_capacity.py` passes in full.
 
 ## 5. Integration
 
