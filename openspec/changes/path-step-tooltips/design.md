@@ -27,11 +27,11 @@
 ### D2. What each step says once it has run
 | Step | Result line, for example |
 |---|---|
-| Intake | "Read boarding for Rosie, Mar 9–12, 2027." or the reason it needs a person |
+| Intake | "Read boarding for Rosie, Mar 9–12, 2027.", plus how many things it flagged for a person |
 | Records | "Read 3 vaccines from the card: Rabies, DHPP, Bordetella." or "No certificate attached." |
 | Compliance | "Every required vaccine covers the stay." or "Bordetella expired." |
 | Capacity | "Kennel M2 is free." / "No medium kennel is free." / "No kennel needed for grooming." |
-| Route | "Every check passed, so straight to the reply." or the first reason and how many more |
+| Route | "Every check passed, so straight to the reply." or "3 things to look at (vaccines and kennel space), so on to the resolver." |
 | Resolver | "Found 3 options, all checked." or why it did not try |
 | Reply | the situation in words, then "passed the promise check" or the first flag |
 | Staff review | "Approved by Dana." / "Waiting for a person." / "Not needed: nothing was flagged." |

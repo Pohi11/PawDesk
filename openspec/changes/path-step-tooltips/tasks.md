@@ -2,7 +2,7 @@
 
 ## 1. Summaries
 
-- [ ] 1.1 Add `lib/step-summary.ts` with `stepSummary(id, status, detail)`. Verify with spec-tagged unit tests: every step's description, results for a clean run, an expired vaccine, no free kennel, a skipped resolver, a review by staff, waiting and running steps, and missing fields falling back to plain text.
+- [x] 1.1 Add `lib/step-summary.ts` with `stepSummary(id, status, detail)`. Verify with spec-tagged unit tests: every step's description, results for a clean run, an expired vaccine, no free kennel, a skipped resolver, a review by staff, waiting and running steps, and missing fields falling back to plain text.
 
 ## 2. Path
 
