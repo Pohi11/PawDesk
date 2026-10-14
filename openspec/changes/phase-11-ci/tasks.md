@@ -2,7 +2,7 @@
 
 ## 1. Recorded responses
 
-- [ ] 1.1 Add `app/cassettes.py` and the cassette settings, and wire them into the default client. Verify with `tests/test_cassettes.py`: record then replay returns the same response with no network call, and a missing recording fails without retry, naming the key.
+- [x] 1.1 Add `app/cassettes.py` and the cassette settings, and wire them into the default client. Verify with `tests/test_cassettes.py`: record then replay returns the same response with no network call, and a missing recording fails without retry, naming the key.
 
 ## 2. Secrets
 
