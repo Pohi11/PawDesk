@@ -15,7 +15,7 @@
 
 ## 3. Decision and real run
 
-- [ ] 3.1 Write [decision record 0013](../../../docs/decisions/0013-live-updates-sse-from-database.md). Verify it exists and that design D1 links to it.
+- [x] 3.1 Write [decision record 0013](../../../docs/decisions/0013-live-updates-sse-from-database.md). Verify it exists and that design D1 links to it.
 - [ ] 3.2 Real demo in a browser: submit the clean and injection samples from the demo page, watch both live, approve the flagged one from the review page. Verify with screenshots and by recording the outcomes.
 
 ## 4. Integration
