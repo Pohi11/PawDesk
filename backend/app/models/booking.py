@@ -8,11 +8,9 @@ from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, String, T
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.enums import ApprovalAction
-from app.lifecycle import Actor, State
+from app.lifecycle import CAN_FAIL, Actor, State
 from app.models.base import Base, UUIDPrimaryKey
 from app.models.types import created_at_column, str_enum
-
-FAILABLE_STATES = ("extracting", "checking", "resolving", "drafting", "approved", "rejected")
 
 
 class BookingRequest(UUIDPrimaryKey, Base):
@@ -24,7 +22,7 @@ class BookingRequest(UUIDPrimaryKey, Base):
             "(status = 'failed') = (failed_step IS NOT NULL)", name="failed_step_iff_failed"
         ),
         CheckConstraint(
-            f"failed_step IN ({', '.join(repr(s) for s in FAILABLE_STATES)})",
+            f"failed_step IN ({', '.join(repr(str(s)) for s in sorted(CAN_FAIL))})",
             name="failed_step_is_failable",
         ),
     )

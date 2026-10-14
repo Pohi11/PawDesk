@@ -21,7 +21,7 @@
 ## 4. Lifecycle guard
 
 - [x] 4.1 Write `tests/test_lifecycle_guard.py`. It enumerates the allowed set from the spec and parametrizes over **every** (from, to, actor) combination, asserting that allowed ones pass and all others raise `IllegalTransition` naming both states. It also covers retry to the recorded failed step versus a different step, `sent` being terminal, and both paths into `approved`. Verify that it collects and fails, since the guard doesn't exist yet.
-- [ ] 4.2 Implement `app/lifecycle.py`: the `State` and `Actor` enums, the allowed-transition table, and the guard function, with no I/O. Verify that `tests/test_lifecycle_guard.py` passes in full.
+- [x] 4.2 Implement `app/lifecycle.py`: the `State` and `Actor` enums, the allowed-transition table, and the guard function, with no I/O. Verify that `tests/test_lifecycle_guard.py` passes in full.
 
 ## 5. Booking requests and the transition service
 
