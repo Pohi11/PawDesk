@@ -26,7 +26,7 @@ See `proposal.md` for motivation and `specs/` for the required behavior.
 ## Decisions
 
 ### D1. A bounded, proposal-only agent with a hand-written loop
-The reasoning (why an agent here at all, why no framework, why proposals only) is recorded in [decision record 0010](../../../docs/decisions/0010-bounded-proposal-only-resolver.md). In short:
+The reasoning (why an agent here at all, why no framework, why proposals only) is recorded in [decision record 0010](../../../../docs/decisions/0010-bounded-proposal-only-resolver.md). In short:
 - a deterministic search *could* list candidate windows;
 - the agent earns its place by combining fixes when several problems interact (dates that fix capacity but break a vaccine, a larger kennel, an updated record) and by writing a short summary for staff;
 - every fence below keeps it from becoming the least predictable part of the system.
