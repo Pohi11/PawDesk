@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import { Loading, PageHeader } from "@/components/ui";
 import { backendJson } from "@/lib/backend";
 import { formatCost } from "@/lib/format";
@@ -22,6 +23,16 @@ export default function EvalsPage() {
 
 async function Reports() {
   const reports = await backendJson<EvalReport[]>("/evals");
+  const comparison = reports.filter((r) => r.kind === "comparison").at(-1);
+  return (
+    <div className="space-y-6">
+      {comparison && <ComparisonTable report={comparison} />}
+      <ReportTable reports={reports} />
+    </div>
+  );
+}
+
+function ReportTable({ reports }: { reports: EvalReport[] }) {
   return (
     <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
       <table className="w-full text-sm">
@@ -48,6 +59,9 @@ async function Reports() {
                 <div className="text-zinc-400">{r.model}</div>
               </td>
               <td className="px-4 py-2">
+                {r.kind === "comparison" ? (
+                  <span className="text-xs text-zinc-500">side by side above</span>
+                ) : (
                 <dl className="grid grid-cols-[auto_auto] gap-x-3 text-xs">
                   {Object.entries(r.headline).map(([key, value]) => (
                     <div key={key} className="contents">
@@ -60,6 +74,7 @@ async function Reports() {
                     </div>
                   ))}
                 </dl>
+                )}
               </td>
               <td className="px-4 py-2 text-right tabular-nums">{formatCost(r.cost_usd)}</td>
             </tr>
