@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-10-14T22:59:37+00:00",
+ "generated_at": "2026-10-14T23:27:49+00:00",
  "reports": {
   "backend": "2026-10-14T17:58:07.256171-05:00",
-  "frontend": "2026-10-14T22:55:41.131Z",
-  "e2e": "2026-10-14T22:56:14.129Z"
+  "frontend": "2026-10-14T23:27:35.307Z",
+  "e2e": "2026-10-14T23:27:40.032Z"
  },
  "totals": {
   "changes": 15,
@@ -11,10 +11,10 @@
   "verified": 125,
   "tests": {
    "backend": 858,
-   "frontend": 33,
-   "e2e": 2
+   "frontend": 39,
+   "e2e": 3
   },
-  "linked_tests": 856
+  "linked_tests": 863
  },
  "changes": [
   {
@@ -1736,7 +1736,7 @@
    "slug": "demo-generated-requests",
    "title": "Demo generated requests",
    "date": "2026-10-14",
-   "archived_at": null,
+   "archived_at": "2026-10-14T17:59:46-05:00",
    "why": "The Try page offers four fixed samples, and its vaccine certificates can't be seen: the page says a card \"is attached\" without showing it. That falls short in two ways:\n- **Showing the system.** A reader can't check what the records step was supposed to read, so they can't judge whether it read it right.\n- **Exploring the system.** Four fixed cases show four fixed paths. A request made up on the spot shows the desk handling something it was never tuned on.",
    "what_changes": "- **Generate a random request:**\n  - a seeded owner and one of their pets;\n  - a service that pet can have;\n  - dates soon after the demo day;\n  - a message in a pet parent's words;\n  - a vaccine certificate that matches all of it.\n- **The card follows one scenario,** stated in plain words:\n  - every vaccine current;\n  - one expired before the stay;\n  - one expiring during the stay;\n  - one missing from the card.\n- **Reproducible:** a seed fully determines the request and its card, so the same seed always gives the same request and image.\n- **See the card before sending,** for generated requests and for the fixed samples.\n- **Send a generated request.** It runs exactly like a sample, with its card attached.",
    "tasks": [
@@ -1992,13 +1992,13 @@
        "suite": "frontend",
        "id": "lib/comparison.test.ts::the dashboard marks the better side of each metric the same way for both",
        "status": "passed",
-       "seconds": 0.0054409
+       "seconds": 0.0043134
       },
       {
        "suite": "frontend",
        "id": "lib/comparison.test.ts::fractions compare by value",
        "status": "passed",
-       "seconds": 0.0009903
+       "seconds": 0.000728
       }
      ],
      "status": "verified"
@@ -7161,19 +7161,19 @@
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::anchors are stable and distinct",
        "status": "passed",
-       "seconds": 0.0065568
+       "seconds": 0.0032127
       },
       {
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::a change's requirements lead to their tests and results",
        "status": "passed",
-       "seconds": 0.0020478
+       "seconds": 0.0013343
       },
       {
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::a change's decisions lead to the decision records",
        "status": "passed",
-       "seconds": 0.0017087
+       "seconds": 0.0009133
       }
      ],
      "status": "verified"
@@ -7499,13 +7499,13 @@
        "suite": "e2e",
        "id": "demo.spec.ts::the clean sample runs live to sent",
        "status": "passed",
-       "seconds": 3.506
+       "seconds": 2.593
       },
       {
        "suite": "e2e",
        "id": "demo.spec.ts::the injection sample waits for review and is approved to sent",
        "status": "passed",
-       "seconds": 3.589
+       "seconds": 2.103
       }
      ],
      "status": "verified"
@@ -8660,37 +8660,37 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::parallel steps both show running",
        "status": "passed",
-       "seconds": 0.0059165
+       "seconds": 0.0033824
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a request routed straight to drafting skips the resolver",
        "status": "passed",
-       "seconds": 0.0009031
+       "seconds": 0.000622
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a request waiting for review",
        "status": "passed",
-       "seconds": 0.0005107
+       "seconds": 0.0003158
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::steps without a span are skipped once their parent step ends",
        "status": "passed",
-       "seconds": 0.000601
+       "seconds": 0.0003424
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::failures show as errors, and a failed send as a send error",
        "status": "passed",
-       "seconds": 0.0006764
+       "seconds": 0.0006216
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::every node has a kind for its color",
        "status": "passed",
-       "seconds": 0.0004067
+       "seconds": 0.0004221
       }
      ],
      "status": "verified"
@@ -8719,19 +8719,19 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::concurrent spans overlap",
        "status": "passed",
-       "seconds": 0.0249755
+       "seconds": 0.0017968
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a child is drawn one level deeper",
        "status": "passed",
-       "seconds": 0.0009279
+       "seconds": 0.000398
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a running span extends to now",
        "status": "passed",
-       "seconds": 0.0004292
+       "seconds": 0.0003101
       }
      ],
      "status": "verified"
@@ -8774,43 +8774,43 @@
        "suite": "frontend",
        "id": "lib/proxy.test.ts::reads and staff actions are allowed",
        "status": "passed",
-       "seconds": 0.0039452
+       "seconds": 0.0020512
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::everything else is refused",
        "status": "passed",
-       "seconds": 0.000993
+       "seconds": 0.0005884
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::an allowed path streams the backend response through",
        "status": "passed",
-       "seconds": 0.0119852
+       "seconds": 0.0050562
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::a refused path never contacts the backend",
        "status": "passed",
-       "seconds": 0.006605
+       "seconds": 0.0019213
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::demo previews and certificate images are allowed",
        "status": "passed",
-       "seconds": 0.0008559
+       "seconds": 0.0005489
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::certificate images pass through unchanged",
        "status": "passed",
-       "seconds": 0.0055382
+       "seconds": 0.0015725
       },
       {
        "suite": "frontend",
        "id": "tests/no-backend-in-client.test.ts::no client component reads the backend address",
        "status": "passed",
-       "seconds": 0.0718159
+       "seconds": 0.0168699
       }
      ],
      "status": "verified"
@@ -8839,13 +8839,13 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::the span inspector shows tokens, dollars, and seconds",
        "status": "passed",
-       "seconds": 0.002227
+       "seconds": 0.0005871
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::submitting a demo sample opens its live run view",
        "status": "passed",
-       "seconds": 0.0715412
+       "seconds": 0.0267637
       }
      ],
      "status": "verified"
@@ -8874,19 +8874,19 @@
        "suite": "frontend",
        "id": "lib/demo.test.ts::generating fetches a request and points at its seed's certificate",
        "status": "passed",
-       "seconds": 0.1145269
+       "seconds": 0.0424568
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::a generated request is sent by its seed and opens its run",
        "status": "passed",
-       "seconds": 0.0035517
+       "seconds": 0.0022568
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::a failed generation says so",
        "status": "passed",
-       "seconds": 0.0062729
+       "seconds": 0.0023443
       }
      ],
      "status": "verified"
