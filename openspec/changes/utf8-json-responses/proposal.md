@@ -25,9 +25,9 @@ None.
 
 ## Impact
 
-- **Backend:** `app/main.py` sets a default JSON response class that adds the charset.
+- **Backend:** `app/main.py` adds a middleware that declares the charset on every JSON response, errors included.
 - **Frontend:** none (`fetch().json()` always reads UTF-8).
 - **Tests:**
   - an orchestration test with an en dash in the resolver's proposal, read back from the database and the API;
   - a cassette test that records and replays a response with an en dash;
-  - an API test on the declared content type.
+  - API tests on the declared content type, for a normal response and for errors.

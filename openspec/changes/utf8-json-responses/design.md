@@ -22,7 +22,9 @@
 ## Decisions
 
 ### D1. Declare the charset, not escape the text
-- **A default response class** (`UTF8JSONResponse`, a `JSONResponse` with `media_type = "application/json; charset=utf-8"`) is set on the app, so every JSON route gets it without per-route changes.
+- **A small ASGI middleware** (`DeclareUTF8JSON` in `app/main.py`) rewrites a response's `content-type: application/json` to `application/json; charset=utf-8` as the response starts.
+- **Middleware, not a default response class:** FastAPI's `default_response_class` covers route return values only. Its 404 and 422 handlers build their own `JSONResponse`, and a 422 can echo non-ASCII input. The middleware covers every JSON response in one place.
+- **The frontend's proxy** (`app/api/[...path]/route.ts`) forwards the upstream content type, so the browser sees the same header.
 - **RFC 8259 says the charset parameter has no meaning for JSON,** and conforming clients ignore it. Clients that guess (Windows PowerShell 5.1, some older tools) use it. Adding it costs nothing and removes the guess.
 - **Non-JSON routes are untouched:** the event stream (`text/event-stream`, whose spec fixes UTF-8) and the PNG endpoints set their own media types.
 

@@ -6,7 +6,7 @@
 
 ## 2. Declare the charset
 
-- [ ] 2.1 Set a default JSON response class that declares `charset=utf-8`. Verify with an API test that inspects a request whose resolver summary has an en dash and checks the header and the text; it fails before the change and passes after.
+- [x] 2.1 Add a middleware that declares `charset=utf-8` on every JSON response. Verify with API tests: one inspects a request whose resolver summary has an en dash and checks the header and the text (it fails before the change and passes after), and one checks a 404 and a 422.
 
 ## 3. Integration
 

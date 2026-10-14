@@ -22,12 +22,15 @@ from tests.test_llm import fake_settings
 from tests.test_orchestrator import (
     CERTIFICATE,
     CLEAR_STATES,
+    EN_DASH_PROPOSAL,
+    EN_DASH_SUMMARY,
     INTENT,
     ONE_DAY_REPLY,
     PNG,
     START,
     TODAY,
     FakeModel,
+    fill_kennel,
 )
 
 spec = pytest.mark.spec
@@ -115,6 +118,31 @@ async def test_unknown_request_is_404(api):
     response = await api.get("/requests/00000000-0000-0000-0000-000000000000")
 
     assert response.status_code == 404
+
+
+# --- JSON responses declare UTF-8 -----------------------------------------------------
+
+
+@spec("observability-api", "JSON responses declare UTF-8")
+async def test_non_ascii_text_in_a_response(api, run, committed, desk):
+    await fill_kennel(committed, desk)
+    request_id = await run(FakeModel(resolver=EN_DASH_PROPOSAL))
+
+    response = await api.get(f"/requests/{request_id}")
+
+    assert response.headers["content-type"] == "application/json; charset=utf-8"
+    assert "–".encode() in response.content  # sent as UTF-8, not escaped
+    assert response.json()["steps"]["resolution"]["proposal"]["summary"] == EN_DASH_SUMMARY
+
+
+@spec("observability-api", "JSON responses declare UTF-8")
+async def test_error_responses_declare_utf8_too(api):
+    unknown = await api.get("/requests/00000000-0000-0000-0000-000000000000")
+    invalid = await api.post("/demo/requests", json={"sample": "clean", "seed": 1})
+
+    assert (unknown.status_code, invalid.status_code) == (404, 422)
+    assert unknown.headers["content-type"] == "application/json; charset=utf-8"
+    assert invalid.headers["content-type"] == "application/json; charset=utf-8"
 
 
 # --- Metrics summarize cost, latency, and flags -----------------------------------------
