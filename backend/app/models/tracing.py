@@ -16,6 +16,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -61,6 +62,7 @@ class Span(UUIDPrimaryKey, Base):
         CheckConstraint(
             "status <> 'error' OR coalesce(btrim(error), '') <> ''", name="error_has_message"
         ),
+        CheckConstraint("jsonb_typeof(attributes) = 'object'", name="attributes_is_object"),
     )
 
     trace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("traces.id"))
@@ -83,3 +85,7 @@ class Span(UUIDPrimaryKey, Base):
     # summing many float costs drifts.
     cost_usd: Mapped[Decimal | None] = mapped_column(Numeric(14, 10))
     error: Mapped[str | None] = mapped_column(Text)
+    # OpenTelemetry-style structured metadata: attempts, finish reason, provider, params.
+    attributes: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )

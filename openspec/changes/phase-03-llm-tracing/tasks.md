@@ -2,7 +2,7 @@
 
 ## 1. Span attributes
 
-- [ ] 1.1 Add `spans.attributes` (JSONB, not null, default `{}`) to the model and a migration. Verify with `alembic check` and the attributes default and round-trip tests in `tests/test_run_tracing.py`.
+- [x] 1.1 Add `spans.attributes` (JSONB, not null, default `{}`) to the model and a migration. Verify with `alembic check` and the attributes default and round-trip tests in `tests/test_run_tracing.py`.
 
 ## 2. Tracing
 
