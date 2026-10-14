@@ -12,7 +12,8 @@ from scripts.seed import SeedRefused, run, seed, table_counts
 
 spec = pytest.mark.spec
 TODAY = date(2027, 3, 1)
-TRACING_TABLES = {"traces", "spans"}
+# Written by real runs (run-tracing, booking-orchestration), never by seed data.
+RUN_TABLES = {"traces", "spans", "booking_step_results", "booking_documents"}
 
 
 @spec("seed-data", "Seeding loads a known synthetic dataset")
@@ -22,8 +23,7 @@ async def test_seed_populates_every_table(session):
     counts = await table_counts(session)
     kennel_classes = set(await session.scalars(select(Kennel.size_class).distinct()))
 
-    # Traces and spans come from real runs (run-tracing), never from seed data.
-    empty = sorted(n for n, c in counts.items() if c == 0 and n not in TRACING_TABLES)
+    empty = sorted(n for n, c in counts.items() if c == 0 and n not in RUN_TABLES)
     assert empty == []
     assert kennel_classes == set(SizeClass)
 

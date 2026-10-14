@@ -50,3 +50,12 @@ class SpanStatus(StrEnum):
     RUNNING = "running"
     OK = "ok"
     ERROR = "error"
+
+
+class Step(StrEnum):
+    """Steps whose results the orchestrator saves (spec: booking-orchestration)."""
+
+    INTAKE = "intake"
+    RECORDS = "records"
+    CHECKS = "checks"
+    ROUTE = "route"

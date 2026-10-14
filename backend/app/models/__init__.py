@@ -11,12 +11,15 @@ from app.models.domain import (
     VaccineRecord,
     VaccineRule,
 )
+from app.models.orchestration import BookingDocument, BookingStepResult
 from app.models.tracing import Span, Trace
 
 __all__ = [
     "Approval",
     "Base",
+    "BookingDocument",
     "BookingRequest",
+    "BookingStepResult",
     "BookingTransition",
     "Facility",
     "Kennel",

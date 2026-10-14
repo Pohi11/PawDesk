@@ -2,7 +2,7 @@
 
 ## 1. Storage
 
-- [ ] 1.1 Add the `booking_documents` and `booking_step_results` models and a migration, plus `attach_certificate()` with magic-byte and size checks. Verify with `tests/test_orchestration_storage.py`, covering image round-trip with hash, type and size, a second certificate rejected, a PDF refused, and a duplicate step result rejected.
+- [x] 1.1 Add the `booking_documents` and `booking_step_results` models and a migration, plus `attach_certificate()` with magic-byte and size checks. Verify with `tests/test_orchestration_storage.py`, covering image round-trip with hash, type and size, a second certificate rejected, a PDF refused, and a duplicate step result rejected.
 
 ## 2. Orchestrator
 
