@@ -10,11 +10,14 @@ import psycopg
 import pytest
 from alembic import command
 from alembic.config import Config
+from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.db import make_engine
+from app.db import make_engine, make_sessionmaker
+from app.models import Trace
+from app.tracing import Tracer
 
 TEST_DB_NAME = "pawdesk_test"
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -95,3 +98,27 @@ async def session(engine):
         finally:
             await session.close()
             await outer.rollback()
+
+
+@pytest.fixture
+async def tracer(engine):
+    """A Tracer on the test database. Its writes are committed (that's the point of
+    tracing), so it remembers the traces it created and deletes them afterward."""
+    sessions = make_sessionmaker(engine)
+    created: list = []
+
+    class CleaningTracer(Tracer):
+        async def _insert(self, row):
+            row_id = await super()._insert(row)
+            if isinstance(row, Trace):
+                created.append(row_id)
+            return row_id
+
+    yield CleaningTracer(sessions)
+
+    if created:
+        async with sessions() as cleanup, cleanup.begin():
+            await cleanup.execute(
+                text("DELETE FROM spans WHERE trace_id = ANY(:ids)"), {"ids": created}
+            )
+            await cleanup.execute(text("DELETE FROM traces WHERE id = ANY(:ids)"), {"ids": created})

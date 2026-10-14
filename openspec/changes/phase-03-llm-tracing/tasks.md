@@ -6,7 +6,7 @@
 
 ## 2. Tracing
 
-- [ ] 2.1 Implement `app/tracing.py`: `Tracer` with its own sessionmaker, `start_trace()`, `span()`, and the context variables. Verify with `tests/test_tracing.py`, covering a running span visible from another connection, failing work recorded and re-raised, nested parent, concurrent siblings, and a span surviving a rolled-back business transaction.
+- [x] 2.1 Implement `app/tracing.py`: `Tracer` with its own sessionmaker, `start_trace()`, `span()`, and the context variables. Verify with `tests/test_tracing.py`, covering a running span visible from another connection, failing work recorded and re-raised, nested parent, concurrent siblings, and a span surviving a rolled-back business transaction.
 - [ ] 2.2 Write [decision record 0006](../../../docs/decisions/0006-tracing-and-model-calls.md) (independent span writes; every model call goes through the traced client). Verify the file exists and that design D4 links to it.
 
 ## 3. Model client
