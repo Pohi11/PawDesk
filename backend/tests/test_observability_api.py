@@ -258,7 +258,8 @@ async def test_resting_request_gets_one_snapshot(api, run, fast_stream):
     events = parse_events((await api.get(f"/requests/{request_id}/events")).text)
 
     assert [kind for kind, _ in events] == ["snapshot", "end"]
-    assert events[0][1]["status"] == "sent"
+    assert (events[0][1]["status"], events[0][1]["flagged"]) == ("sent", False)
+    assert events[0][1]["failed_step"] is None
 
 
 async def test_events_for_unknown_request_is_404(api):

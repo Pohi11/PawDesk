@@ -197,12 +197,24 @@ async def request_detail(session: AsyncSession, request_id: uuid.UUID) -> dict[s
 
 
 async def snapshot(session: AsyncSession, request_id: uuid.UUID) -> dict[str, Any]:
-    """The light view the live stream sends: state and span timing, no payloads."""
-    status = await session.scalar(
-        select(BookingRequest.status).where(BookingRequest.id == request_id)
-    )
-    if status is None:
+    """The light view the live stream sends: state, whether the reply was flagged (None
+    until drafted), and span timing, with no payloads."""
+    row = (
+        await session.execute(
+            select(BookingRequest.status, BookingRequest.failed_step).where(
+                BookingRequest.id == request_id
+            )
+        )
+    ).one_or_none()
+    if row is None:
         raise LookupError(f"no booking request {request_id}")
+    status, failed_step = row
+    reply = await session.scalar(
+        select(BookingStepResult.output).where(
+            BookingStepResult.booking_request_id == request_id,
+            BookingStepResult.step == Step.REPLY,
+        )
+    )
     rows = await session.execute(
         select(Span)
         .join(Trace, Trace.id == Span.trace_id)
@@ -217,7 +229,12 @@ async def snapshot(session: AsyncSession, request_id: uuid.UUID) -> dict[str, An
         }
         for s in rows.scalars()
     ]
-    return {"status": str(status), "spans": spans}
+    return {
+        "status": str(status),
+        "failed_step": str(failed_step) if failed_step else None,
+        "flagged": reply["target"] == State.NEEDS_REVIEW if reply else None,
+        "spans": spans,
+    }
 
 
 def is_resting(snap: dict[str, Any]) -> bool:
