@@ -15,7 +15,7 @@
 
 ## 4. Labeled set and evaluation
 
-- [ ] 4.1 Add `backend/evals/intake_cases.json` (16 cases, 3 injections) and `scripts/eval_intake.py` with a pure scoring function. Verify with `tests/test_intake_eval.py`, covering the set's shape and scoring per field and in total with scripted answers.
+- [x] 4.1 Add `backend/evals/intake_cases.json` (16 cases, 3 injections) and `scripts/eval_intake.py` with a pure scoring function. Verify with `tests/test_intake_eval.py`, covering the set's shape and scoring per field and in total with scripted answers.
 - [ ] 4.2 Run `uv run python -m scripts.eval_intake` against the real model. Verify that a report is written under `backend/evals/results/` and that the measured totals are recorded (not estimated).
 
 ## 5. Integration
