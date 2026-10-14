@@ -10,7 +10,7 @@
 
 - [x] 2.1 Add vitest with JUnit output and the `specTest` helper, `@xyflow/react`, and `recharts`. Write [decision record 0012](../../../docs/decisions/0012-frontend-test-traceability.md). Verify `pnpm test` writes a JUnit report with spec-tagged names.
 - [x] 2.2 Add the allowlisted proxy route (`lib/proxy.ts` + `app/api/[...path]/route.ts`). Verify with unit tests for allowed and refused paths, streaming pass-through, and no backend call for refused paths. (The check that no client component reads the backend address lands with the components in 2.4.)
-- [ ] 2.3 Add `lib/graph.ts`, `lib/timeline.ts`, and `lib/format.ts`. Verify with unit tests for: parallel running nodes, skipped resolver, waiting for review, overlapping bars, nesting depth, and inspector formatting.
+- [x] 2.3 Add `lib/graph.ts`, `lib/timeline.ts`, and `lib/format.ts`. Verify with unit tests for: parallel running nodes, skipped resolver, waiting for review, overlapping bars, nesting depth, and inspector formatting.
 - [ ] 2.4 Build the pages: home, live run view (graph, timeline, inspector, SSE), review queue, metrics, evals, demo. Verify that `pnpm lint`, `tsc`, and `pnpm build` pass.
 
 ## 3. Decision and real run
