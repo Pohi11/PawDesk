@@ -94,6 +94,28 @@ async def show(sessions: async_sessionmaker[AsyncSession], request_id: uuid.UUID
             print(f"route:   {route['target']}")
             for reason in route["reasons"]:
                 print(f"         - {reason}")
+        if resolution := results.get(Step.RESOLUTION):
+            why = (
+                ""
+                if resolution["reason"] == resolution["outcome"]
+                else f" ({resolution['reason']})"
+            )
+            print(f"resolve: {resolution['outcome']}{why}, {resolution['turns']} turns")
+            for call in resolution["tool_calls"]:
+                error = f"  -> error: {call['error']}" if "error" in call else ""
+                print(f"         call {call['name']}({call['arguments']}){error}")
+            if proposal := resolution["proposal"]:
+                print(f"         summary: {proposal['summary']}")
+                for option in proposal["options"]:
+                    details = {
+                        k: v
+                        for k, v in option.items()
+                        if k not in ("kind", "verified", "remaining_problems")
+                    }
+                    mark = "verified" if option["verified"] else "NOT verified"
+                    print(f"         - {option['kind']} {details}: {mark}")
+                    for problem in option["remaining_problems"]:
+                        print(f"             remaining: {problem}")
         for n, trace in enumerate(traces, 1):
             spans = list(await session.scalars(select(Span).where(Span.trace_id == trace.id)))
             names = Counter(s.name for s in spans)
