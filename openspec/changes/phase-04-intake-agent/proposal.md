@@ -9,6 +9,7 @@ A booking starts as a free-text message from a pet parent, for example "can bisc
 - Add an intake step that turns a pet-parent message into a validated `BookingIntent`: pet name, service, start and end dates, special notes, the model's confidence, and anything it found ambiguous.
 - Request structured output from the provider using a strict JSON schema generated from the same Pydantic model used for validation, and route such requests only to endpoints that support them.
 - Always validate the model's output with Pydantic, whatever the provider promised. On a validation failure, make exactly one repair attempt that shows the model its validation errors.
+- Flag instruction-like text in the message with fixed patterns in code, so a detected injection attempt always goes to human review.
 - Run deterministic checks in code after parsing:
   - dates are in order, not in the past, and within a booking horizon;
   - day services fit a single day;

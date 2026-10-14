@@ -11,7 +11,7 @@
 ## 3. Prompt and pipeline
 
 - [ ] 3.1 Add the versioned prompt in `app/prompts/intake.py` (system rules, today's date and weekday, time zone, message delimited and neutralized). Verify with tests that the system message never contains the customer text and the user message wraps it in the delimiters.
-- [ ] 3.2 Implement `run_intake()`: the oversize refusal, the model call with strict `response_format` and temperature 0, Pydantic validation, one repair carrying the errors, `IntakeInvalidOutput`, date and pet checks in code, confidence and ambiguity issues, the outcome, and the `intake` span with prompt version and output. Verify with `tests/test_intake.py` against scripted responses, covering every booking-intake scenario except the labeled set.
+- [ ] 3.2 Implement `run_intake()`: the oversize refusal, the model call with strict `response_format` and temperature 0, Pydantic validation, one repair carrying the errors, `IntakeInvalidOutput`, date and pet checks in code, the instruction-like-text flag, confidence and ambiguity issues, the outcome, and the `intake` span with prompt version and output. Verify with `tests/test_intake.py` against scripted responses, covering every booking-intake scenario except the labeled set.
 
 ## 4. Labeled set and evaluation
 

@@ -59,6 +59,12 @@ On a validation failure, call the model again with the conversation so far, plus
 - **Dates:** checked against `facility_date(timezone, now)`, which is injected for tests.
 - **Confidence:** below 0.7 adds an issue, and nothing about confidence ever removes one. A model that writes "confidence: 1.0" because the message told it to can't skip review.
 
+### D5b. A deterministic flag for instruction-like text
+- **What it does:** a small list of regular expressions runs over the raw message before any model call. They cover instruction overrides, role labels (`system:`, `assistant:`, `developer:`), `confidence =`/`:`, "no review", "mark … approved", and "you are now". Any match adds the issue "message contains instruction-like text".
+- **Why:** prompt rules make injections less likely to work, but they can't guarantee it. This check is code, so the message can't talk it out of firing.
+- **Trade-off:** false positives cost a human review, never a wrong booking. The patterns are deliberately narrow (for example, a plain "approve" isn't matched), so ordinary messages aren't flagged.
+- *Alternative:* a second model as an injection judge. That judge is itself injectable, and it adds cost and latency.
+
 ### D6. Oversized messages never reach the model
 Messages over 4,000 characters return `needs_review` with an issue, and no model call is made. This caps cost and limits the attack surface.
 
