@@ -63,7 +63,7 @@ Only the `system` actor SHALL move a request from `approved` or `rejected` to `s
 - **THEN** the request's state becomes `sent`
 
 ### Requirement: Approval requires deterministic clearance or a person
-A request SHALL enter `approved` only through the system from `ready`, or through staff from `needs_review`. No other path into `approved` SHALL exist, so that no model output or message content can cause an approval.
+A request SHALL enter `approved` only through the system from `ready`, or through staff from `needs_review`. The one exception is a retry, which MAY return a request to `approved` only if it failed while already in `approved`. No other path SHALL exist, so that no model output or message content can cause an approval.
 
 #### Scenario: System cannot approve a flagged request
 - **WHEN** the system tries to move a request from `needs_review` to `approved`
@@ -72,6 +72,14 @@ A request SHALL enter `approved` only through the system from `ready`, or throug
 #### Scenario: Staff approves a flagged request
 - **WHEN** staff moves a request from `needs_review` to `approved`
 - **THEN** the request's state becomes `approved`
+
+#### Scenario: Retry after a failed send returns to approved
+- **WHEN** a request that failed while in `approved` is retried
+- **THEN** its state becomes `approved` again
+
+#### Scenario: Retry cannot reach approved from an earlier step
+- **WHEN** a request that failed in `drafting` is moved from `failed` to `approved` by anyone
+- **THEN** the transition is rejected
 
 #### Scenario: Approval cannot skip the checks
 - **WHEN** anyone tries to move a request from `drafting` or `checking` directly to `approved`
