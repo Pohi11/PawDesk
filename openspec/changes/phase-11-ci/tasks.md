@@ -17,7 +17,7 @@
 ## 4. Pipeline and README
 
 - [x] 4.1 Add `.github/workflows/ci.yml` and `tests/test_ci_workflow.py`. Verify the structural test, and run each job's commands locally.
-- [ ] 4.2 Write [decision record 0016](../../../docs/decisions/0016-recorded-model-responses-for-ci.md), add `scripts/make_demo_gif.py`, generate `docs/demo.gif`, and rewrite the README with an architecture diagram and the measured results. Verify that the GIF exists and that the README links resolve.
+- [x] 4.2 Write [decision record 0016](../../../docs/decisions/0016-recorded-model-responses-for-ci.md), add `scripts/make_demo_gif.py`, generate `docs/demo.gif`, and rewrite the README with an architecture diagram and the measured results. Verify that the GIF exists and that the README links resolve.
 
 ## 5. Integration
 
