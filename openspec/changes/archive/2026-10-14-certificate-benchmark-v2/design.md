@@ -2,7 +2,7 @@
 
 ## Context
 
-Benchmark v1 lives in `backend/evals/certificates/` (`images/`, `truth.json`), generated from a seed by drawing random dates. Its first evaluation report (`records-20261014T154345Z.json`) refers to it. [Decision record 0007](../../../docs/decisions/0007-evaluating-llm-steps.md) requires benchmarks to be versioned, never edited in place.
+Benchmark v1 lives in `backend/evals/certificates/` (`images/`, `truth.json`), generated from a seed by drawing random dates. Its first evaluation report (`records-20261014T154345Z.json`) refers to it. [Decision record 0007](../../../../docs/decisions/0007-evaluating-llm-steps.md) requires benchmarks to be versioned, never edited in place.
 
 ## Goals / Non-Goals
 
