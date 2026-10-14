@@ -17,7 +17,7 @@
 ## 4. Evaluation
 
 - [x] 4.1 Implement `scripts/eval_records.py` with pure matching, scoring, invented-expiry, and decision-agreement functions. Verify with `tests/test_records_eval.py` against the spec's scoring scenarios, plus a scripted end-to-end run on two certificates.
-- [ ] 4.2 Write [decision record 0007](../../../docs/decisions/0007-evaluating-llm-steps.md) (how LLM steps are evaluated). Verify the file exists and that design D7 links to it.
+- [x] 4.2 Write [decision record 0007](../../../docs/decisions/0007-evaluating-llm-steps.md) (how LLM steps are evaluated). Verify the file exists and that design D7 links to it.
 - [ ] 4.3 Run `uv run python -m scripts.eval_records` against the real model. Verify that a report is written under `backend/evals/results/` and that the measured totals are recorded (not estimated).
 
 ## 5. Integration
