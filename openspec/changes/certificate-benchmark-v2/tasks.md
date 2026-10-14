@@ -2,7 +2,7 @@
 
 ## 1. Generator
 
-- [ ] 1.1 Add `make_truth_v2()` (targets first, self-verifying against the compliance check) and a version argument to `scripts/generate_certificates.py`, leaving v1 generation byte-for-byte unchanged. Verify with `tests/test_certificates.py`, covering v2 determinism, the decision mix, boundary coverage, and a failed self-check raising.
+- [x] 1.1 Add `make_truth_v2()` (targets first, self-verifying against the compliance check) and a version argument to `scripts/generate_certificates.py`, leaving v1 generation byte-for-byte unchanged. Verify with `tests/test_certificates.py`, covering v2 determinism, the decision mix, boundary coverage, and a failed self-check raising.
 - [ ] 1.2 Render v2 with `uv run python -m scripts.generate_certificates v2`. Verify that `tests/test_certificate_set.py` passes for both v1 (unchanged) and v2 (36 images with truth and a version field).
 
 ## 2. Evaluation
