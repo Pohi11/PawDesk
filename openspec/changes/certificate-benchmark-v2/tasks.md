@@ -12,7 +12,7 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Run the full suite, lint, and the spec-coverage check. Verify that all pass and both new requirements have matching `spec` markers.
+- [x] 3.1 Run the full suite, lint, and the spec-coverage check. Verify that all pass and both new requirements have matching `spec` markers.
 
 ## Workflow follow-up
 
