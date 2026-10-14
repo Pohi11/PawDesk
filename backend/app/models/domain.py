@@ -3,6 +3,7 @@
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Any, ClassVar
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy import (
@@ -69,6 +70,10 @@ class Owner(UUIDPrimaryKey, Base):
 class Pet(UUIDPrimaryKey, Base):
     __tablename__ = "pets"
     __table_args__ = (CheckConstraint("weight_lb > 0", name="weight_positive"),)
+    # Fetch size_class via RETURNING on insert *and* update. Without this, an update would
+    # leave it expired, and reading an expired attribute is an implicit query that async
+    # sessions can't run.
+    __mapper_args__: ClassVar[dict[str, Any]] = {"eager_defaults": True}
 
     owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("owners.id"), index=True)
     name: Mapped[str] = mapped_column(String(100))
