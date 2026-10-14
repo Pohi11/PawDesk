@@ -6,7 +6,7 @@
 
 ## 2. Path
 
-- [ ] 2.1 Give the path a custom step node (a button), the tooltip outside React Flow, and Escape to hide it, and pass the request detail from the run view. Verify with an end-to-end test that hovers and focuses a step on the clean sample's run, then lint, type check, and build.
+- [x] 2.1 Give the path a custom step node (a button), the tooltip outside React Flow, and Escape to hide it, and pass the request detail from the run view. Verify with an end-to-end test that hovers and focuses a step on the clean sample's run, then lint, type check, and build.
 - [ ] 2.2 Try it for real in a browser on runs with different outcomes. Verify with screenshots of the tooltip near the graph's edges and at phone width.
 
 ## 3. Integration
