@@ -36,9 +36,16 @@ class Sources:
     decisions: Path
     backend_junit: Path
     frontend_junit: Path
+    e2e_junit: Path | None = None
 
     @classmethod
-    def of(cls, repo: Path, backend_junit: Path, frontend_junit: Path) -> "Sources":
+    def of(
+        cls,
+        repo: Path,
+        backend_junit: Path,
+        frontend_junit: Path,
+        e2e_junit: Path | None = None,
+    ) -> "Sources":
         return cls(
             archive=repo / "openspec" / "changes" / "archive",
             active=repo / "openspec" / "changes",
@@ -46,6 +53,7 @@ class Sources:
             decisions=repo / "docs" / "decisions",
             backend_junit=backend_junit,
             frontend_junit=frontend_junit,
+            e2e_junit=e2e_junit,
         )
 
 
@@ -236,7 +244,10 @@ def decisions(src: Sources) -> list[dict[str, Any]]:
 def tests(src: Sources) -> tuple[list[dict[str, Any]], dict[str, str | None]]:
     """Every test case from both reports, with the requirements it names."""
     found, reports = [], {}
-    for suite, path in (("backend", src.backend_junit), ("frontend", src.frontend_junit)):
+    suites = [("backend", src.backend_junit), ("frontend", src.frontend_junit)]
+    if src.e2e_junit is not None:
+        suites.append(("e2e", src.e2e_junit))
+    for suite, path in suites:
         if not path.is_file():
             reports[suite] = None
             continue
@@ -247,7 +258,7 @@ def tests(src: Sources) -> tuple[list[dict[str, Any]], dict[str, str | None]]:
             name = case.get("name", "")
             if suite == "backend":
                 links = [p.get("value") for p in case.iter("property") if p.get("name") == "spec"]
-            else:
+            else:  # frontend and e2e tests carry the tag in their names (decision record 0012)
                 tag = FRONTEND_TAG.match(name)
                 links = [f"{tag.group(1)}: {tag.group(2)}"] if tag else []
                 name = FRONTEND_TAG.sub("", name)
@@ -305,7 +316,7 @@ def build(src: Sources) -> dict[str, Any]:
             "verified": statuses.count("verified"),
             "tests": {
                 suite: sum(1 for t in all_tests if t["suite"] == suite)
-                for suite in ("backend", "frontend")
+                for suite in ("backend", "frontend", "e2e")
             },
             "linked_tests": sum(1 for t in all_tests if t["requirements"]),
         },
@@ -343,6 +354,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", type=Path, default=REPO)
     parser.add_argument("--backend-junit", type=Path)
     parser.add_argument("--frontend-junit", type=Path)
+    parser.add_argument("--e2e-junit", type=Path)
     parser.add_argument("--out", type=Path)
     parser.add_argument("--check", action="store_true", help="exit 1 on any coverage gap")
     args = parser.parse_args(argv)
@@ -352,6 +364,7 @@ def main(argv: list[str]) -> int:
         repo,
         args.backend_junit or repo / "backend" / "test-results" / "junit.xml",
         args.frontend_junit or repo / "frontend" / "test-results" / "junit.xml",
+        args.e2e_junit or repo / "frontend" / "test-results" / "e2e-junit.xml",
     )
     data = build(src)
     if args.check:

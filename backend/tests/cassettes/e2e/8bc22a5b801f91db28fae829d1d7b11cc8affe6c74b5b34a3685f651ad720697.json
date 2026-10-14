@@ -1,0 +1,54 @@
+{
+ "id": "gen-1792012785-tqRv2P0H1kId4Y02tHlp",
+ "object": "chat.completion",
+ "created": 1792012785,
+ "model": "deepseek/deepseek-v4.1-flash",
+ "provider": "DigitalOcean",
+ "system_fingerprint": null,
+ "service_tier": null,
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"body\": \"Hi Avery,\\n\\nGreat news — Biscuit's boarding stay at Maple Hollow Pet Lodge is confirmed for March 24 to March 27, 2027. We're so glad Biscuit will be staying with us!\\n\\nIf anything changes or you'd like to add any details about Biscuit's routine, just let us know. We'll be ready to welcome your pup.\\n\\nWarmly,\\nThe Maple Hollow Pet Lodge team\",\n  \"subject\": \"Biscuit's boarding stay is confirmed!\"\n}",
+    "refusal": null,
+    "reasoning": "Confirmed stay. Dates 2027-03-24 to 2027-03-27. Keep under 150 words. Sign off \"The Maple Hollow Pet Lodge team\".",
+    "reasoning_details": [
+     {
+      "type": "reasoning.text",
+      "text": "Confirmed stay. Dates 2027-03-24 to 2027-03-27. Keep under 150 words. Sign off \"The Maple Hollow Pet Lodge team\".",
+      "format": "unknown",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 294,
+  "completion_tokens": 151,
+  "total_tokens": 445,
+  "cost": 0.000107466,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 256,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.000107466,
+   "upstream_inference_prompt_cost": 7.806e-06,
+   "upstream_inference_completions_cost": 9.966e-05
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 36,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}

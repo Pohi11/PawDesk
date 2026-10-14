@@ -1,0 +1,147 @@
+# Continuous integration (spec: delivery-pipeline; decision record 0016).
+# Never calls a model: end-to-end tests replay recorded responses, and the only key in this
+# file is a placeholder that settings require and nothing sends.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  OPENROUTER_API_KEY: sk-or-v1-placeholder-replay-only
+  DATABASE_URL: postgresql://pawdesk:pawdesk-ci@localhost:5432/pawdesk
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: pawdesk
+          POSTGRES_PASSWORD: pawdesk-ci
+          POSTGRES_DB: pawdesk
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pawdesk -d pawdesk"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Secret check (tracked files)
+        run: uv run python -m scripts.secret_scan
+      - name: Migrations apply and match the models
+        run: uv run alembic upgrade head && uv run alembic check
+      - name: Tests against Postgres
+        run: uv run pytest --junitxml=test-results/junit.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-junit
+          path: backend/test-results/junit.xml
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-junit
+          path: frontend/test-results/junit.xml
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: pawdesk
+          POSTGRES_PASSWORD: pawdesk-ci
+          POSTGRES_DB: pawdesk
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pawdesk -d pawdesk"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+        working-directory: backend
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - run: pnpm exec playwright install --with-deps chromium
+        working-directory: frontend
+      - name: End-to-end demo (recorded model responses)
+        run: pnpm e2e
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results
+          path: |
+            frontend/test-results/e2e-junit.xml
+            frontend/test-results/demo-frames/
+
+  traceability:
+    needs: [backend, frontend, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+        working-directory: backend
+      - uses: actions/download-artifact@v4
+        with:
+          path: reports
+      - name: Every requirement has a passing linked test
+        run: >-
+          uv run python -m scripts.walkthrough --check
+          --backend-junit ../reports/backend-junit/junit.xml
+          --frontend-junit ../reports/frontend-junit/junit.xml
+          --e2e-junit ../reports/e2e-results/e2e-junit.xml
+        working-directory: backend
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

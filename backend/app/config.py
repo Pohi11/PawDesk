@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,6 +22,9 @@ class Settings(BaseSettings):
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     llm_timeout_seconds: float = 30.0  # per attempt
     llm_max_attempts: int = 3
+    # Recorded responses (decision record 0016): "off", "record", or "replay".
+    llm_cassette_mode: Literal["off", "record", "replay"] = "off"
+    llm_cassette_dir: Path | None = None
 
 
 @lru_cache

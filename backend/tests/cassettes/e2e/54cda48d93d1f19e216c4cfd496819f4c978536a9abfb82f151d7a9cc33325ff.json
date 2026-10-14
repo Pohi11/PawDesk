@@ -1,0 +1,54 @@
+{
+ "id": "gen-1792012783-OWqUjQiTPFo1GwAYAJgO",
+ "object": "chat.completion",
+ "created": 1792012783,
+ "model": "deepseek/deepseek-v4.1-flash",
+ "provider": "DigitalOcean",
+ "system_fingerprint": null,
+ "service_tier": null,
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"ambiguities\": [],\n  \"confidence\": 0.98,\n  \"end_date\": \"2027-03-27\",\n  \"pet_name\": \"Biscuit\",\n  \"service\": \"boarding\",\n  \"special_notes\": \"Eats grain-free food twice a day; vaccine card attached.\",\n  \"start_date\": \"2027-03-24\"\n}",
+    "refusal": null,
+    "reasoning": "We need answer JSON only likely. Need parse. Today 2027-03-03 Wednesday. Customer asks Biscuit board from March 24 to March 27. Dates without year => next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 upcoming. Check weekday? Not needed. Boarding start 2027-03-24 end 2027-03-27 checkout day. Pet name Biscuit. service boarding. special_notes: eats grain-free food twice a day; vaccine card attached maybe care detail? The field special_notes care details customer mentions (food, medication, behavior). Vaccine card attached is not care detail? Maybe not. Could include \"vaccine card attached\" as note? It mentions vaccine card attached. special_notes should be care details mentioned: food. Vaccine card is admin. But maybe special_notes includes \"vaccine card attached\" if relevant? The spec says care details (food, medication, behavior); empty if none. So include \"eats grain-free food twice a day\". Vaccine card attachment not care detail? Could add? Hmm likely special_notes: \"Eats grain-free food twice a day.\" Ambiguities: none. Confidence high. Ensure JSON.",
+    "reasoning_details": [
+     {
+      "type": "reasoning.text",
+      "text": "We need answer JSON only likely. Need parse. Today 2027-03-03 Wednesday. Customer asks Biscuit board from March 24 to March 27. Dates without year => next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 upcoming. Check weekday? Not needed. Boarding start 2027-03-24 end 2027-03-27 checkout day. Pet name Biscuit. service boarding. special_notes: eats grain-free food twice a day; vaccine card attached maybe care detail? The field special_notes care details customer mentions (food, medication, behavior). Vaccine card attached is not care detail? Maybe not. Could include \"vaccine card attached\" as note? It mentions vaccine card attached. special_notes should be care details mentioned: food. Vaccine card is admin. But maybe special_notes includes \"vaccine card attached\" if relevant? The spec says care details (food, medication, behavior); empty if none. So include \"eats grain-free food twice a day\". Vaccine card attachment not care detail? Could add? Hmm likely special_notes: \"Eats grain-free food twice a day.\" Ambiguities: none. Confidence high. Ensure JSON.",
+      "format": "unknown",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 434,
+  "completion_tokens": 347,
+  "total_tokens": 781,
+  "cost": 0.000239574,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 384,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.000239574,
+   "upstream_inference_prompt_cost": 1.0554e-05,
+   "upstream_inference_completions_cost": 0.00022902
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 265,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}

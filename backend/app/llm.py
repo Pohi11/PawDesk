@@ -23,6 +23,7 @@ from typing import Any
 import httpx
 from openai import APIConnectionError, APIStatusError, APITimeoutError, AsyncOpenAI
 
+from app.cassettes import CassetteTransport
 from app.config import Settings, get_settings
 from app.enums import SpanKind
 from app.tracing import NoActiveTrace, SpanHandle, current_trace_id, span
@@ -140,7 +141,25 @@ def make_client(
 
 @lru_cache
 def _default_client() -> AsyncOpenAI:
-    return make_client(get_settings())
+    settings = get_settings()
+    return make_client(settings, transport=cassette_transport(settings))
+
+
+def cassette_transport(settings: Settings) -> httpx.AsyncBaseTransport | None:
+    """The recording or replaying transport the settings ask for, or None to call the model."""
+    if settings.llm_cassette_mode == "off":
+        return None
+    if settings.llm_cassette_dir is None:
+        raise ValueError("llm_cassette_dir is required when llm_cassette_mode is set")
+    return CassetteTransport(settings.llm_cassette_dir, settings.llm_cassette_mode)
+
+
+def _error_message(body: object) -> str | None:
+    """The provider's own error message, when the error body carries one."""
+    if isinstance(body, dict):
+        message = body.get("message") or (body.get("error") or {}).get("message")
+        return str(message) if message else None
+    return None
 
 
 def _retry_after(headers: httpx.Headers) -> float | None:
@@ -221,6 +240,8 @@ async def complete(
                 outcome, error = AttemptOutcome.RETRYABLE, "connection error"
             except APIStatusError as exc:
                 outcome, error = classify_status(exc.status_code), f"HTTP {exc.status_code}"
+                if detail := _error_message(exc.body):
+                    error = f"{error}: {detail[:200]}"
                 entry["http_status"] = exc.status_code
                 retry_after = _retry_after(exc.response.headers)
             else:

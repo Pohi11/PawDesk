@@ -17,7 +17,7 @@ The generator SHALL read only the archived OpenSpec changes, the current specs, 
 - **THEN** the marker appears nowhere in the output
 
 ### Requirement: Requirements link to their tests and latest results
-For every current requirement, the output SHALL list the backend and frontend tests that name it, each with its latest result (`passed`, `failed`, or `skipped`) and duration. It SHALL give the requirement an overall status:
+For every current requirement, the output SHALL list the backend, frontend, and end-to-end tests that name it, each with its latest result (`passed`, `failed`, or `skipped`) and duration. It SHALL give the requirement an overall status:
 - `verified` when it has at least one test and all of them passed;
 - `failing` when any linked test failed;
 - `untested` when it has no linked test.
@@ -33,6 +33,10 @@ For every current requirement, the output SHALL list the backend and frontend te
 #### Scenario: Untested requirement
 - **WHEN** no test names a requirement
 - **THEN** the requirement is `untested`
+
+#### Scenario: End-to-end tests count
+- **WHEN** a requirement is named only by a passing end-to-end test
+- **THEN** it lists that test with the suite `e2e` and is `verified`
 
 ### Requirement: Changes link to the decisions they relied on
 Each change in the output SHALL list the decision records its proposal, design, or tasks link to. Every decision record SHALL appear in the output with its number, title, date, status, and full text.

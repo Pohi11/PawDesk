@@ -18,11 +18,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-import psycopg
-from alembic import command
-from alembic.config import Config
 from sqlalchemy import delete, func, select
-from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.autonomous import AgentContext, run_autonomous
@@ -50,8 +46,7 @@ from app.prompts.reply import PROMPT_VERSION as REPLY_PROMPT
 from app.prompts.resolver import PROMPT_VERSION as RESOLVER_PROMPT
 from app.structured import InvalidModelOutput
 from app.tracing import Tracer
-from scripts.seed import ensure_local
-from scripts.seed import run as seed_run
+from scripts import lab_database
 
 EVALS = Path(__file__).resolve().parents[1] / "evals"
 CASES = EVALS / "comparison_cases.json"
@@ -174,8 +169,7 @@ def score(rows: list[dict[str, Any]], arch: str) -> dict[str, Any]:
 
 def lab_url(database_url: str, name: str = LAB_DATABASE) -> str:
     """The lab database next to the configured one, refusing anything but a local host."""
-    ensure_local(database_url)
-    return make_url(database_url).set(database=name).render_as_string(hide_password=False)
+    return lab_database.database_url(database_url, name)
 
 
 # --- The lab run (design D4) -------------------------------------------------------------
@@ -374,21 +368,9 @@ async def _clear(url: str, pets: set[tuple[str, str]]) -> None:
 
 
 def prepare_lab(url: str, today: date, cases: list[dict[str, Any]]) -> None:
-    """Create the lab database if needed, migrate it from scratch, seed it, and clear the
-    records on file of pets that bring a certificate."""
-    admin = make_url(url).set(database="postgres", drivername="postgresql")
-    name = make_url(url).database
-    with psycopg.connect(admin.render_as_string(hide_password=False), autocommit=True) as conn:
-        exists = conn.execute("SELECT 1 FROM pg_database WHERE datname = %s", (name,)).fetchone()
-        if not exists:
-            conn.execute(f'CREATE DATABASE "{name}"')
-    backend = Path(__file__).resolve().parents[1]
-    cfg = Config(str(backend / "alembic.ini"))
-    cfg.set_main_option("script_location", str(backend / "migrations"))
-    cfg.set_main_option("sqlalchemy.url", url.replace("%", "%%"))
-    command.downgrade(cfg, "base")
-    command.upgrade(cfg, "head")
-    asyncio.run(seed_run(url, today))
+    """Create, migrate, and seed the lab database, then clear the records on file of pets
+    that bring a certificate."""
+    lab_database.prepare(url, today)
     asyncio.run(_clear(url, certificate_pets(cases)))
 
 
