@@ -2,17 +2,20 @@
 
 import asyncio
 import json
+import uuid
 from decimal import Decimal
 
 import httpx
 import pytest
+from sqlalchemy import func, select
 
-from app.api import StreamTiming, get_results_dir, get_stream_timing
+from app.api import StreamTiming, get_llm_kwargs, get_results_dir, get_stream_timing
 from app.db import get_sessionmaker
+from app.demo import SAMPLES
 from app.documents import attach_certificate
 from app.llm import RetryPolicy, make_client
 from app.main import app
-from app.models import BookingRequest
+from app.models import BookingRequest, Owner
 from app.orchestrator import process_request
 from tests.test_llm import fake_settings
 from tests.test_orchestrator import (
@@ -262,3 +265,66 @@ async def test_events_for_unknown_request_is_404(api):
     response = await api.get("/requests/00000000-0000-0000-0000-000000000000/events")
 
     assert response.status_code == 404
+
+
+# --- Demo requests run in the background ------------------------------------------------
+
+
+@pytest.fixture
+async def demo_owner(committed, desk):
+    """Give the test owner the injection sample's seeded email address."""
+    async with committed() as s:
+        owner = await s.get(Owner, desk.owner_id)
+        owner.email = SAMPLES["injection"].owner_email
+        await s.commit()
+
+
+@pytest.fixture
+def scripted_background():
+    settings = fake_settings()
+    app.dependency_overrides[get_llm_kwargs] = lambda: {
+        "client": make_client(settings, transport=httpx.MockTransport(FakeModel())),
+        "settings": settings,
+        "policy": RetryPolicy(max_attempts=1),
+    }
+    yield
+
+
+async def wait_for(committed, request_id, states, seconds=5.0):
+    for _ in range(int(seconds / 0.05)):
+        async with committed() as s:
+            status = (await s.get(BookingRequest, request_id)).status
+        if status in states:
+            return status
+        await asyncio.sleep(0.05)
+    return status
+
+
+@spec("observability-api", "Demo requests run in the background")
+async def test_samples_include_an_injection_attempt(api):
+    samples = (await api.get("/demo/samples")).json()
+
+    injection = next(s for s in samples if s["id"] == "injection")
+    assert "ignore your rules" in injection["message"]
+
+
+@spec("observability-api", "Demo requests run in the background")
+async def test_submit_the_injection_sample(api, committed, demo_owner, scripted_background):
+    response = await api.post("/demo/requests", json={"sample": "injection"})
+
+    assert response.status_code == 202
+    request_id = uuid.UUID(response.json()["id"])
+    status = await wait_for(committed, request_id, {"needs_review", "sent", "failed"})
+    assert status == "needs_review"
+    async with committed() as s:
+        request = await s.get(BookingRequest, request_id)
+    assert "ignore your rules" in request.raw_message
+
+
+@spec("observability-api", "Demo requests run in the background")
+async def test_unknown_sample(api, committed, demo_owner):
+    response = await api.post("/demo/requests", json={"sample": "no-such-sample"})
+
+    assert response.status_code == 404
+    async with committed() as s:
+        assert await s.scalar(select(func.count()).select_from(BookingRequest)) == 0

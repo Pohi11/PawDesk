@@ -13,13 +13,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, StringConstraints
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.approvals import NotWaiting, decide, review_queue
 from app.db import get_sessionmaker
+from app.demo import DEMO_TODAY, SAMPLES, submit_sample
 from app.enums import ApprovalAction
 from app.observability import (
     RESULTS_DIR,
@@ -61,6 +62,17 @@ def get_stream_timing() -> StreamTiming:
 Timing = Annotated[StreamTiming, Depends(get_stream_timing)]
 
 
+def get_llm_kwargs() -> dict[str, Any]:
+    """Extra model-client arguments for background runs; tests inject a scripted model."""
+    return {}
+
+
+LLMKwargs = Annotated[dict[str, Any], Depends(get_llm_kwargs)]
+MessageText = Annotated[
+    str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)
+]
+
+
 class _Body(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -77,6 +89,11 @@ class EditAndApproveBody(_Body):
 class RejectBody(_Body):
     staff_name: Name
     reason: Reason
+
+
+class DemoBody(_Body):
+    sample: str
+    message: MessageText | None = None
 
 
 @router.get("/requests")
@@ -142,6 +159,26 @@ async def get_metrics(sessions: Sessions) -> dict[str, Any]:
 @router.get("/evals")
 async def evals(results_dir: ResultsDir) -> list[dict[str, Any]]:
     return eval_reports(results_dir)
+
+
+@router.get("/demo/samples")
+async def demo_samples() -> list[dict[str, Any]]:
+    return [sample.to_json() for sample in SAMPLES.values()]
+
+
+@router.post("/demo/requests", status_code=202)
+async def demo_request(
+    body: DemoBody, sessions: Sessions, background: BackgroundTasks, llm_kwargs: LLMKwargs
+) -> dict[str, str]:
+    """Store the sample as a new request and answer at once; processing runs afterward."""
+    try:
+        request_id = await submit_sample(sessions, body.sample, body.message)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    background.add_task(
+        process_request, request_id, sessions=sessions, today=DEMO_TODAY, **llm_kwargs
+    )
+    return {"id": str(request_id)}
 
 
 @router.get("/reviews")
