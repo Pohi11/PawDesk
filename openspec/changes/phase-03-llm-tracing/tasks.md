@@ -11,7 +11,7 @@
 
 ## 3. Model client
 
-- [ ] 3.1 Add `scrub()` and the failure classification (design D5, D8) with unit tests in `tests/test_llm.py`, covering a data-URL image replaced by its hash and size, and every status in the classification table. Verify that the tests pass.
+- [x] 3.1 Add `scrub()` and the failure classification (design D5, D8) with unit tests in `tests/test_llm.py`, covering a data-URL image replaced by its hash and size, and every status in the classification table. Verify that the tests pass.
 - [ ] 3.2 Implement `complete()` in `app/llm.py` (trace required, per-attempt timeout, retry loop with `Retry-After` and full jitter, 200-with-error handling, exact cost, one span per call). Verify with `tests/test_llm.py` against `httpx.MockTransport`, covering every llm-client scenario, including the API-key scan of stored rows.
 
 ## 4. Live check

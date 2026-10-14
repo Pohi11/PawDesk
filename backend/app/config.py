@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     openrouter_api_key: SecretStr
     openrouter_model: str = "deepseek/deepseek-v4.1-flash"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    llm_timeout_seconds: float = 30.0  # per attempt
+    llm_max_attempts: int = 3
 
 
 @lru_cache
