@@ -20,7 +20,7 @@
 ## Decisions
 
 ### D1. Recorded responses at the HTTP layer
-Recorded in [decision record 0016](../../../docs/decisions/0016-recorded-model-responses-for-ci.md).
+Recorded in [decision record 0016](../../../../docs/decisions/0016-recorded-model-responses-for-ci.md).
 - `app/cassettes.py` has a `CassetteTransport` (an httpx transport):
   - the key is the SHA-256 of the exact request body, which holds the model, the messages (including image data), the tools, and the response format;
   - **record** forwards to the real network and saves the JSON body of each 200 response as `<key>.json`;
