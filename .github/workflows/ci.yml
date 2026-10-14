@@ -136,6 +136,17 @@ jobs:
           --e2e-junit ../reports/e2e-results/e2e-junit.xml
         working-directory: backend
 
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Backend image builds, and the app imports with runtime dependencies only
+        run: |
+          docker build -t pawdesk-backend backend
+          docker run --rm --entrypoint /opt/venv/bin/python pawdesk-backend -c "import app.main"
+      - name: Frontend image builds
+        run: docker build -t pawdesk-frontend frontend
+
   secrets:
     runs-on: ubuntu-latest
     steps:

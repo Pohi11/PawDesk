@@ -32,7 +32,7 @@ def test_runs_on_every_push_and_pull_request(workflow):
 def test_every_check_has_a_job(workflow):
     jobs = workflow["jobs"]
 
-    assert set(jobs) == {"backend", "frontend", "e2e", "traceability", "secrets"}
+    assert set(jobs) == {"backend", "frontend", "e2e", "traceability", "secrets", "images"}
     backend = commands(jobs["backend"])
     for check in ("ruff check", "alembic upgrade head", "alembic check", "pytest --junitxml"):
         assert check in backend
@@ -44,6 +44,9 @@ def test_every_check_has_a_job(workflow):
     assert "scripts.walkthrough --check" in commands(jobs["traceability"])
     assert set(jobs["traceability"]["needs"]) == {"backend", "frontend", "e2e"}
     assert any("gitleaks" in step.get("uses", "") for step in jobs["secrets"]["steps"])
+    images = commands(jobs["images"])
+    assert "docker build -t pawdesk-backend backend" in images
+    assert "import app.main" in images and "docker build -t pawdesk-frontend frontend" in images
 
 
 @spec("delivery-pipeline", REQ)
