@@ -6,7 +6,7 @@
 
 ## 2. Intent schema
 
-- [ ] 2.1 Add `BookingIntent` (Pydantic, `extra="forbid"`) and `strict_json_schema()` in `app/intake.py`. Verify with `tests/test_intake_schema.py`, covering valid parsing, an extra field rejected, out-of-range confidence rejected, and the strict schema with every field required, no additional properties, and no `title`/`default` keys.
+- [x] 2.1 Add `BookingIntent` (Pydantic, `extra="forbid"`) and `strict_json_schema()` in `app/intake.py`. Verify with `tests/test_intake_schema.py`, covering valid parsing, an extra field rejected, out-of-range confidence rejected, and the strict schema with every field required, no additional properties, and no `title`/`default` keys.
 
 ## 3. Prompt and pipeline
 
