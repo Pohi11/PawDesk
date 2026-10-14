@@ -30,7 +30,7 @@
 
 ## 6. Run tracing schema
 
-- [ ] 6.1 Add models and a migration for traces and spans: kind and status CHECKs, error-requires-message, non-negative tokens and cost, `ended_at >= started_at`, `NUMERIC(14,10)` cost, `JSONB` payloads, and the composite parent foreign key. Verify with `tests/test_run_tracing.py`, covering every run-tracing scenario, including the 8-decimal cost round trip and the cross-trace parent rejection.
+- [x] 6.1 Add models and a migration for traces and spans: kind and status CHECKs, error-requires-message, non-negative tokens and cost, `ended_at >= started_at`, `NUMERIC(14,10)` cost, `JSONB` payloads, and the composite parent foreign key. Verify with `tests/test_run_tracing.py`, covering every run-tracing scenario, including the 8-decimal cost round trip and the cross-trace parent rejection.
 
 ## 7. Seed data
 

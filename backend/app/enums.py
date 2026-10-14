@@ -37,3 +37,16 @@ class ApprovalAction(StrEnum):
     APPROVE = "approve"
     EDIT_AND_APPROVE = "edit_and_approve"
     REJECT = "reject"
+
+
+class SpanKind(StrEnum):
+    LLM = "llm"
+    TOOL = "tool"
+    CODE = "code"
+    HUMAN = "human"
+
+
+class SpanStatus(StrEnum):
+    RUNNING = "running"
+    OK = "ok"
+    ERROR = "error"

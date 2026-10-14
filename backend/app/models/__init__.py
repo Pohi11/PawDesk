@@ -11,6 +11,7 @@ from app.models.domain import (
     VaccineRecord,
     VaccineRule,
 )
+from app.models.tracing import Span, Trace
 
 __all__ = [
     "Approval",
@@ -22,6 +23,8 @@ __all__ = [
     "Owner",
     "Pet",
     "Reservation",
+    "Span",
+    "Trace",
     "VaccineRecord",
     "VaccineRule",
 ]
