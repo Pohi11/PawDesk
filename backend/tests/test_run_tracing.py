@@ -139,3 +139,37 @@ async def test_end_before_start_is_rejected(session):
 
     with pytest.raises(IntegrityError, match="ck_spans_ends_after_start"):
         await make_span(session, trace, started_at=start, ended_at=start - timedelta(seconds=1))
+
+
+@spec("run-tracing", "Spans carry attributes")
+async def test_attributes_default_to_an_empty_object(session):
+    span = await make_span(session, await make_trace(session))
+    session.expunge(span)
+
+    stored = await session.get(Span, span.id)
+
+    assert stored.attributes == {}
+
+
+@spec("run-tracing", "Spans carry attributes")
+async def test_attributes_round_trip(session):
+    attributes = {"finish_reason": "stop", "attempts": [{"n": 1, "outcome": "ok"}]}
+    span = await make_span(session, await make_trace(session), attributes=attributes)
+    session.expunge(span)
+
+    stored = await session.get(Span, span.id)
+
+    assert stored.attributes == attributes
+
+
+@spec("run-tracing", "Spans carry attributes")
+async def test_attributes_must_be_an_object(session):
+    trace = await make_trace(session)
+
+    with pytest.raises(IntegrityError, match="ck_spans_attributes_is_object"):
+        await session.execute(
+            text(
+                "INSERT INTO spans (trace_id, kind, name, attributes) VALUES (:t, 'code', 'x', '[1]')"
+            ),
+            {"t": trace.id},
+        )

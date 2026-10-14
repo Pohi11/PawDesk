@@ -1,43 +1,39 @@
-"""Phase 0 smoke test: one real call to OpenRouter, printing the reply, tokens, and cost.
+"""Smoke test: one real, traced call to OpenRouter, recorded as a span in the dev database.
 
 Run from backend/:  uv run python -m scripts.hello_openrouter
 """
 
-import time
+import asyncio
 
-from openai import OpenAI
+from app.db import get_engine, make_sessionmaker
+from app.llm import complete
+from app.tracing import Tracer
 
-from app.config import get_settings
 
+async def main() -> None:
+    engine = get_engine()
+    tracer = Tracer(make_sessionmaker(engine))
+    try:
+        async with tracer.start_trace("smoke: hello openrouter") as trace_id:
+            result = await complete(
+                [
+                    {
+                        "role": "user",
+                        "content": "In one sentence, what does a dog boarding facility do?",
+                    }
+                ],
+                name="smoke.hello",
+            )
+    finally:
+        await engine.dispose()
 
-def main() -> None:
-    settings = get_settings()
-    client = OpenAI(
-        base_url=settings.openrouter_base_url,
-        api_key=settings.openrouter_api_key.get_secret_value(),
-        timeout=30,
-    )
-
-    started = time.perf_counter()
-    response = client.chat.completions.create(
-        model=settings.openrouter_model,
-        messages=[
-            {"role": "user", "content": "In one sentence, what does a dog boarding facility do?"}
-        ],
-    )
-    latency_ms = (time.perf_counter() - started) * 1000
-
-    usage = response.usage
-    # `cost` is an OpenRouter extension to the OpenAI usage object, so the SDK has no typed
-    # field for it; it's kept as an extra attribute.
-    cost = getattr(usage, "cost", None)
-
-    print(f"model:    {response.model}")
-    print(f"reply:    {response.choices[0].message.content}")
-    print(f"tokens:   {usage.prompt_tokens} in / {usage.completion_tokens} out")
-    print(f"cost:     ${cost} (USD)")
-    print(f"latency:  {latency_ms:.0f} ms")
+    print(f"model:   {result.model}")
+    print(f"reply:   {result.text}")
+    print(f"tokens:  {result.prompt_tokens} in / {result.completion_tokens} out")
+    print(f"cost:    {result.cost_usd} USD (as reported by the provider)")
+    print(f"trace:   {trace_id}")
+    print(f"span:    {result.span_id}")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
