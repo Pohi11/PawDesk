@@ -42,7 +42,7 @@ A call made of several attempts is one span. `attributes.attempts` lists each at
 ### D4. Span writes are independent, short transactions
 A `Tracer` owns its own `async_sessionmaker`. Each span is written twice: an INSERT with status `running` at start, and an UPDATE with the end time, status, output, usage, and attributes at the end. Each write is its own transaction, committed immediately. Business code never shares a session with the tracer.
 
-This affects every later phase, because the orchestrator and agents rely on it, so it's recorded as [decision record 0006](../../../docs/decisions/0006-tracing-and-model-calls.md).
+This affects every later phase, because the orchestrator and agents rely on it, so it's recorded as [decision record 0006](../../../../docs/decisions/0006-tracing-and-model-calls.md).
 - *Why:* a span describing failed work has to survive that work's rollback. That's the point of tracing. A `running` row also lets the dashboard (Phase 9) show work in progress.
 - *Cost:* two extra round trips per span, which is negligible next to multi-second model calls.
 
