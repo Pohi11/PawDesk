@@ -26,7 +26,7 @@
 ## 5. Booking requests and the transition service
 
 - [x] 5.1 Add models and a migration for booking requests (status, `failed_step`, `last_error`, `version`), the transition log, and approvals, including the failed-state CHECK and the reject-requires-reason CHECK. Verify the round trip and `tests/test_booking_lifecycle.py::test_new_request_starts_received` / `test_unknown_state_rejected`.
-- [ ] 5.2 Implement `app/transitions.py`: `transition()` applies the guard, updates the state, sets or clears the failure fields, appends the log row, and flushes, converting `StaleDataError` into `TransitionConflict`. Verify with `tests/test_booking_lifecycle.py`, covering the logged transition, no log entry on rejection, failure recorded, retry clearing the failure, staff rejecting a failed request, the stale update rejected with exactly one log row, and reject-without-reason rejected.
+- [x] 5.2 Implement `app/transitions.py`: `transition()` applies the guard, updates the state, sets or clears the failure fields, appends the log row, and flushes, converting `StaleDataError` into `TransitionConflict`. Verify with `tests/test_booking_lifecycle.py`, covering the logged transition, no log entry on rejection, failure recorded, retry clearing the failure, staff rejecting a failed request, the stale update rejected with exactly one log row, and reject-without-reason rejected.
 
 ## 6. Run tracing schema
 
