@@ -17,4 +17,4 @@
 
 ## 4. Integration
 
-- [ ] 4.1 Run both suites, lint, type check, build, `alembic check`, and the walkthrough coverage check. Regenerate the walkthrough. Verify all pass.
+- [x] 4.1 Run both suites, lint, type check, build, `alembic check`, and the walkthrough coverage check. Regenerate the walkthrough. Verify all pass.
