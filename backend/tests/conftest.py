@@ -4,6 +4,8 @@ Tests that need the database take the `session` fixture. Everything a test write
 including commits, is rolled back when the test ends.
 """
 
+import os
+import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -31,7 +33,11 @@ from app.models import (
 )
 from app.tracing import Tracer
 
-TEST_DB_NAME = "pawdesk_test"
+# Separate checkouts (worktrees) running at the same time each need their own database,
+# because every session starts by migrating it down and up.
+TEST_DB_NAME = os.environ.get("PAWDESK_TEST_DB", "pawdesk_test")
+if not re.fullmatch(r"[a-z_][a-z0-9_]*", TEST_DB_NAME):
+    raise ValueError(f"PAWDESK_TEST_DB must be a plain lowercase identifier, got {TEST_DB_NAME!r}")
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 
 
