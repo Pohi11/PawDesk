@@ -17,13 +17,13 @@ End-to-end tests SHALL run the real backend and dashboard against a freshly migr
 - **THEN** the request first waits in review with its flag reasons, and then reaches `sent`
 
 ### Requirement: Every change is checked automatically
-The pipeline SHALL run on every push and pull request, with no secret except the scanner's own token, and SHALL run:
-- the backend lint, migrations, migration check, and tests against a Postgres service;
-- the frontend lint, type check, unit tests, and build;
-- the end-to-end tests with recorded responses;
+The pipeline SHALL run on every push and pull request, using no secret except the scanner's own token. It SHALL run:
+- backend lint, migrations, migration check, and tests against Postgres;
+- frontend lint, type check, unit tests, and build;
+- end-to-end tests with recorded responses;
 - the spec-coverage check over all three test reports;
-- a secret scan of the repository history;
-- a build of both production images, and an import of the app inside the backend image, which holds runtime dependencies only.
+- a secret scan of the history;
+- both production image builds, with the app imported inside the backend image.
 
 #### Scenario: Pipeline definition
 - **WHEN** the pipeline definition is read
