@@ -2,13 +2,16 @@
 
 Run from backend/:
     uv run python -m scripts.bookings submit OWNER_EMAIL "message" [--certificate PATH]
-    uv run python -m scripts.bookings process REQUEST_ID [--crash-after STATE]
+    uv run python -m scripts.bookings process REQUEST_ID [--crash-after STATE] [--today DATE]
     uv run python -m scripts.bookings resume REQUEST_ID      # the same as process, after a crash
     uv run python -m scripts.bookings show REQUEST_ID
 
 --crash-after STATE hard-stops the process (os._exit, no cleanup, nothing flushed) right
 after the work for STATE commits: `received` stops before extraction, `extracting` stops
 after extraction is saved. It exists for the manual kill-and-resume test.
+
+--today YYYY-MM-DD overrides the facility-local date, e.g. to match the date a benchmark
+certificate was generated for.
 """
 
 import argparse
@@ -17,6 +20,7 @@ import os
 import sys
 import uuid
 from collections import Counter
+from datetime import date
 from pathlib import Path
 
 from sqlalchemy import func, select
@@ -116,6 +120,7 @@ async def main(argv: list[str]) -> None:
         cmd = commands.add_parser(name)
         cmd.add_argument("request_id", type=uuid.UUID)
         cmd.add_argument("--crash-after", type=State, choices=list(State), metavar="STATE")
+        cmd.add_argument("--today", type=date.fromisoformat, metavar="YYYY-MM-DD")
     commands.add_parser("show").add_argument("request_id", type=uuid.UUID)
     args = parser.parse_args(argv)
 
@@ -128,7 +133,11 @@ async def main(argv: list[str]) -> None:
         elif args.command in ("process", "resume"):
             crash = hard_stop(args.crash_after) if args.crash_after else None
             state = await process_request(
-                args.request_id, sessions=sessions, tracer=Tracer(sessions), crash_after=crash
+                args.request_id,
+                sessions=sessions,
+                tracer=Tracer(sessions),
+                today=args.today,
+                crash_after=crash,
             )
             print(f"ended in: {state}\n")
             await show(sessions, args.request_id)
