@@ -13,8 +13,8 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Look at every page in a browser with seeded data and a finished demo run, and read the text on each one against the guide. Verify with screenshots of the home, Try, run, review, metrics, evals, and build pages.
-- [ ] 3.2 Regenerate `docs/demo.gif` from the new end-to-end frames, run every suite and the coverage check, and regenerate the build walkthrough. Verify with `uv run python -m scripts.make_demo_gif`, the full backend and frontend suites, and `--check` on the walkthrough.
+- [x] 3.1 Look at every page in a browser with seeded data and a finished demo run, and read the text on each one against the guide. Verify with screenshots of the home, Try, run, review, metrics, evals, and build pages.
+- [x] 3.2 Regenerate `docs/demo.gif` from the new end-to-end frames, run every suite and the coverage check, and regenerate the build walkthrough. Verify with `uv run python -m scripts.make_demo_gif`, the full backend and frontend suites, and `--check` on the walkthrough.
 
 ## Workflow follow-up
 
