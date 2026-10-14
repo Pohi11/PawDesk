@@ -78,6 +78,16 @@ def sniff_image_type(data: bytes) -> str | None:
     return None
 
 
+def pet_name_mismatch(printed: str | None, booked_pet: str | None) -> str | None:
+    """An issue when the certificate clearly names a different pet; None when the names
+    match or either one is unknown (an unknown name is someone else's issue to raise)."""
+    printed = (printed or "").strip()
+    booked = (booked_pet or "").strip()
+    if printed and booked and printed.casefold() != booked.casefold():
+        return f"certificate names {printed!r}, booking is for {booked!r}"
+    return None
+
+
 def record_issues(
     extraction: CertificateExtraction, today: date, booked_pet: str | None
 ) -> list[str]:
@@ -91,9 +101,8 @@ def record_issues(
             issues.append(f"{r.label!r}: expiry {r.expires_on} is before the date given")
         if r.vaccine is None:
             issues.append(f"{r.label!r}: not a known vaccine; not used for compliance")
-    printed = (extraction.pet_name or "").strip()
-    if booked_pet and printed and printed.casefold() != booked_pet.strip().casefold():
-        issues.append(f"certificate names {printed!r}, booking is for {booked_pet.strip()!r}")
+    if mismatch := pet_name_mismatch(extraction.pet_name, booked_pet):
+        issues.append(mismatch)
     if not extraction.readable:
         issues.append("image not readable")
     if extraction.confidence < CONFIDENCE_THRESHOLD:

@@ -20,11 +20,13 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import func, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.enums import SpanKind, SpanStatus
 from app.models import Span, Trace
+
+ABANDONED = "abandoned: the process stopped before this work finished"
 
 
 class NoActiveTrace(RuntimeError):
@@ -75,6 +77,27 @@ class Tracer:
         async with self._sessions() as session, session.begin():
             await session.execute(statement)
 
+    async def close_abandoned(self, booking_request_id: uuid.UUID) -> int:
+        """Close what an earlier, killed run of this request left open (design D7).
+
+        Only safe while one worker processes a request at a time: a span that is still
+        `running` in an earlier trace can then only belong to a process that stopped.
+        Returns how many spans were closed.
+        """
+        earlier = select(Trace.id).where(Trace.booking_request_id == booking_request_id)
+        async with self._sessions() as session, session.begin():
+            closed = await session.execute(
+                update(Span)
+                .where(Span.status == SpanStatus.RUNNING, Span.trace_id.in_(earlier))
+                .values(status=SpanStatus.ERROR, error=ABANDONED, ended_at=func.now())
+            )
+            await session.execute(
+                update(Trace)
+                .where(Trace.booking_request_id == booking_request_id, Trace.ended_at.is_(None))
+                .values(ended_at=func.now())
+            )
+            return closed.rowcount
+
     @asynccontextmanager
     async def start_trace(
         self, name: str, booking_request_id: uuid.UUID | None = None
@@ -112,7 +135,7 @@ async def span(name: str, kind: SpanKind, input: Any = None) -> AsyncIterator[Sp
     status, error = SpanStatus.OK, None
     try:
         yield handle
-    except Exception as exc:
+    except BaseException as exc:  # includes CancelledError: a cancelled span did not succeed
         status, error = SpanStatus.ERROR, f"{type(exc).__name__}: {exc}"
         raise  # the caller gets the original exception, unchanged
     finally:
