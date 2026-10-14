@@ -16,4 +16,4 @@
 
 ## 4. Integration
 
-- [ ] 4.1 Run the backend suite, the frontend tests, lint, type check, build, and `--check` (which now replaces the one-off coverage script). Verify all pass.
+- [x] 4.1 Run the backend suite, the frontend tests, lint, type check, build, and `--check` (which now replaces the one-off coverage script). Verify all pass.
