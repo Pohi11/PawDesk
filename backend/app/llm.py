@@ -14,7 +14,7 @@ import random
 import time
 import uuid
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import StrEnum
 from functools import lru_cache
@@ -83,6 +83,16 @@ class LLMError(Exception):
 
 
 @dataclass(frozen=True)
+class ToolCall:
+    """One tool call the model asked for. `arguments` is the raw JSON text, unvalidated:
+    the caller parses and checks it before running anything."""
+
+    id: str
+    name: str
+    arguments: str
+
+
+@dataclass(frozen=True)
 class LLMResult:
     text: str
     model: str
@@ -92,6 +102,10 @@ class LLMResult:
     completion_tokens: int | None
     cost_usd: Decimal | None
     span_id: uuid.UUID
+    tool_calls: tuple[ToolCall, ...] = ()
+    # The assistant turn exactly as the API expects it back on the next call. A tool result
+    # must follow the assistant message that requested it, with the same tool_call_id.
+    assistant_message: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -151,6 +165,7 @@ async def complete(
     model: str | None = None,
     response_format: dict[str, Any] | None = None,
     temperature: float | None = None,
+    tools: list[dict[str, Any]] | None = None,
     client: AsyncOpenAI | None = None,
     policy: RetryPolicy | None = None,
     settings: Settings | None = None,
@@ -164,12 +179,18 @@ async def complete(
     model = model or settings.openrouter_model
     params = {
         k: v
-        for k, v in {"response_format": response_format, "temperature": temperature}.items()
+        for k, v in {
+            "response_format": response_format,
+            "temperature": temperature,
+            "tools": tools,
+        }.items()
         if v is not None
     }
-    # Some endpoints treat a schema as a hint or ignore it; only route structured requests to
-    # endpoints that support every parameter we send. Pydantic still validates the result.
-    extra_body = {"provider": {"require_parameters": True}} if response_format else None
+    # Some endpoints treat a schema as a hint or ignore it, and some can't call tools; route
+    # those requests only to endpoints that support every parameter we send. Pydantic still
+    # validates the result.
+    needs_support = response_format is not None or tools is not None
+    extra_body = {"provider": {"require_parameters": True}} if needs_support else None
 
     async with span(
         name, SpanKind.LLM, input={"messages": scrub(messages), "model": model, "params": params}
@@ -235,7 +256,19 @@ def _record_success(s: SpanHandle, response: Any, extra: dict[str, Any]) -> LLMR
     s.completion_tokens = usage.completion_tokens if usage else None
     # str() first: keeps the digits the provider sent (9.42e-05 -> exactly 0.0000942) (D9).
     s.cost_usd = Decimal(str(cost)) if cost is not None else None
+    tool_calls = tuple(
+        ToolCall(id=c.id, name=c.function.name, arguments=c.function.arguments or "")
+        for c in choice.message.tool_calls or ()
+    )
+    assistant_message: dict[str, Any] = {"role": "assistant", "content": choice.message.content}
+    if tool_calls:
+        assistant_message["tool_calls"] = [
+            {"id": c.id, "type": "function", "function": {"name": c.name, "arguments": c.arguments}}
+            for c in tool_calls
+        ]
     s.output = {"text": choice.message.content, "finish_reason": choice.finish_reason}
+    if tool_calls:
+        s.output["tool_calls"] = [{"name": c.name, "arguments": c.arguments} for c in tool_calls]
     s.attributes.update(
         finish_reason=choice.finish_reason,
         generation_id=response.id,
@@ -250,4 +283,6 @@ def _record_success(s: SpanHandle, response: Any, extra: dict[str, Any]) -> LLMR
         completion_tokens=s.completion_tokens,
         cost_usd=s.cost_usd,
         span_id=s.id,
+        tool_calls=tool_calls,
+        assistant_message=assistant_message,
     )

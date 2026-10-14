@@ -2,7 +2,7 @@
 
 ## 1. Model client
 
-- [ ] 1.1 Add tool calling to `complete()`: a `tools` parameter, `ToolCall` and `assistant_message` on `LLMResult`, tool calls in the span output, and `require_parameters` when tools are offered. Verify with `tests/test_llm.py` tests for a scripted tool-call response and for the routing preference. Add an opt-in live test that the configured model calls a trivial tool.
+- [x] 1.1 Add tool calling to `complete()`: a `tools` parameter, `ToolCall` and `assistant_message` on `LLMResult`, tool calls in the span output, and `require_parameters` when tools are offered. Verify with `tests/test_llm.py` tests for a scripted tool-call response and for the routing preference. Add an opt-in live test that the configured model calls a trivial tool.
 
 ## 2. Resolver
 
