@@ -2,7 +2,7 @@
 
 ## 1. Provider routing for structured requests
 
-- [ ] 1.1 In `complete()`, add `provider.require_parameters: true` to the request body only when `response_format` is given. Verify with new tests in `tests/test_llm.py` that inspect the request body for both cases.
+- [x] 1.1 In `complete()`, add `provider.require_parameters: true` to the request body only when `response_format` is given. Verify with new tests in `tests/test_llm.py` that inspect the request body for both cases.
 
 ## 2. Intent schema
 

@@ -2,6 +2,7 @@
 
 import base64
 import hashlib
+import json
 from decimal import Decimal
 
 import httpx
@@ -343,3 +344,38 @@ async def test_span_stores_image_hash_not_image(llm):
     stored_url = s.input["messages"][0]["content"][1]["image_url"]["url"]
     assert stored_url.startswith("[image sha256=")
     assert base64.b64encode(PNG_BYTES).decode() not in str(s.input)
+
+
+@spec("llm-client", "Structured requests go only to endpoints that support them")
+async def test_response_format_requires_supporting_endpoints(tracer):
+    script = Script(ok())
+    settings = fake_settings()
+    client = make_client(settings, transport=httpx.MockTransport(script))
+    schema = {"type": "json_schema", "json_schema": {"name": "x", "strict": True, "schema": {}}}
+
+    async with tracer.start_trace("t"):
+        await complete(
+            [{"role": "user", "content": "hi"}],
+            name="x",
+            response_format=schema,
+            client=client,
+            settings=settings,
+        )
+
+    body = json.loads(script.requests[0].content)
+    assert body["provider"] == {"require_parameters": True}
+    assert body["response_format"] == schema
+
+
+@spec("llm-client", "Structured requests go only to endpoints that support them")
+async def test_plain_request_has_no_routing_preferences(tracer):
+    script = Script(ok())
+    settings = fake_settings()
+    client = make_client(settings, transport=httpx.MockTransport(script))
+
+    async with tracer.start_trace("t"):
+        await complete(
+            [{"role": "user", "content": "hi"}], name="x", client=client, settings=settings
+        )
+
+    assert "provider" not in json.loads(script.requests[0].content)
