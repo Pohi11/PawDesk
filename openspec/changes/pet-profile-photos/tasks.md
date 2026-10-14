@@ -12,7 +12,7 @@
 
 ## 3. Dashboard
 
-- [ ] 3.1 Add `frontend/lib/pet-photo.ts` (breed match within species, else an FNV-1a pick from the pet id, else none) with unit tests for every scenario of "A matched pet shows a photo of its breed" and "Other pets show a stable photo of their species". Verify with `pnpm test`.
+- [x] 3.1 Add `frontend/lib/pet-photo.ts` (breed match within species, else an FNV-1a pick from the pet id, else none) with unit tests for every scenario of "A matched pet shows a photo of its breed" and "Other pets show a stable photo of their species". Verify with `pnpm test`.
 - [ ] 3.2 Add a `PetAvatar` component (photo with alternative text naming the pet, or the inline paw placeholder) and use it on the requests list rows and the run page heading. Verify with lint, type check, build, and a screenshot of both pages with a matched and an unmatched request.
 - [ ] 3.3 Extend the end-to-end demo with checks tagged `pet-photos` / "Photos appear on the requests list and the run page" and "A request without a matched pet shows a placeholder": Biscuit's Beagle photo on the run page and on the list, and the placeholder for the unknown-pet sample. Verify with `pnpm e2e`.
 
