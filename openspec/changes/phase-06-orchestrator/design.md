@@ -44,7 +44,7 @@ This is the pattern later phases follow (resolver, reply, and approval steps), s
 | State on entry | Work | Saved results | Moves to |
 |---|---|---|---|
 | `received` | — | — | `extracting` |
-| `extracting` | `asyncio.gather(intake, records)`, each with its own database session | `intake`, `records` | `checking` |
+| `extracting` | `asyncio.gather(intake, records)`, with no database session held during the model calls | `intake`, `records` | `checking` |
 | `checking` | pet-name cross-check, compliance (records on file plus extracted), capacity (boarding only) | `checks` | — |
 | `checking` (after checks) | routing | `route` (target and reasons) | `drafting` or `resolving` |
 | `failed` | retry → back to `failed_step`, then continue | — | — |
@@ -54,7 +54,7 @@ This is the pattern later phases follow (resolver, reply, and approval steps), s
 - Records runs with `booked_pet=None`, because the pet isn't known until intake finishes. The pet-name comparison moves to the checking step, the point where both results come together.
 
 ### D4. Concurrency
-Intake and records run in `asyncio.gather`. Each gets its **own** `AsyncSession` (an `AsyncSession` must never be shared between concurrent tasks, per decision record 0003). Trace context propagates through `contextvars`, so their spans become siblings under `extract`. If one fails, the other is allowed to finish (`return_exceptions=True`), so its spans close cleanly. The step then fails as a whole.
+Intake and records run in `asyncio.gather`. Their inputs (message, pets, time zone, certificate bytes) are read in one session that is closed **before** the model calls start, and their results are saved in a new session afterward. So no `AsyncSession` is ever shared between concurrent tasks (decision record 0003), and no database connection sits idle for the length of a model call. Trace context propagates through `contextvars`, so their spans become siblings under `extract`. If one fails, the other is allowed to finish (`return_exceptions=True`), so its spans close cleanly. The step then fails as a whole.
 
 ### D5. Certificate storage
 - **Table:** `booking_documents(booking_request_id UNIQUE, mime, sha256, size_bytes, content BYTEA)`.

@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.db import make_engine, make_sessionmaker
-from app.models import Trace
+from app.models import Base, Trace
 from app.tracing import Tracer
 
 TEST_DB_NAME = "pawdesk_test"
@@ -122,3 +122,14 @@ async def tracer(engine):
                 text("DELETE FROM spans WHERE trace_id = ANY(:ids)"), {"ids": created}
             )
             await cleanup.execute(text("DELETE FROM traces WHERE id = ANY(:ids)"), {"ids": created})
+
+
+@pytest.fixture
+async def committed(engine):
+    """A sessionmaker whose commits are real, for work that spans several sessions and
+    connections (the orchestrator, the command line). Every table is emptied afterward."""
+    sessions = make_sessionmaker(engine)
+    yield sessions
+    tables = ", ".join(t.name for t in Base.metadata.sorted_tables)
+    async with sessions() as cleanup, cleanup.begin():
+        await cleanup.execute(text(f"TRUNCATE {tables} CASCADE"))

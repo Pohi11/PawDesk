@@ -65,7 +65,7 @@ Daycare and grooming SHALL need no kennel.
 
 ### Requirement: Routing is decided by code with reasons
 After checking, the request SHALL move to `drafting` only when:
-- intake and records are both clear;
+- intake is clear, and records are clear or were skipped because no certificate was sent;
 - a pet is matched;
 - compliance is `compliant`;
 - a kennel was found or none is needed.
@@ -79,6 +79,10 @@ Otherwise it SHALL move to `resolving`, and the saved routing result SHALL list 
 #### Scenario: Several problems
 - **WHEN** a vaccine expires during the stay and no kennel is free
 - **THEN** the request moves to `resolving`, and the reasons name both the vaccine and the capacity problem
+
+#### Scenario: No certificate, records on file cover the stay
+- **WHEN** a request has no certificate and the pet's records on file cover every required vaccine
+- **THEN** the request moves to `drafting`
 
 #### Scenario: No pet matched
 - **WHEN** intake could not match a pet

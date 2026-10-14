@@ -6,7 +6,7 @@
 
 ## 2. Orchestrator
 
-- [ ] 2.1 Implement `process_request()` in `app/orchestrator.py`: the received → extracting checkpoint, concurrent extraction with separate sessions, checks (pet cross-check, compliance with on-file plus extracted records, capacity for boarding), routing with reasons, and saved results with transitions in one transaction. Verify with `tests/test_orchestrator.py` against scripted model answers, covering concurrency, no certificate, every check scenario, every routing scenario, and tracing.
+- [x] 2.1 Implement `process_request()` in `app/orchestrator.py`: the received → extracting checkpoint, concurrent extraction with no session held during the model calls, checks (pet cross-check, compliance with on-file plus extracted records, capacity for boarding), routing with reasons, and saved results with transitions in one transaction. Verify with `tests/test_orchestrator.py` against scripted model answers, covering concurrency, no certificate, every check scenario, every routing scenario, and tracing.
 - [ ] 2.2 Add resume and failure behavior: skip steps that have saved results, the crash hook, failures moving to `failed`, retrying from the failed step, and finished requests left unchanged. Verify with the crash-after-extraction (no model calls on resume), crash-during-extraction (exactly one result per step), finished-request, failure, and retry tests.
 - [ ] 2.3 Close abandoned spans when processing starts. Verify with tests for a span left running being closed as abandoned, and for finished spans being left untouched.
 
