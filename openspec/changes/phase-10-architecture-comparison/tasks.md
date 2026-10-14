@@ -7,7 +7,7 @@
 ## 2. Comparison
 
 - [x] 2.1 Add `evals/comparison_cases.json` and the pure parts of `scripts/compare_architectures.py`: expected outcomes from true facts, outcome mapping, and scoring. Verify with `tests/test_compare_architectures.py`: confirmable truth, injection never confirmable, unsafe confirmation counted, hybrid outcome mapping, and the lab guard refusing non-local hosts.
-- [ ] 2.2 Add the lab runner (database creation, migration, seeding, both architectures, report) and a scripted end-to-end test on two cases that also shows nothing is sent.
+- [x] 2.2 Add the lab runner (database creation, migration, seeding, both architectures, report) and a scripted end-to-end test on two cases that also shows nothing is sent.
 - [ ] 2.3 Show comparison reports side by side on the dashboard's Evals page. Verify with lint, the type check, the build, and a frontend test of the report shaping.
 
 ## 3. Real run and conclusion
