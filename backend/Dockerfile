@@ -16,4 +16,6 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY . .
 
 EXPOSE 8000
-CMD ["uv", "run", "--frozen", "--no-dev", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Bring the schema up to date before serving, so `docker compose up` never runs new code
+# against an old schema. `exec` makes uvicorn PID 1, so it receives Docker's stop signal.
+CMD ["sh", "-c", "/opt/venv/bin/alembic upgrade head && exec /opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000"]

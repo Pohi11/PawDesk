@@ -35,11 +35,11 @@
 ## 7. Seed data
 
 - [x] 7.1 Implement `scripts/seed.py`: the host allowlist, a single `TRUNCATE … CASCADE`, and the fixed fictional dataset with dates relative to today, all in one transaction. Verify with `tests/test_seed.py`, covering every table populated, all five kennel size classes, the three vaccine edge cases, identical counts after two runs, and a non-local host refused with no changes.
-- [ ] 7.2 Run the seed against the development database. Verify with `uv run python -m scripts.seed`, which prints per-table counts.
+- [x] 7.2 Run the seed against the development database. Verify with `uv run python -m scripts.seed`, which prints per-table counts.
 
 ## 8. Integration
 
-- [ ] 8.1 Make the backend container run `alembic upgrade head` before uvicorn. Verify that `docker compose up --build` reports all services healthy and `/health/db` returns ok.
+- [x] 8.1 Make the backend container run `alembic upgrade head` before uvicorn. Verify that `docker compose up --build` reports all services healthy and `/health/db` returns ok.
 - [ ] 8.2 Update `README.md` with the migrate, seed, and test commands. Verify that each documented command runs as written.
 - [ ] 8.3 Run the full suite and lint. Verify that `uv run pytest` and `uv run ruff check . && uv run ruff format --check .` pass, and that every spec requirement in this change has at least one test carrying a matching `spec` marker.
 
