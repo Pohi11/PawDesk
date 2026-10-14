@@ -51,7 +51,7 @@ export default function SpecsPage() {
                     <Md>{req.text}</Md>
                   </div>
                   <div className="mt-3 grid gap-4 lg:grid-cols-2">
-                    <div>
+                    <div className="min-w-0">
                       <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Scenarios</h4>
                       <ul className="mt-1 space-y-2">
                         {req.scenarios.map((s) => (
@@ -66,7 +66,7 @@ export default function SpecsPage() {
                         ))}
                       </ul>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                         Tests ({req.tests.length})
                       </h4>

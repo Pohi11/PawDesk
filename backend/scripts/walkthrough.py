@@ -364,7 +364,8 @@ def main(argv: list[str]) -> int:
 
     out = args.out or repo / "frontend" / "content" / "walkthrough.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    text = json.dumps(data, indent=1, ensure_ascii=False) + "\n"
+    out.write_text(text, encoding="utf-8", newline="\n")  # LF on every platform
     totals = data["totals"]
     print(
         f"wrote {out}: {totals['changes']} changes, {totals['verified']}/{totals['requirements']} "
