@@ -1,16 +1,21 @@
 """Spec: certificate-evaluation, the synthetic certificate set (rendering not needed here)."""
 
 from collections import Counter
+from datetime import timedelta
 
 import pytest
 
 from scripts.generate_certificates import (
     CLINICS,
     LAYOUTS,
+    STAY_END,
     VARIANTS,
     WATERMARK,
     make_truth,
+    make_truth_v2,
+    reference_decision,
     render_html,
+    verify_decision,
 )
 
 spec = pytest.mark.spec
@@ -59,3 +64,59 @@ def test_fonts_are_embedded_not_fetched_from_disk():
 
     assert page.count("url(data:font/ttf;base64,") == 3
     assert "file://" not in page
+
+
+# --- Benchmark v2 ---------------------------------------------------------------------
+
+
+@spec("certificate-evaluation", "Certificates are generated with ground truth")
+def test_v2_ground_truth_is_deterministic():
+    assert make_truth_v2() == make_truth_v2()
+
+
+@spec("certificate-evaluation", "The set covers hard cases")
+def test_v2_keeps_layout_and_variant_coverage():
+    certs = make_truth_v2()
+
+    assert min(Counter(c["layout"] for c in certs).values()) >= 4
+    assert min(Counter(c["variant"] for c in certs).values()) >= 4
+
+
+@spec("certificate-evaluation", "Reference decisions are balanced")
+def test_v2_decision_mix():
+    certs = make_truth_v2()
+    decisions = Counter(reference_decision(c) for c in certs)
+
+    assert max(decisions["compliant"], decisions["not_compliant"]) <= 0.6 * len(certs)
+    assert decisions["needs_review"] >= 4
+    assert all(reference_decision(c) == c["decision"] for c in certs)
+
+
+@spec("certificate-evaluation", "Reference decisions are balanced")
+def test_v2_boundary_coverage():
+    certs = make_truth_v2()
+    required = {"dog": {"rabies", "dhpp", "bordetella"}, "cat": {"rabies", "fvrcp"}}
+
+    def expiring_on(cert, day):
+        return any(
+            r["vaccine"] in required[cert["species"]] and r["expires_on"] == day.isoformat()
+            for r in cert["records"]
+        )
+
+    on_checkout = [c for c in certs if c["decision"] == "compliant" and expiring_on(c, STAY_END)]
+    day_before = [
+        c
+        for c in certs
+        if c["decision"] == "not_compliant" and expiring_on(c, STAY_END - timedelta(days=1))
+    ]
+    assert len(on_checkout) >= 4
+    assert len(day_before) >= 4
+
+
+@spec("certificate-evaluation", "Reference decisions are balanced")
+def test_generator_refuses_a_certificate_that_misses_its_target():
+    cert = make_truth_v2()[0]
+
+    wrong = "not_compliant" if cert["decision"] != "not_compliant" else "compliant"
+    with pytest.raises(ValueError, match="compliance says"):
+        verify_decision(cert, wrong)

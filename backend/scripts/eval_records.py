@@ -1,6 +1,6 @@
 """Evaluate the records step on the synthetic certificate benchmark (spec: certificate-evaluation).
 
-Run from backend/:  uv run python -m scripts.eval_records
+Run from backend/:  uv run python -m scripts.eval_records [v1|v2]   (default: newest benchmark)
 Calls the real vision model (costs money). Each run is traced in the dev database and writes
 a dated JSON report to evals/results/. Never edit a report by hand: it is a measurement.
 """
@@ -8,6 +8,7 @@ a dated JSON report to evals/results/. Never edit a report by hand: it is a meas
 import asyncio
 import itertools
 import json
+import sys
 from collections import defaultdict
 from collections.abc import Awaitable, Callable
 from datetime import UTC, date, datetime
@@ -24,15 +25,17 @@ from app.models import Span
 from app.prompts.records import PROMPT_VERSION
 from app.records import RecordsInvalidOutput, run_records
 from app.tracing import Tracer
-from scripts.generate_certificates import CERT_DIR, TRUTH_FILE
+from scripts.generate_certificates import BENCHMARK_DIRS, CERT_DIR, LATEST
 from scripts.seed import RULES
 
 RESULTS_DIR = CERT_DIR.parent / "results"
 TIMEZONE = "America/Chicago"
 
 
-def load_truth() -> dict[str, Any]:
-    return json.loads(TRUTH_FILE.read_text(encoding="utf-8"))
+def load_truth(version: str = LATEST) -> dict[str, Any]:
+    doc = json.loads((BENCHMARK_DIRS[version] / "truth.json").read_text(encoding="utf-8"))
+    doc.setdefault("version", "v1")  # v1 predates the version field and is never rewritten
+    return doc
 
 
 # --- Pure scoring ---------------------------------------------------------------------
@@ -150,8 +153,10 @@ def summarize(scored: list[dict[str, Any]]) -> dict[str, Any]:
 # --- Running --------------------------------------------------------------------------
 
 
-async def run_certificate(cert: dict, today: date, **llm_kwargs: Any) -> dict[str, Any]:
-    image = (CERT_DIR / cert["file"]).read_bytes()
+async def run_certificate(
+    cert: dict, today: date, version: str, **llm_kwargs: Any
+) -> dict[str, Any]:
+    image = (BENCHMARK_DIRS[version] / cert["file"]).read_bytes()
     try:
         result = await run_records(
             image, booked_pet=cert["pet_name"], today=today, timezone=TIMEZONE, **llm_kwargs
@@ -177,7 +182,7 @@ async def evaluate(
     today = date.fromisoformat(truth_doc["today"])
     scored = []
     for cert in truth_doc["certificates"]:
-        actual = await run(cert, today, **llm_kwargs)
+        actual = await run(cert, today, truth_doc["version"], **llm_kwargs)
         scored.append(
             {
                 "id": cert["id"],
@@ -190,36 +195,49 @@ async def evaluate(
     return scored
 
 
-async def main() -> None:
-    engine = get_engine()
-    tracer = Tracer(make_sessionmaker(engine))
-    started = datetime.now(UTC)
-    truth_doc = load_truth()
-    try:
-        async with tracer.start_trace(f"eval: records {PROMPT_VERSION}") as trace_id:
-            scored = await evaluate(truth_doc)
-        async with make_sessionmaker(engine)() as s:
-            cost = await s.scalar(select(func.sum(Span.cost_usd)).where(Span.trace_id == trace_id))
-    finally:
-        await engine.dispose()
-
-    summary = summarize(scored)
-    report = {
+def build_report(
+    truth_doc: dict[str, Any],
+    scored: list[dict[str, Any]],
+    *,
+    started: datetime,
+    trace_id: Any,
+    cost: Any,
+) -> dict[str, Any]:
+    return {
         "prompt_version": PROMPT_VERSION,
         "model": get_settings().openrouter_model,
         "run_at": started.isoformat(),
         "trace_id": str(trace_id),
         "total_cost_usd": str(cost) if cost is not None else None,
         "benchmark": {
+            "version": truth_doc["version"],
             "seed": truth_doc["seed"],
             "certificates": len(truth_doc["certificates"]),
             "reference_stay": truth_doc["reference_stay"],
         },
-        "summary": summary,
+        "summary": summarize(scored),
         "certificates": scored,
     }
+
+
+async def main(argv: list[str]) -> None:
+    engine = get_engine()
+    tracer = Tracer(make_sessionmaker(engine))
+    started = datetime.now(UTC)
+    truth_doc = load_truth(argv[0] if argv else LATEST)
+    version = truth_doc["version"]
+    try:
+        async with tracer.start_trace(f"eval: records {PROMPT_VERSION} on {version}") as trace_id:
+            scored = await evaluate(truth_doc)
+        async with make_sessionmaker(engine)() as s:
+            cost = await s.scalar(select(func.sum(Span.cost_usd)).where(Span.trace_id == trace_id))
+    finally:
+        await engine.dispose()
+
+    report = build_report(truth_doc, scored, started=started, trace_id=trace_id, cost=cost)
+    summary = report["summary"]
     RESULTS_DIR.mkdir(exist_ok=True)
-    out = RESULTS_DIR / f"records-{started:%Y%m%dT%H%M%SZ}.json"
+    out = RESULTS_DIR / f"records-{version}-{started:%Y%m%dT%H%M%SZ}.json"
     out.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     for row in scored:
@@ -246,4 +264,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main(sys.argv[1:]))
