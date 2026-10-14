@@ -54,6 +54,7 @@ Cases live in `evals/comparison_cases.json`: an id, the owner's email, the messa
 
 ### D4. The lab
 - **The database:** `pawdesk_lab` on the same local server. The runner creates it if needed, migrates it, and seeds it as of 2027-03-03, using the same local-host guard as the seed script.
+- **Pets that bring a certificate in the set start with no vaccine records on file.** The seed gives every pet valid records relative to its "today". Left in place, they would cover most stays whatever the certificate said, and certificate reading, where the two architectures differ most, would rarely decide anything. This was found when a first run showed an expired-rabies certificate still expected to confirm.
 - **The hybrid workflow** runs through `process_request(..., crash_after=stop after drafting)`, so it never sends or reserves.
 - **The autonomous agent** runs inside its own trace linked to the same request.
 - **The report:** `evals/results/comparison-<timestamp>.json`, with a `headline` per architecture, which the Evals page shows side by side.

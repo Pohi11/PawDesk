@@ -21,7 +21,7 @@ from typing import Any
 import psycopg
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,7 +34,16 @@ from app.documents import attach_certificate
 from app.enums import Service, SpanKind, Step, Vaccine
 from app.lifecycle import State
 from app.llm import LLMError
-from app.models import BookingRequest, BookingStepResult, Facility, Owner, Pet, Span, Trace
+from app.models import (
+    BookingRequest,
+    BookingStepResult,
+    Facility,
+    Owner,
+    Pet,
+    Span,
+    Trace,
+    VaccineRecord,
+)
 from app.orchestrator import process_request
 from app.prompts.autonomous import PROMPT_VERSION as AUTONOMOUS_PROMPT
 from app.prompts.reply import PROMPT_VERSION as REPLY_PROMPT
@@ -331,8 +340,42 @@ def build_report(
     }
 
 
-def prepare_lab(url: str, today: date) -> None:
-    """Create the lab database if needed, migrate it from scratch, and seed it."""
+def certificate_pets(cases: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    """(owner email, pet name) for every case that brings a certificate."""
+    return {(c["owner"], c["pet"]) for c in cases if c["certificate"] and c["pet"]}
+
+
+async def clear_records_on_file(session: AsyncSession, pets: set[tuple[str, str]]) -> int:
+    """Remove those pets' vaccine records, so their certificate alone decides compliance.
+
+    The seed gives every pet valid records relative to its "today"; left in place, they
+    would cover most stays whatever the certificate said, and certificate reading (where
+    the two architectures differ most) would rarely matter.
+    """
+    removed = 0
+    for email, name in sorted(pets):
+        pet_id = await session.scalar(
+            select(Pet.id)
+            .join(Owner, Owner.id == Pet.owner_id)
+            .where(Owner.email == email, Pet.name == name)
+        )
+        result = await session.execute(delete(VaccineRecord).where(VaccineRecord.pet_id == pet_id))
+        removed += result.rowcount
+    return removed
+
+
+async def _clear(url: str, pets: set[tuple[str, str]]) -> None:
+    engine = make_engine(url)
+    try:
+        async with make_sessionmaker(engine)() as session, session.begin():
+            await clear_records_on_file(session, pets)
+    finally:
+        await engine.dispose()
+
+
+def prepare_lab(url: str, today: date, cases: list[dict[str, Any]]) -> None:
+    """Create the lab database if needed, migrate it from scratch, seed it, and clear the
+    records on file of pets that bring a certificate."""
     admin = make_url(url).set(database="postgres", drivername="postgresql")
     name = make_url(url).database
     with psycopg.connect(admin.render_as_string(hide_password=False), autocommit=True) as conn:
@@ -346,6 +389,7 @@ def prepare_lab(url: str, today: date) -> None:
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
     asyncio.run(seed_run(url, today))
+    asyncio.run(_clear(url, certificate_pets(cases)))
 
 
 async def main_async(url: str) -> Path:
@@ -388,8 +432,8 @@ async def main_async(url: str) -> Path:
 
 def main() -> None:
     url = lab_url(get_settings().database_url)
-    today = date.fromisoformat(json.loads(CASES.read_text(encoding="utf-8"))["today"])
-    prepare_lab(url, today)
+    cases_doc = json.loads(CASES.read_text(encoding="utf-8"))
+    prepare_lab(url, date.fromisoformat(cases_doc["today"]), cases_doc["cases"])
     print(f"report: {asyncio.run(main_async(url))}")
 
 

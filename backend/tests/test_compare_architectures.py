@@ -24,6 +24,8 @@ from scripts.compare_architectures import (
     CASES,
     autonomous_outcome,
     build_report,
+    certificate_pets,
+    clear_records_on_file,
     expected,
     hybrid_outcome,
     lab_url,
@@ -271,3 +273,17 @@ async def test_two_cases_run_through_both_architectures_and_nothing_is_sent(
             .where(Reservation.booking_request_id.is_not(None))
         )
     assert (sent, reserved) == (0, 0)
+
+
+@spec("architecture-comparison", "Expected outcomes are computed from the true facts")
+async def test_pets_with_a_certificate_start_without_records_on_file(session, facility):
+    pets = certificate_pets([case(), case(pet="Other", certificate=None), case(pet=None)])
+
+    removed = await clear_records_on_file(session, pets)
+    result = await expected(session, case(), CERT)
+
+    assert pets == {("lab@example.test", "Biscuit")}
+    assert removed == 2
+    # With nothing on file, the certificate alone must cover rabies and DHPP too.
+    assert result.outcome == "not_confirm"
+    assert "rabies: missing" in result.why
