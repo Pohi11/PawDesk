@@ -154,3 +154,17 @@ async def test_failed_model_call_is_scored_as_error_not_a_crash(tracer):
     assert row["score"]["decision_agrees"] is False
     assert row["score"]["silent_disagreement"] is False  # a failure is visible, not silent
     assert summarize([row])["total"]["errors"] == 1
+
+
+@spec("certificate-evaluation", "Benchmark versions are kept side by side")
+def test_evaluation_defaults_to_v2_and_report_names_it():
+    from datetime import UTC, datetime
+
+    from scripts.eval_records import build_report
+
+    doc = load_truth()
+    report = build_report(doc, [], started=datetime.now(UTC), trace_id="t", cost=None)
+
+    assert doc["version"] == "v2"
+    assert report["benchmark"]["version"] == "v2"
+    assert load_truth("v1")["version"] == "v1"
