@@ -6,7 +6,7 @@
 
 ## 2. Secrets
 
-- [ ] 2.1 Add `tests/test_secrets.py`. Verify that it fails on a planted key-shaped value in a temporary repository and passes on the real one.
+- [x] 2.1 Add `tests/test_secrets.py`. Verify that it fails on a planted key-shaped value in a temporary repository and passes on the real one.
 
 ## 3. End-to-end
 
