@@ -8,6 +8,9 @@ const WEB_PORT = 3011;
 
 export default defineConfig({
   testDir: "./e2e",
+  // Its own folder: Playwright empties outputDir on every run, and test-results/ also holds
+  // the unit tests' report.
+  outputDir: "test-results/e2e",
   timeout: 120_000,
   expect: { timeout: 60_000 },
   fullyParallel: false,
