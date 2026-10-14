@@ -374,7 +374,10 @@ def eval_reports(results_dir: Path = RESULTS_DIR) -> list[dict[str, Any]]:
             {
                 "file": path.name,
                 "kind": kind,
-                "benchmark": benchmark.get("version") if isinstance(benchmark, dict) else None,
+                # Reports from before benchmarks were versioned are v1 (as the eval runner reads them).
+                "benchmark": benchmark.get("version", "v1")
+                if isinstance(benchmark, dict)
+                else None,
                 "prompt_version": report.get("prompt_version"),
                 "model": report.get("model"),
                 "run_at": report.get("run_at"),

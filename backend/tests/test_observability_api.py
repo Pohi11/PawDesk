@@ -196,6 +196,8 @@ async def test_real_results_folder_is_readable(api):
     reports = (await api.get("/evals")).json()
 
     assert {r["kind"] for r in reports} >= {"intake", "records"}
+    records = [r["benchmark"] for r in reports if r["kind"] == "records"]
+    assert records[:2] == ["v1", "v2"]  # the first report predates versioning
 
 
 # --- Run progress streams as server-sent events -----------------------------------------

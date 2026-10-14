@@ -10,14 +10,14 @@ import { KIND_STYLE, NODE_STATUS_STYLE } from "./ui";
 
 const POSITION: Record<NodeId, { x: number; y: number }> = {
   intake: { x: 0, y: 0 },
-  records: { x: 0, y: 110 },
-  compliance: { x: 210, y: 55 },
-  capacity: { x: 420, y: 55 },
-  route: { x: 630, y: 55 },
-  resolver: { x: 840, y: 0 },
-  reply: { x: 1050, y: 55 },
-  review: { x: 1260, y: 0 },
-  send: { x: 1470, y: 55 },
+  records: { x: 0, y: 90 },
+  compliance: { x: 165, y: 45 },
+  capacity: { x: 330, y: 45 },
+  route: { x: 495, y: 45 },
+  resolver: { x: 660, y: 0 },
+  reply: { x: 825, y: 45 },
+  review: { x: 990, y: 0 },
+  send: { x: 1155, y: 45 },
 };
 
 export function RunGraph({
@@ -52,7 +52,7 @@ export function RunGraph({
         color: look.text,
         border: `2px ${status === "skipped" ? "dashed" : "solid"} ${KIND_STYLE[node.kind].border}`,
         borderRadius: 10,
-        width: 150,
+        width: 135,
         fontSize: 12,
         opacity: status === "skipped" ? 0.6 : 1,
       },
@@ -67,7 +67,7 @@ export function RunGraph({
   }));
 
   return (
-    <div className="h-64 w-full">
+    <div className="h-56 w-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
