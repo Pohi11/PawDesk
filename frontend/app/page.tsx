@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { PetAvatar } from "@/components/pet-avatar";
 import { Loading, StateTag } from "@/components/ui";
 import { backendJson } from "@/lib/backend";
 import { formatCost, formatService, formatStay } from "@/lib/format";
@@ -57,11 +58,14 @@ async function Desk() {
                 href={`/requests/${row.id}`}
                 className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-5 py-4 hover:bg-wash sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto_5rem]"
               >
-                <div className="min-w-0">
-                  <div className="truncate font-display text-lg font-semibold">
-                    {row.pet ?? <span className="text-muted">Pet not on file</span>}
+                <div className="flex min-w-0 items-center gap-4">
+                  <PetAvatar pet={row} />
+                  <div className="min-w-0">
+                    <div className="truncate font-display text-lg font-semibold">
+                      {row.pet ?? <span className="text-muted">Pet not on file</span>}
+                    </div>
+                    <div className="truncate text-sm text-muted">{row.owner}</div>
                   </div>
-                  <div className="truncate text-sm text-muted">{row.owner}</div>
                 </div>
                 <div className="hidden text-sm sm:block">
                   <div>{formatService(row.service)}</div>

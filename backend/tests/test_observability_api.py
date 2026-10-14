@@ -15,7 +15,7 @@ from app.demo import DEMO_TODAY, SAMPLES
 from app.documents import attach_certificate, load_certificate
 from app.llm import RetryPolicy, make_client
 from app.main import app
-from app.models import BookingRequest, Owner
+from app.models import BookingRequest, Owner, Pet
 from app.orchestrator import process_request
 from scripts.seed import seed
 from tests.test_llm import fake_settings
@@ -108,6 +108,38 @@ async def test_detail_shows_the_whole_run(api, run):
     assert spans["intake.extract"]["kind"] == "llm"
     assert spans["intake.extract"]["prompt_tokens"] == 42
     assert all(s["started_at"] and s["ended_at"] for s in trace["spans"])
+
+
+@spec("observability-api", "Requests identify the matched pet")
+async def test_matched_pet_is_identified(api, run, committed, desk):
+    async with committed() as s:
+        (await s.get(Pet, desk.biscuit_id)).breed = "Beagle"
+        await s.commit()
+    request_id = await run()
+
+    [row] = (await api.get("/requests")).json()
+    detail = (await api.get(f"/requests/{request_id}")).json()
+
+    for found in (row, detail):
+        assert found["pet"] == "Biscuit"
+        assert found["pet_id"] == str(desk.biscuit_id)
+        assert (found["pet_species"], found["pet_breed"]) == ("dog", "Beagle")
+
+
+@spec("observability-api", "Requests identify the matched pet")
+async def test_unmatched_pet_is_null(api, committed, desk):
+    async with committed() as s:
+        request = BookingRequest(
+            facility_id=desk.facility_id, owner_id=desk.owner_id, raw_message="Hello?"
+        )
+        s.add(request)
+        await s.commit()
+
+    [row] = (await api.get("/requests")).json()
+    detail = (await api.get(f"/requests/{request.id}")).json()
+
+    for found in (row, detail):
+        assert [found[k] for k in ("pet", "pet_id", "pet_species", "pet_breed")] == [None] * 4
 
 
 @spec("observability-api", "Requests can be listed and inspected")

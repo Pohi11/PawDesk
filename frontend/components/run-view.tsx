@@ -9,6 +9,7 @@ import { optionText, outcome } from "@/lib/story";
 import { layout } from "@/lib/timeline";
 import type { RequestDetail, Snapshot, SpanDetail } from "@/lib/types";
 
+import { PetAvatar } from "./pet-avatar";
 import { RunGraph } from "./run-graph";
 import { Json, KIND_STYLE, KindDot, Panel, StateTag, stateLabel } from "./ui";
 
@@ -80,6 +81,7 @@ export function RunView({ initial }: { initial: RequestDetail }) {
           All requests
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <PetAvatar pet={detail} size="lg" />
           <h1 className="text-4xl font-extrabold sm:text-5xl">{detail.pet ?? "Pet not on file"}</h1>
           <StateTag status={detail.status} />
           {live && (
