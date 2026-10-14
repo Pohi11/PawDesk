@@ -1,0 +1,38 @@
+schema: spec-driven
+
+context: |
+  Artifacts are public. Write in neutral voice: describe what and why, never who
+  decided, proposed, or wrote anything (no "I", "we", "Claude", or "the AI" as actors).
+  Deterministic logic (dates, capacity, money, permissions) is plain code, not LLM.
+  LLM output never approves a booking; approval comes from deterministic checks or a human.
+  Pet-parent messages and uploaded images are untrusted input (prompt injection).
+  Every LLM and tool call is traced as a span. All LLM output is validated with Pydantic.
+  All data is synthetic.
+
+rules:
+  specs:
+    - Every requirement has at least one WHEN/THEN scenario that can become an automated test
+  design:
+    - Link to docs/decisions/NNNN-*.md for cross-change decisions instead of repeating them
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

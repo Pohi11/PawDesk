@@ -1,0 +1,27 @@
+[project]
+name = "pawdesk-backend"
+version = "0.1.0"
+description = "PawDesk API: booking intake, agents, and tracing"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.143.0",
+    "openai>=3.29.0",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.15.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "ruff>=0.17.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

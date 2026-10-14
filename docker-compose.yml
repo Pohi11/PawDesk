@@ -1,0 +1,46 @@
+# Full stack from built images: `docker compose up --build`.
+# Day-to-day development runs only Postgres here (`docker compose up -d postgres`) and the
+# backend/frontend on the host for fast reloads. See docs/decisions/0002-local-dev-topology.md.
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Postgres 18+ images keep data under /var/lib/postgresql/<major>/, so the volume
+      # is mounted one level up from the older /var/lib/postgresql/data convention.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      # Inside the Compose network the database host is the service name, not localhost.
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    # Deliberately no env_file: the frontend never sees backend secrets.
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
