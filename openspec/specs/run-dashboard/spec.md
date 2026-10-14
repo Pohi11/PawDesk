@@ -36,7 +36,7 @@ The timeline SHALL place every span of a trace as a bar positioned by its start 
 
 ### Requirement: The backend is reached only through an allowlisted proxy
 The browser SHALL reach the backend only through the dashboard's own route. The route SHALL forward only these paths:
-- `GET` for requests, reviews, metrics, evals, and demo samples;
+- `GET` for requests, reviews, metrics, evals, demo samples, generated demo requests, and demo certificate images;
 - `POST` for staff actions and demo submissions.
 
 Everything else SHALL be refused with 404. The backend address SHALL NOT appear in browser code.
@@ -48,6 +48,10 @@ Everything else SHALL be refused with 404. The backend address SHALL NOT appear 
 #### Scenario: Refused path
 - **WHEN** the browser asks for `GET /api/health/db` or `DELETE /api/requests/<id>`
 - **THEN** the route answers 404 without contacting the backend
+
+#### Scenario: Certificate images pass through
+- **WHEN** the browser asks for `GET /api/demo/generated/42/certificate.png`
+- **THEN** the route forwards it and returns the image unchanged
 
 #### Scenario: No backend address in client code
 - **WHEN** the client components are checked
@@ -67,3 +71,29 @@ The dashboard SHALL provide:
 #### Scenario: Demo opens the live view
 - **WHEN** a sample is submitted from the demo page
 - **THEN** the browser navigates to that request's live run view
+
+### Requirement: The Try page previews a request and its certificate
+The Try page SHALL let the visitor generate a random request, and show its message (editable), its scenario in plain words, and its certificate image before sending. A new request can be generated at any time. Fixed samples SHALL show their certificate too, when they have one.
+
+#### Scenario: Generate and preview
+- **WHEN** the visitor generates a request
+- **THEN** the page shows the generated message, the scenario, and the certificate image for that request's seed
+
+#### Scenario: Send a generated request
+- **WHEN** the visitor sends a generated request
+- **THEN** it is submitted by its seed, and the browser opens its live run view
+
+### Requirement: Path steps explain themselves
+Hovering or focusing a step in the run view's path SHALL show a tooltip with what the step does and, once the step has run, a one-line summary of its result for this request. A step that is skipped or has not run SHALL say so. The summary SHALL come only from the request detail already loaded, and SHALL update as the run does.
+
+#### Scenario: A finished step
+- **WHEN** the visitor hovers the Compliance step of a request whose Bordetella record expired before the stay
+- **THEN** the tooltip says what the compliance check does, and that Bordetella expired
+
+#### Scenario: A step that did not run
+- **WHEN** the visitor hovers the Staff review step of a request sent without review
+- **THEN** the tooltip says what staff review is for, and that this request did not need it
+
+#### Scenario: Keyboard
+- **WHEN** the visitor tabs to a step
+- **THEN** the same tooltip is shown and announced as the step's description, Escape hides it, and Enter opens the step in the inspector

@@ -91,24 +91,43 @@ SAMPLES = {
 }
 
 
+def sample_certificate(sample_id: str) -> bytes | None:
+    """A fixed sample's certificate image, or None (unknown sample, none attached, or the
+    image is absent from a slim build)."""
+    sample = SAMPLES.get(sample_id)
+    if sample is None or sample.certificate is None:
+        return None
+    path = CERTIFICATES / sample.certificate
+    return path.read_bytes() if path.is_file() else None
+
+
 async def submit_sample(
     sessions: async_sessionmaker[AsyncSession], sample_id: str, message: str | None = None
 ) -> uuid.UUID:
     sample = SAMPLES.get(sample_id)
     if sample is None:
         raise LookupError(f"no demo sample {sample_id!r}")
+    return await store_request(
+        sessions, sample.owner_email, message or sample.message, sample_certificate(sample_id)
+    )
+
+
+async def store_request(
+    sessions: async_sessionmaker[AsyncSession],
+    owner_email: str,
+    message: str,
+    certificate: bytes | None,
+) -> uuid.UUID:
+    """Store a demo request for a seeded owner, with its certificate attached if any."""
     async with sessions() as session:
-        owner = await session.scalar(select(Owner).where(Owner.email == sample.owner_email))
+        owner = await session.scalar(select(Owner).where(Owner.email == owner_email))
         facility_id = await session.scalar(select(Facility.id).order_by(Facility.id).limit(1))
         if owner is None or facility_id is None:
             raise LookupError("demo data is missing: run the seed script first")
-        request = BookingRequest(
-            facility_id=facility_id, owner_id=owner.id, raw_message=message or sample.message
-        )
+        request = BookingRequest(facility_id=facility_id, owner_id=owner.id, raw_message=message)
         session.add(request)
         await session.flush()
-        image = CERTIFICATES / sample.certificate if sample.certificate else None
-        if image is not None and image.is_file():  # images may be absent from a slim build
-            await attach_certificate(session, request.id, image.read_bytes())
+        if certificate is not None:
+            await attach_certificate(session, request.id, certificate)
         await session.commit()
         return request.id

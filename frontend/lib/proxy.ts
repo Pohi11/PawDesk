@@ -12,6 +12,9 @@ const RULES: ReadonlyArray<{ method: string; pattern: RegExp }> = [
   { method: "GET", pattern: /^metrics$/ },
   { method: "GET", pattern: /^evals$/ },
   { method: "GET", pattern: /^demo\/samples$/ },
+  { method: "GET", pattern: /^demo\/samples\/[a-z0-9-]+\/certificate\.png$/ },
+  { method: "GET", pattern: /^demo\/generate$/ },
+  { method: "GET", pattern: /^demo\/generated\/\d{1,10}\/certificate\.png$/ },
   { method: "POST", pattern: new RegExp(`^requests/${ID}/(approve|edit-and-approve|reject)$`) },
   { method: "POST", pattern: /^demo\/requests$/ },
 ];
