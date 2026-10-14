@@ -18,7 +18,7 @@
 
 ## 4. Integration
 
-- [ ] 4.1 Run every suite and the traceability check, regenerate the README demo GIF from the new frames, and regenerate the build walkthrough. Verify with `pytest`, `pnpm test`, `pnpm e2e`, and `uv run python -m scripts.walkthrough --check`.
+- [x] 4.1 Run every suite and the traceability check, regenerate the README demo GIF from the new frames, and regenerate the build walkthrough. Verify with `pytest`, `pnpm test`, `pnpm e2e`, and `uv run python -m scripts.walkthrough --check`.
 
 ## Workflow follow-up
 
