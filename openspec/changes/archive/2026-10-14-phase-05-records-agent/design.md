@@ -79,7 +79,7 @@ Any issue makes the outcome `needs_review`.
 - **Breakdown:** everything is reported per variant and in total.
 - **Report:** written to `evals/results/records-<timestamp>.json` with the prompt version, model, cost from spans, and trace id.
 
-The evaluation methodology is shared with intake now and the architecture comparison later, so it's recorded as [decision record 0007](../../../docs/decisions/0007-evaluating-llm-steps.md).
+The evaluation methodology is shared with intake now and the architecture comparison later, so it's recorded as [decision record 0007](../../../../docs/decisions/0007-evaluating-llm-steps.md).
 
 ## Risks / Trade-offs
 
