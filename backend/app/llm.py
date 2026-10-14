@@ -167,6 +167,9 @@ async def complete(
         for k, v in {"response_format": response_format, "temperature": temperature}.items()
         if v is not None
     }
+    # Some endpoints treat a schema as a hint or ignore it; only route structured requests to
+    # endpoints that support every parameter we send. Pydantic still validates the result.
+    extra_body = {"provider": {"require_parameters": True}} if response_format else None
 
     async with span(
         name, SpanKind.LLM, input={"messages": scrub(messages), "model": model, "params": params}
@@ -181,7 +184,11 @@ async def complete(
             retry_after: float | None = None
             try:
                 response = await client.chat.completions.create(
-                    model=model, messages=messages, timeout=settings.llm_timeout_seconds, **params
+                    model=model,
+                    messages=messages,
+                    timeout=settings.llm_timeout_seconds,
+                    extra_body=extra_body,
+                    **params,
                 )
             except APITimeoutError:
                 outcome, error = AttemptOutcome.RETRYABLE, "timeout"
