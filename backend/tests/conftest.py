@@ -4,6 +4,8 @@ Tests that need the database take the `session` fixture. Everything a test write
 including commits, is rolled back when the test ends.
 """
 
+from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 import psycopg
@@ -16,7 +18,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.db import make_engine, make_sessionmaker
-from app.models import Base, Trace
+from app.enums import Service, Species, Vaccine
+from app.models import (
+    Base,
+    Facility,
+    Kennel,
+    Owner,
+    Pet,
+    Trace,
+    VaccineRecord,
+    VaccineRule,
+)
 from app.tracing import Tracer
 
 TEST_DB_NAME = "pawdesk_test"
@@ -133,3 +145,51 @@ async def committed(engine):
     tables = ", ".join(t.name for t in Base.metadata.sorted_tables)
     async with sessions() as cleanup, cleanup.begin():
         await cleanup.execute(text(f"TRUNCATE {tables} CASCADE"))
+
+
+@dataclass
+class Desk:
+    facility_id: object
+    owner_id: object
+    biscuit_id: object
+    olive_id: object
+    kennel_id: object
+
+
+@pytest.fixture
+async def desk(committed) -> Desk:
+    """A facility with one owner, Biscuit (medium dog) and Olive (cat), one medium kennel,
+    and Biscuit's records on file: rabies and DHPP, but no bordetella."""
+    async with committed() as s:
+        facility = Facility(name="Test Lodge", timezone="America/Chicago")
+        owner = Owner(full_name="Test Owner", email="orchestrator@example.test")
+        s.add_all([facility, owner])
+        await s.flush()
+        biscuit = Pet(owner_id=owner.id, name="Biscuit", species=Species.DOG, weight_lb=35)
+        olive = Pet(owner_id=owner.id, name="Olive", species=Species.CAT, weight_lb=9)
+        kennel = Kennel(facility_id=facility.id, name="M1", size_class="medium")
+        s.add_all([biscuit, olive, kennel])
+        await s.flush()
+        s.add_all(
+            [
+                VaccineRule(
+                    facility_id=facility.id, service=service, species=Species.DOG, vaccine=v
+                )
+                for service, vaccines in {
+                    Service.BOARDING: [Vaccine.RABIES, Vaccine.DHPP, Vaccine.BORDETELLA],
+                    Service.GROOMING: [Vaccine.RABIES],
+                }.items()
+                for v in vaccines
+            ]
+            + [
+                VaccineRecord(
+                    pet_id=biscuit.id,
+                    vaccine=v,
+                    administered_on=date(2026, 4, 1),
+                    expires_on=date(2028, 4, 1),
+                )
+                for v in (Vaccine.RABIES, Vaccine.DHPP)
+            ]
+        )
+        await s.commit()
+        return Desk(facility.id, owner.id, biscuit.id, olive.id, kennel.id)

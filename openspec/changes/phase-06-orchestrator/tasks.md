@@ -16,7 +16,7 @@
 
 ## 4. Command line and real runs
 
-- [ ] 4.1 Add `scripts/bookings.py` with `submit`, `process`, and `resume` (with an optional `--crash-after STEP` hard stop). Verify with a test of `submit` storing the request and certificate.
+- [x] 4.1 Add `scripts/bookings.py` with `submit`, `process`, and `resume` (with an optional `--crash-after STEP` hard stop). Verify with a test of `submit` storing the request and certificate.
 - [ ] 4.2 Real end-to-end: submit a seeded owner's message with a benchmark v2 certificate, process it, and confirm routing. Then a real kill: submit another, `process --crash-after extracting`, `resume`, and confirm it completes without new extraction model calls (span counts). Verify by recording the observed states and span counts.
 
 ## 5. Integration
