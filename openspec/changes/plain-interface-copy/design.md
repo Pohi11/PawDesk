@@ -71,13 +71,13 @@ Known gap: class strings kept outside a `className` attribute, such as the `TONE
 
 | State | Before | After |
 |---|---|---|
-| sent, no approval | Sent automatically. Every check passed and the reply promised nothing more. | The checks passed it and the reply makes no promise they didn't confirm, so it went out without a person. |
-| sent, approved | Sent after Dana approved the reply. | Dana approved the reply and it was sent. |
+| sent, no approval | Sent automatically. Every check passed and the reply promised nothing more. | The checks passed it, so it went out without a person. |
+| sent, approved | Sent after Dana approved the reply. | Dana approved the reply, and the desk sent it. |
 | sent, edited | Sent after Dana edited the reply. | Dana edited the reply and sent it. |
 | sent, rejected | Declined by Sam. A polite decline was sent. | Sam declined the request, and the pet parent got a polite no. |
-| failed | Stopped while approved. It can be retried. | Stopped while sending the reply. Running it again resumes from the last saved step. |
+| failed | Stopped while approved. It can be retried. | Stopped while sending the reply. Processing it again resumes from that step. |
 
-The failed sentence maps each `failed_step` state to plain words: `received` and `extracting` → reading the request; `checking` → running the checks; `resolving` → looking for other options; `drafting` → writing the reply; `ready`, `approved`, and `rejected` → sending the reply. A state missing from the map falls back to "working on it", so a raw name never shows. The resume claim is checked against `process_request` during the build (it retries a failed request from `failed_step`). If it doesn't hold, the sentence drops it.
+The failed sentence maps each `failed_step` state to plain words: `received` and `extracting` → reading the request; `checking` → running the checks; `resolving` → looking for other options; `drafting` → writing the reply; `ready` → approving the reply (the checks' approval runs in that state); `approved` and `rejected` → sending the reply. A state missing from the map falls back to "working on it", so a raw name never shows. The resume claim holds: `process_request` retries a failed request from `failed_step`, and every state is a step it can resume. Resuming runs from the command line, so the sentence says "processing it again" and doesn't suggest a button.
 
 ### D5. The rewrite, page by page
 
@@ -86,20 +86,20 @@ The full before and after for every string goes in the build commits. The table 
 | Where | Before | After | Rule |
 |---|---|---|---|
 | Home, none waiting | Every request so far was decided by the checks or already handled by staff. | The checks or your staff have decided every request so far. | name the actor |
-| Home, some waiting | Each one needs a person before anything is sent. The rest were decided by the checks. | A person approves each reply before it goes out. The checks decided the rest. | name the actor |
-| Try page intro | …watch the desk handle it live, with real model calls. Samples are handled as of March 3, 2027, the day their certificates were made for. | Pick a sample from a made-up pet parent, send it, and watch each step run with real model calls. The desk treats today as March 3, 2027, the date the sample certificates were drawn for. | passive, clarity |
+| Home, some waiting | Each one needs a person before anything is sent. The rest were decided by the checks. | A person decides each one before anything goes out. The checks decided the rest. | name the actor |
+| Try page intro | …watch the desk handle it live, with real model calls. Samples are handled as of March 3, 2027, the day their certificates were made for. | Pick a sample from a made-up pet parent, send it, and watch each step run with real model calls. The desk treats today as March 3, 2027, so the sample certificates' dates line up with the stays. | passive, clarity |
 | Sample "Clean boarding request" | Every check passes: drafted, approved by the system, and sent. | The checks pass it and the reply goes out with no person involved. | three-part run |
 | Sample "Prompt injection attempt" | The instruction-like text is flagged in code; the request waits for staff. | Code spots the planted instruction and holds the request for staff. | passive |
-| Sample "Expired vaccine" | Compliance fails; the resolver proposes an updated record; staff review. | The vaccine check fails, the resolver asks for an updated record, and staff review the reply. | staccato clauses |
+| Sample "Expired vaccine" | Compliance fails; the resolver proposes an updated record; staff review. | The vaccine check fails. The resolver suggests an updated record, and staff review the reply. | staccato clauses |
 | Sample "Pet not on file" | Intake can't match the pet; no agent runs; a person follows up. | Intake can't find the pet on file, so the request goes to a person. | staccato clauses |
-| Metrics intro | Costs are exactly what the model provider reported… Nothing here is estimated. | Costs are the amounts the model provider billed for each call. Times run from each step's recorded start to its end. | adverb, punchline ending |
+| Metrics intro | Costs are exactly what the model provider reported… Nothing here is estimated. | Costs are the amounts the model provider reported for each call. Times run from each step's recorded start to its end. | adverb, punchline ending |
 | Metrics charts | Where the money goes / How long each model step takes / Where requests are now | Cost by model step / Average time per model step / Requests by state | cute headings |
 | Evals intro | How well the model steps do on labeled, synthetic examples. | Scores for the model steps on labeled synthetic examples. | fragment opener |
 | Evals measure | Wrong decisions nobody would notice | Wrong decisions not sent to a person | vague extreme |
 | Evals measure | Messages read completely right | Messages with every field right | adverb |
-| Comparison intro | The same N booking requests, the same model, and the same checking tools. … An unsafe confirmation is a booking confirmed that should not have been. | Both ran N booking requests with one model and one set of checking tools. … An unsafe confirmation means the agent confirmed a booking the checks would have stopped. | three-part run, passive |
+| Comparison intro | The same N booking requests, the same model, and the same checking tools. … An unsafe confirmation is a booking confirmed that should not have been. | Both ran the same N booking requests with one model and one set of checking tools. … An unsafe confirmation counts a reply that confirmed a booking the checks would have stopped. | three-part run, passive |
 | Run view | The desk's path / Select a step to see exactly what it was given and what it returned. | Steps / Select a step to see its input and output. | cute heading, adverb |
-| Run view panels | What they asked / What was sent / Why it went this way / Every step it took | Message / Sent reply / Routing reasons / State changes | Wh- headings |
+| Run view panels | What they asked / What was sent / Why it went this way / Every step it took | Message from the pet parent / Sent reply or Draft reply / Routing reasons / State changes | Wh- headings |
 | Run view option | Checked and works | Verified by the checks | vague |
 | Review card | There is no drafted reply for this request, so it can't be sent from here. | This request has no draft, so you can't send it from here. | passive |
 | Build page intro | …every change, every requirement with the tests that prove it, and every decision. Nothing on these pages is written by hand. | The changes, requirements, tests, and decision records on these pages come from the repository and the latest test run. The method section below is written by hand. | false claim, three-part run |
