@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-10-14T22:59:19+00:00",
+ "generated_at": "2026-10-14T22:59:37+00:00",
  "reports": {
   "backend": "2026-10-14T17:58:07.256171-05:00",
   "frontend": "2026-10-14T22:55:41.131Z",
   "e2e": "2026-10-14T22:56:14.129Z"
  },
  "totals": {
-  "changes": 14,
-  "requirements": 119,
-  "verified": 119,
+  "changes": 15,
+  "requirements": 125,
+  "verified": 125,
   "tests": {
    "backend": 858,
    "frontend": 33,
@@ -1727,6 +1727,100 @@
      "capability": "delivery-pipeline",
      "kind": "modified",
      "name": "Every change is checked automatically"
+    }
+   ],
+   "decisions": []
+  },
+  {
+   "id": "2026-10-14-demo-generated-requests",
+   "slug": "demo-generated-requests",
+   "title": "Demo generated requests",
+   "date": "2026-10-14",
+   "archived_at": null,
+   "why": "The Try page offers four fixed samples, and its vaccine certificates can't be seen: the page says a card \"is attached\" without showing it. That falls short in two ways:\n- **Showing the system.** A reader can't check what the records step was supposed to read, so they can't judge whether it read it right.\n- **Exploring the system.** Four fixed cases show four fixed paths. A request made up on the spot shows the desk handling something it was never tuned on.",
+   "what_changes": "- **Generate a random request:**\n  - a seeded owner and one of their pets;\n  - a service that pet can have;\n  - dates soon after the demo day;\n  - a message in a pet parent's words;\n  - a vaccine certificate that matches all of it.\n- **The card follows one scenario,** stated in plain words:\n  - every vaccine current;\n  - one expired before the stay;\n  - one expiring during the stay;\n  - one missing from the card.\n- **Reproducible:** a seed fully determines the request and its card, so the same seed always gives the same request and image.\n- **See the card before sending,** for generated requests and for the fixed samples.\n- **Send a generated request.** It runs exactly like a sample, with its card attached.",
+   "tasks": [
+    {
+     "title": "1. Generator",
+     "items": [
+      {
+       "id": "1.1",
+       "done": true,
+       "text": "Add `app/demo_generator.py` (request, scenario, and records from a seed) and `app/certificate_card.py` (the card drawn with Pillow), and move Pillow to the runtime dependencies. Verify with `tests/test_demo_generator.py` against a seeded database: same seed gives an identical request and image, seeds vary pets, services, and scenarios, the card names the pet and owner, and scenario dates checked alone give the expected compliance status."
+      }
+     ]
+    },
+    {
+     "title": "2. API",
+     "items": [
+      {
+       "id": "2.1",
+       "done": true,
+       "text": "Add the preview routes and accept `{seed}` on demo submission. Verify with API tests: a generated certificate PNG equal to the one attached on send, 404 for a sample without a certificate, and sending a seed stores the request with its card and processes it with a scripted model."
+      }
+     ]
+    },
+    {
+     "title": "3. Dashboard",
+     "items": [
+      {
+       "id": "3.1",
+       "done": true,
+       "text": "Extend the proxy allowlist and the Try page (generate, preview message, scenario, and card, generate another, send). Verify with frontend tests for the new proxy paths and the submission body, then lint, type check, build, and the end-to-end demo."
+      },
+      {
+       "id": "3.2",
+       "done": true,
+       "text": "Try it for real in a browser: generate requests, check each card against its request, and send one. Verify with screenshots and by recording the outcome."
+      }
+     ]
+    },
+    {
+     "title": "4. Integration",
+     "items": [
+      {
+       "id": "4.1",
+       "done": true,
+       "text": "Run every suite and the coverage check, then regenerate the walkthrough."
+      }
+     ]
+    }
+   ],
+   "requirements": [
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "Random requests are reproducible"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "The certificate matches its request"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "Scenarios hold with the records on file"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "Certificates can be viewed before sending"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "A generated request runs like a sample"
+    },
+    {
+     "capability": "run-dashboard",
+     "kind": "added",
+     "name": "The Try page previews a request and its certificate"
+    },
+    {
+     "capability": "run-dashboard",
+     "kind": "modified",
+     "name": "The backend is reached only through an allowlisted proxy"
     }
    ],
    "decisions": []
@@ -7507,6 +7601,167 @@
    ]
   },
   {
+   "capability": "demo-generator",
+   "purpose": "Makes up demo booking requests on the spot, each with a vaccine certificate that matches it, so the desk can be shown handling requests it was never tuned on, and the certificate can be read by a person before the model reads it.",
+   "requirements": [
+    {
+     "name": "Random requests are reproducible",
+     "text": "Given a seed, the generator SHALL produce a request for a seeded owner and one of their pets. The request SHALL include:\n- a service the facility has vaccine rules for, for that species;\n- a stay starting 5 to 40 days after the demo day (boarding lasts 2 to 6 nights; other services take one day);\n- a message in the pet parent's words;\n- a certificate scenario.\n\nThe same seed SHALL always give the same request and certificate.",
+     "scenarios": [
+      {
+       "name": "Same seed, same request",
+       "steps": [
+        "**WHEN** a request is generated twice with seed 42",
+        "**THEN** both are identical, and both certificate images are byte-for-byte equal"
+       ]
+      },
+      {
+       "name": "Seeds vary the request",
+       "steps": [
+        "**WHEN** requests are generated for seeds 1 to 40",
+        "**THEN** they include more than one pet, more than one service, and every scenario"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_same_seed_gives_the_same_request_and_image",
+       "status": "passed",
+       "seconds": 0.562
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_seeds_vary_the_request",
+       "status": "passed",
+       "seconds": 1.928
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "The certificate matches its request",
+     "text": "The certificate SHALL name the request's pet and owner, and list the vaccines the facility requires for that service and species, dated by its scenario:\n- `current`: every vaccine was given before the stay and expires after it;\n- `expired`: one required vaccine expired before the stay;\n- `expires_during_stay`: one required vaccine expires on a day of the stay before checkout;\n- `missing`: one required vaccine is left off the card.\n\nThe scenario SHALL be described in plain words with the request.",
+     "scenarios": [
+      {
+       "name": "Matching pet and owner",
+       "steps": [
+        "**WHEN** a request is generated for Biscuit",
+        "**THEN** its certificate names Biscuit and Biscuit's owner"
+       ]
+      },
+      {
+       "name": "Scenario dates",
+       "steps": [
+        "**WHEN** requests are generated for each scenario",
+        "**THEN** the changed vaccine's dates on the card, or its absence, match the scenario's description"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_card_names_the_pet_and_its_owner",
+       "status": "passed",
+       "seconds": 2.055
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_card_dates_match_the_scenario_text",
+       "status": "passed",
+       "seconds": 1.574
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "Scenarios hold with the records on file",
+     "text": "The desk checks a card together with the pet's records on file, so the generator SHALL change only a vaccine for which that combined check gives the scenario's status. When no draw of pet, service, and stay allows it, the request SHALL use `current`.",
+     "scenarios": [
+      {
+       "name": "A record on file would cover the card",
+       "steps": [
+        "**WHEN** requests are generated for seeds 1 to 80",
+        "**THEN** checking each card together with its pet's records on file gives `compliant` for `current`, and otherwise exactly one failing vaccine with that scenario's status"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_scenario_holds_with_the_records_on_file",
+       "status": "passed",
+       "seconds": 2.107
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "Certificates can be viewed before sending",
+     "text": "The API SHALL serve a generated request's certificate, and each fixed sample's certificate, as a PNG image. An unknown sample, or a sample without a certificate, SHALL get 404.",
+     "scenarios": [
+      {
+       "name": "Generated certificate image",
+       "steps": [
+        "**WHEN** the certificate for seed 42 is requested",
+        "**THEN** a PNG is returned, equal to the image that would be attached when sending seed 42"
+       ]
+      },
+      {
+       "name": "Sample without a certificate",
+       "steps": [
+        "**WHEN** the certificate for the unknown-pet sample is requested",
+        "**THEN** the API answers 404"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_generated_preview_and_image",
+       "status": "passed",
+       "seconds": 0.441
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_sample_certificates",
+       "status": "passed",
+       "seconds": 0.044
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_send_a_generated_request",
+       "status": "passed",
+       "seconds": 0.893
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "A generated request runs like a sample",
+     "text": "Sending a generated request by its seed (optionally with edited message text) SHALL store it with its certificate attached and process it in the background, exactly like a sample.",
+     "scenarios": [
+      {
+       "name": "Send a generated request",
+       "steps": [
+        "**WHEN** seed 42 is sent",
+        "**THEN** a request is stored for the generated owner with the generated certificate attached, its id is returned at once, and it is later processed"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_send_a_generated_request",
+       "status": "passed",
+       "seconds": 0.893
+      }
+     ],
+     "status": "verified"
+    }
+   ]
+  },
+  {
    "capability": "kennel-capacity",
    "purpose": "Finds a kennel of a given size class that is free for every night of a stay, so that boarding requests can be answered from actual availability.",
    "requirements": [
@@ -8483,7 +8738,7 @@
     },
     {
      "name": "The backend is reached only through an allowlisted proxy",
-     "text": "The browser SHALL reach the backend only through the dashboard's own route. The route SHALL forward only these paths:\n- `GET` for requests, reviews, metrics, evals, and demo samples;\n- `POST` for staff actions and demo submissions.\n\nEverything else SHALL be refused with 404. The backend address SHALL NOT appear in browser code.",
+     "text": "The browser SHALL reach the backend only through the dashboard's own route. The route SHALL forward only these paths:\n- `GET` for requests, reviews, metrics, evals, demo samples, generated demo requests, and demo certificate images;\n- `POST` for staff actions and demo submissions.\n\nEverything else SHALL be refused with 404. The backend address SHALL NOT appear in browser code.",
      "scenarios": [
       {
        "name": "Allowed path",
@@ -8497,6 +8752,13 @@
        "steps": [
         "**WHEN** the browser asks for `GET /api/health/db` or `DELETE /api/requests/<id>`",
         "**THEN** the route answers 404 without contacting the backend"
+       ]
+      },
+      {
+       "name": "Certificate images pass through",
+       "steps": [
+        "**WHEN** the browser asks for `GET /api/demo/generated/42/certificate.png`",
+        "**THEN** the route forwards it and returns the image unchanged"
        ]
       },
       {
@@ -8584,6 +8846,47 @@
        "id": "lib/view.test.ts::submitting a demo sample opens its live run view",
        "status": "passed",
        "seconds": 0.0715412
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "The Try page previews a request and its certificate",
+     "text": "The Try page SHALL let the visitor generate a random request, and show its message (editable), its scenario in plain words, and its certificate image before sending. A new request can be generated at any time. Fixed samples SHALL show their certificate too, when they have one.",
+     "scenarios": [
+      {
+       "name": "Generate and preview",
+       "steps": [
+        "**WHEN** the visitor generates a request",
+        "**THEN** the page shows the generated message, the scenario, and the certificate image for that request's seed"
+       ]
+      },
+      {
+       "name": "Send a generated request",
+       "steps": [
+        "**WHEN** the visitor sends a generated request",
+        "**THEN** it is submitted by its seed, and the browser opens its live run view"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "frontend",
+       "id": "lib/demo.test.ts::generating fetches a request and points at its seed's certificate",
+       "status": "passed",
+       "seconds": 0.1145269
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/demo.test.ts::a generated request is sent by its seed and opens its run",
+       "status": "passed",
+       "seconds": 0.0035517
+      },
+      {
+       "suite": "frontend",
+       "id": "lib/demo.test.ts::a failed generation says so",
+       "status": "passed",
+       "seconds": 0.0062729
       }
      ],
      "status": "verified"
