@@ -19,6 +19,7 @@ from app.compliance import VaccineEvidence, check
 from app.config import get_settings
 from app.db import get_engine, make_sessionmaker
 from app.enums import Service, Species, Vaccine
+from app.llm import LLMError
 from app.models import Span
 from app.prompts.records import PROMPT_VERSION
 from app.records import RecordsInvalidOutput, run_records
@@ -155,7 +156,9 @@ async def run_certificate(cert: dict, today: date, **llm_kwargs: Any) -> dict[st
         result = await run_records(
             image, booked_pet=cert["pet_name"], today=today, timezone=TIMEZONE, **llm_kwargs
         )
-    except RecordsInvalidOutput as exc:
+    except (RecordsInvalidOutput, LLMError) as exc:
+        # A failed call is a real outcome (the request would go to `failed` for staff),
+        # so it is scored, not allowed to crash the run.
         return {"pet_name": None, "records": [], "outcome": "error", "issues": [str(exc)]}
     extraction = result.extraction
     return {

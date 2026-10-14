@@ -131,3 +131,26 @@ async def test_scripted_end_to_end_on_two_certificates(tracer):
     assert total["certificates"] == 2
     assert total["invented_expiries"] == 0
     assert set(summary["by_variant"]) == {c["variant"] for c in two["certificates"]}
+
+
+@spec("certificate-evaluation", "Evaluation reports decision agreement")
+async def test_failed_model_call_is_scored_as_error_not_a_crash(tracer):
+    doc = load_truth()
+    one = doc | {"certificates": doc["certificates"][:1]}
+    script = Script(*(httpx.Response(503, json={"error": {"code": 503}}) for _ in range(3)))
+    settings = fake_settings()
+    client = make_client(settings, transport=httpx.MockTransport(script))
+
+    async def no_wait():
+        return None
+
+    async with tracer.start_trace("records eval failure"):
+        [row] = await evaluate(
+            one, client=client, settings=settings, policy=RetryPolicy(sleep=lambda s: no_wait())
+        )
+
+    assert row["actual"]["outcome"] == "error"
+    assert row["score"]["extracted_decision"] == "error"
+    assert row["score"]["decision_agrees"] is False
+    assert row["score"]["silent_disagreement"] is False  # a failure is visible, not silent
+    assert summarize([row])["total"]["errors"] == 1
