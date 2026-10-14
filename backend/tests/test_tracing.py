@@ -75,6 +75,28 @@ async def test_span_outside_a_trace_is_refused():
             pass
 
 
+@spec("run-tracing", "Spans are recorded while work runs")
+async def test_cancelled_work_is_recorded_as_an_error(tracer, engine):
+    started, ids = asyncio.Event(), []
+
+    async def work():
+        async with tracer.start_trace("t"), span("waiting", SpanKind.CODE) as s:
+            ids.append(s.id)
+            started.set()
+            await asyncio.sleep(10)
+
+    task = asyncio.create_task(work())
+    await started.wait()
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    stored = await read_span(engine, ids[0])
+    assert stored.status == SpanStatus.ERROR
+    assert stored.error.startswith("CancelledError")
+    assert stored.ended_at is not None
+
+
 @spec("run-tracing", "Parent links follow the code structure")
 async def test_nested_span_has_the_outer_span_as_parent(tracer, engine):
     async with tracer.start_trace("t"), span("outer", SpanKind.CODE) as outer:

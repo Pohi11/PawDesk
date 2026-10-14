@@ -91,6 +91,7 @@ async def process_request(
 
     run = _Run(request_id, sessions, today, crash_after, llm_kwargs)
     tracer = tracer or Tracer(sessions)
+    await tracer.close_abandoned(request_id)  # left open by an earlier run that was killed
     async with tracer.start_trace("process booking", booking_request_id=request_id):
         if retryable:
             status = await _retry(run, failed_step)

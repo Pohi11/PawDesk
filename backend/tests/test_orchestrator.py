@@ -557,3 +557,42 @@ async def test_a_bug_is_not_hidden_as_a_failed_step(committed, submit, process, 
         await process(request_id, FakeModel())
 
     assert (await request_row(committed, request_id)).status == State.EXTRACTING
+
+
+# --- Abandoned spans are closed (run-tracing) -------------------------------------------
+
+
+@spec("run-tracing", "Abandoned spans are closed")
+async def test_span_left_running_by_a_killed_run_is_closed(committed, submit, process):
+    request_id = await submit()
+    async with committed() as s:
+        killed = Trace(name="process booking", booking_request_id=request_id)
+        s.add(killed)
+        await s.flush()
+        stuck = Span(trace_id=killed.id, kind="llm", name="records.extract", status="running")
+        s.add(stuck)
+        await s.commit()
+
+    await process(request_id, FakeModel())
+
+    async with committed() as s:
+        stuck = await s.get(Span, stuck.id)
+        killed = await s.get(Trace, killed.id)
+    assert stuck.status == "error"
+    assert stuck.error == "abandoned: the process stopped before this work finished"
+    assert stuck.ended_at is not None
+    assert killed.ended_at is not None
+
+
+@spec("run-tracing", "Abandoned spans are closed")
+async def test_finished_spans_are_left_untouched(committed, submit, process):
+    request_id = await submit()
+    with pytest.raises(Crash):
+        await process(request_id, FakeModel(), crash_after=crash_after(State.EXTRACTING))
+    before = {s.id: (s.status, s.ended_at, s.error) for s in await spans_of(committed, request_id)}
+
+    await process(request_id, FakeModel())
+
+    after = {s.id: (s.status, s.ended_at, s.error) for s in await spans_of(committed, request_id)}
+    assert {i: after[i] for i in before} == before
+    assert all(status == "ok" for status, _, _ in before.values())
