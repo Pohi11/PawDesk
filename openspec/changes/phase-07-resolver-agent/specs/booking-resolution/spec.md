@@ -52,13 +52,11 @@ The tools SHALL be `find_alternative_dates`, `list_missing_vaccines`, `check_ken
 - **THEN** the call is answered with an error result describing the problem
 
 ### Requirement: The loop stops when done, stuck, or out of steps
-The resolver SHALL repeat (call the model, run the requested tools, append the results) until one of these happens:
-- `propose_offer` is called with valid arguments: outcome `proposed`;
-- a tool is called with the same name and arguments as an earlier call in the same run: outcome `escalated`, reason stuck;
-- the model answers without calling a tool: outcome `escalated`, reason no proposal;
-- the step limit of 6 model calls, or 12 tool calls, is reached: outcome `escalated`, reason step limit.
-
-Every stop SHALL record its reason.
+The resolver SHALL repeat (call the model, run the requested tools, append the results) until it stops, and SHALL record the reason it stopped:
+- a valid `propose_offer` call: `proposed`;
+- a repeat of an earlier call's tool and arguments: `escalated`, stuck;
+- an answer with no tool call: `escalated`, no proposal;
+- 6 model calls or 12 tool calls: `escalated`, step limit.
 
 #### Scenario: Proposal ends the loop
 - **WHEN** the model calls `find_alternative_dates` and then `propose_offer` with one of the returned windows
