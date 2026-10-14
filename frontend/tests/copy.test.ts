@@ -59,11 +59,18 @@ test("the shared list is read from docs/style", () => {
   expect(bannedList()).toContain("simply");
 });
 
-test.fails("the current dashboard passes (turned on once the rewrite lands)", () => {
+function dashboardIssues(): string[] {
   const banned = bannedList();
-  const issues = ["app", "components", "lib"]
+  return ["app", "components", "lib"]
     .flatMap(sourceFiles)
-    .flatMap((file) => copyIssues(file, readFileSync(file, "utf8"), banned));
+    .flatMap((file) => copyIssues(file, readFileSync(file, "utf8"), banned))
+    .map((i) => `${i.file}:${i.line} ${i.found}`);
+}
 
-  expect(issues.map((i) => `${i.file}:${i.line} ${i.found}`)).toEqual([]);
+specTest("interface-copy", WORDS, "the current dashboard has no banned words", () => {
+  expect(dashboardIssues().filter((issue) => !issue.endsWith("—"))).toEqual([]);
+});
+
+specTest("interface-copy", DASHES, "the current dashboard has no em dash inside a sentence", () => {
+  expect(dashboardIssues().filter((issue) => issue.endsWith("—"))).toEqual([]);
 });

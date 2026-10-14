@@ -31,13 +31,13 @@ export function MetricsCharts({ metrics }: { metrics: Metrics }) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <Panel title="Where the money goes">
+      <Panel title="Cost by model step">
         <Chart data={steps} y="cost" color="#5847c2" format={(v) => formatCost(v)} />
       </Panel>
-      <Panel title="How long each model step takes">
+      <Panel title="Average time per model step">
         <Chart data={steps} y="seconds" color="#2d5da8" format={(v) => `${v.toFixed(1)} s`} />
       </Panel>
-      <Panel title="Where requests are now" className="lg:col-span-2">
+      <Panel title="Requests by state" className="lg:col-span-2">
         <Chart data={states} y="count" color="#1f6f55" format={(v) => String(v)} />
       </Panel>
     </div>

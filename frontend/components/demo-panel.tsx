@@ -56,8 +56,8 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
             />
           </label>
           <p className="mt-2 text-sm text-faint">
-            {sample.certificate ? "A vaccine certificate photo is attached." : "No certificate is attached."} You can edit the
-            message before sending.
+            {sample.certificate ? "This sample includes a photo of a vaccine certificate." : "This sample has no certificate."}{" "}
+            You can edit the message before sending.
           </p>
           <button
             type="button"

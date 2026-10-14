@@ -30,7 +30,7 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
           placeholder="Your name"
           autoComplete="name"
         />
-        <span className="text-sm text-faint">Recorded with every decision you make.</span>
+        <span className="text-sm text-faint">Saved with each decision you make.</span>
       </label>
       {items.map((item) => (
         <ReviewCard key={item.id} item={item} staff={staff.trim()} onDone={setDone} />
@@ -70,9 +70,10 @@ function ReviewCard({
     });
     const data = (await response.json().catch(() => ({}))) as { status?: string; detail?: unknown };
     setBusy(false);
-    const pet = item.pet ?? "this request";
     if (response.ok) {
-      onDone(action === "reject" ? `Declined ${pet}. A polite decline was sent.` : `Sent the reply for ${pet}.`);
+      const declined = item.pet ? `Declined ${item.pet}'s request.` : "Declined the request.";
+      const sent = `Sent the reply for ${item.pet ?? "this request"}.`;
+      onDone(action === "reject" ? `${declined} The pet parent gets a polite no.` : sent);
       router.refresh();
     } else {
       const detail = typeof data.detail === "string" ? data.detail : "check the fields and try again";
@@ -95,7 +96,7 @@ function ReviewCard({
       </div>
 
       <div className="border-l-4 border-signal px-6 pt-4 pb-5">
-        <p className="text-sm font-medium">Why it stopped</p>
+        <p className="text-sm font-medium">Reasons for review</p>
         <ul className="mt-1.5 space-y-1">
           {item.flags.length > 0 ? (
             item.flags.map((flag) => (
@@ -108,7 +109,7 @@ function ReviewCard({
               </li>
             ))
           ) : (
-            <li className="text-muted">No reason was recorded.</li>
+            <li className="text-muted">The desk recorded no reason.</li>
           )}
         </ul>
       </div>
@@ -133,7 +134,7 @@ function ReviewCard({
                 className="mt-1.5 w-full rounded-lg bg-surface px-3 py-2 ring-1 ring-rule"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="Kept internal. The pet parent gets a polite decline."
+                placeholder="Only staff see this. The pet parent gets a polite no."
               />
             </label>
           )}
@@ -182,7 +183,7 @@ function ReviewCard({
         </div>
       ) : (
         <p className="border-t border-rule bg-wash px-6 py-5 text-muted">
-          There is no drafted reply for this request, so it can&apos;t be sent from here.
+          This request has no draft, so you can&apos;t send it from here.
         </p>
       )}
     </article>

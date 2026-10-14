@@ -16,8 +16,8 @@ export default function SpecsPage() {
   return (
     <>
       <PageTitle title="Specs and tests">
-        The current requirements, grouped by capability, each with its WHEN/THEN scenarios and the
-        tests that name it, with their result in the latest test reports.
+        The current requirements by capability. Each one shows its WHEN/THEN scenarios and the tests
+        that name it, with each test&apos;s latest result.
       </PageTitle>
       <BuildNav />
 
