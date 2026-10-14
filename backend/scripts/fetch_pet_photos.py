@@ -54,7 +54,38 @@ class RefusedLicense(ValueError):
     pass
 
 
-PICKS: tuple[Pick, ...] = ()
+PICKS: tuple[Pick, ...] = (
+    # One per seeded breed (scripts/seed.py).
+    Pick("File:One Beagle Cute (2429819734).jpg", "beagle", "dog", "Beagle"),
+    Pick(
+        "File:Mountain dog looking at you.jpg",
+        "bernese-mountain-dog",
+        "dog",
+        "Bernese Mountain Dog",
+    ),
+    Pick("File:Chihuahua 2.jpg", "chihuahua", "dog", "Chihuahua"),
+    Pick(
+        "File:Labrador Retriever (1210559).jpg",
+        "labrador-retriever",
+        "dog",
+        "Labrador Retriever",
+    ),
+    Pick("File:Border Collie intense look.jpg", "border-collie", "dog", "Border Collie"),
+    Pick(
+        "File:Gracie.Day at the beach. (20539043889).jpg",
+        "pembroke-welsh-corgi",
+        "dog",
+        "Pembroke Welsh Corgi",
+    ),
+    Pick("File:Tabby cat-3337027.jpg", "domestic-shorthair", "cat", "Domestic Shorthair"),
+    Pick("File:Ragdoll cat resting (July 30, 2022).jpg", "ragdoll", "cat", "Ragdoll"),
+    # General photos for pets whose breed has none here.
+    Pick("File:BobbyWonderful.jpg", "dog-1", "dog", None),
+    Pick("File:Langhaarchihuahua.jpg", "dog-2", "dog", None),
+    Pick("File:Beagle-Harrier2.JPG", "dog-3", "dog", None),
+    Pick("File:Orange tabby cat closeup.jpg", "cat-1", "cat", None),
+    Pick("File:Cat portrait (Unsplash).jpg", "cat-2", "cat", None),
+)
 
 
 def _plain(value: str) -> str:

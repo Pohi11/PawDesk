@@ -1,1 +1,106 @@
-[]
+[
+  {
+    "file": "/pets/beagle.jpg",
+    "species": "dog",
+    "breed": "Beagle",
+    "source": "https://commons.wikimedia.org/wiki/File:One_Beagle_Cute_(2429819734).jpg",
+    "author": "cogdogblog",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/bernese-mountain-dog.jpg",
+    "species": "dog",
+    "breed": "Bernese Mountain Dog",
+    "source": "https://commons.wikimedia.org/wiki/File:Mountain_dog_looking_at_you.jpg",
+    "author": "Hamoma30",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/chihuahua.jpg",
+    "species": "dog",
+    "breed": "Chihuahua",
+    "source": "https://commons.wikimedia.org/wiki/File:Chihuahua_2.jpg",
+    "author": "Historytoby",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/labrador-retriever.jpg",
+    "species": "dog",
+    "breed": "Labrador Retriever",
+    "source": "https://commons.wikimedia.org/wiki/File:Labrador_Retriever_(1210559).jpg",
+    "author": "https://pixabay.com/es/users/chiemsee2016-1892688/",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/border-collie.jpg",
+    "species": "dog",
+    "breed": "Border Collie",
+    "source": "https://commons.wikimedia.org/wiki/File:Border_Collie_intense_look.jpg",
+    "author": "Lisafern",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/pembroke-welsh-corgi.jpg",
+    "species": "dog",
+    "breed": "Pembroke Welsh Corgi",
+    "source": "https://commons.wikimedia.org/wiki/File:Gracie.Day_at_the_beach._(20539043889).jpg",
+    "author": "Bernard Spragg. NZ from Christchurch, New Zealand",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/domestic-shorthair.jpg",
+    "species": "cat",
+    "breed": "Domestic Shorthair",
+    "source": "https://commons.wikimedia.org/wiki/File:Tabby_cat-3337027.jpg",
+    "author": "pasja1000",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/ragdoll.jpg",
+    "species": "cat",
+    "breed": "Ragdoll",
+    "source": "https://commons.wikimedia.org/wiki/File:Ragdoll_cat_resting_(July_30,_2022).jpg",
+    "author": "Elli",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/dog-1.jpg",
+    "species": "dog",
+    "breed": null,
+    "source": "https://commons.wikimedia.org/wiki/File:BobbyWonderful.jpg",
+    "author": "Jen Wong Hui Xian",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/dog-2.jpg",
+    "species": "dog",
+    "breed": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Langhaarchihuahua.jpg",
+    "author": "ToniaC18",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/dog-3.jpg",
+    "species": "dog",
+    "breed": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Beagle-Harrier2.JPG",
+    "author": "Grzes1966",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/cat-1.jpg",
+    "species": "cat",
+    "breed": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Orange_tabby_cat_closeup.jpg",
+    "author": "Miscellaneous contributor",
+    "license": "CC0"
+  },
+  {
+    "file": "/pets/cat-2.jpg",
+    "species": "cat",
+    "breed": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Cat_portrait_(Unsplash).jpg",
+    "author": "Anton Petrov aptrov",
+    "license": "CC0"
+  }
+]

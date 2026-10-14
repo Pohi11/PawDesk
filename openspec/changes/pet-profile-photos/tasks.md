@@ -7,8 +7,8 @@
 ## 2. Photo set
 
 - [x] 2.1 Add `backend/scripts/fetch_pet_photos.py` (hand-picked Commons titles; license check; 640 px thumbnail, 320 × 320 center crop, JPEG without EXIF or XMP; writes `frontend/public/pets/` and `frontend/lib/pet-photos.json`). Unit-test its license filter and crop on a local image with fake metadata, with no network. Verify with `pytest tests/test_fetch_pet_photos.py`.
-- [ ] 2.2 Choose the titles (one per seeded breed where a CC0 or public-domain photo exists, plus general photos for each species), confirm the file list, source, and total size before downloading, then run the script once. Verify with the manifest tests (2.3) and by looking at every photo.
-- [ ] 2.3 Add `frontend/tests/pet-photos-manifest.test.ts` for "Every committed photo is licensed for reuse and recorded" and "Committed photos carry no embedded metadata". Verify with `pnpm test`.
+- [x] 2.2 Choose the titles (one per seeded breed where a CC0 or public-domain photo exists, plus general photos for each species), confirm the file list, source, and total size before downloading, then run the script once. Verify with the manifest tests (2.3) and by looking at every photo.
+- [x] 2.3 Add `frontend/tests/pet-photos-manifest.test.ts` for "Every committed photo is licensed for reuse and recorded" and "Committed photos carry no embedded metadata". Verify with `pnpm test`.
 
 ## 3. Dashboard
 
