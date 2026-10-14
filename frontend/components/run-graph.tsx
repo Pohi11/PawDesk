@@ -190,6 +190,7 @@ export function RunGraph({
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.04 }}
+          minZoom={0.2} // the whole path fits a phone; the tooltips carry the detail
           nodesConnectable={false}
           nodesFocusable={false}
           edgesFocusable={false}

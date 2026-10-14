@@ -43,10 +43,12 @@ Steps that are waiting say "Not run yet." Running steps say "Working on it now."
 - **React Flow's viewport clips its contents,** so a tooltip drawn inside a node would be cut off at the top and bottom of the graph.
 - **The tooltip renders in the graph's wrapper** (`position: relative`, not clipped). It's placed below the hovered step from the step's bounding box relative to the wrapper, and clamped so it stays inside the wrapper's width.
 - **One tooltip at a time,** keyed by the step id.
+- **The whole path fits at phone width.** React Flow's default minimum zoom (0.5) cut the path to its middle steps on a phone. The minimum is lowered to 0.2, so every step shows. The labels get small, and the tooltip carries the detail.
 
 ### D4. Keyboard and screen readers
 - **Each step's content is a `<button>`.** Enter or Space opens the step in the inspector, like a click. React Flow's own node focus is turned off, so each step is one tab stop, not two.
 - **Focus shows the same tooltip as hover.** The button's `aria-describedby` points at the tooltip (`role="tooltip"`), so it's announced.
+- **Steps keep focus while the run is live.** The run view re-renders several times a second while live. React Flow hides a node it receives as a new object until it measures it again, and a hidden button loses focus, which made keyboard focus drop at random (found by repeating the end-to-end test). Steps have a fixed size (132 × 50), so they never count as unmeasured, and the node list is memoized so it changes only when the run does.
 - **Escape hides the tooltip** until the pointer or focus moves to another step. The pointer can move onto the tooltip without it disappearing, so it can be read and selected (WCAG 1.4.13: dismissible, hoverable, persistent).
 
 ### D5. Only structured facts in the tooltip
