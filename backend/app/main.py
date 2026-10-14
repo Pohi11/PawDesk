@@ -1,9 +1,11 @@
 import psycopg
 from fastapi import FastAPI, HTTPException
 
+from app.api import router
 from app.config import get_settings
 
 app = FastAPI(title="PawDesk API")
+app.include_router(router)
 
 
 @app.get("/health")

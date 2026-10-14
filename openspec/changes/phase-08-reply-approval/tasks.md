@@ -10,7 +10,7 @@
 
 ## 3. Staff approval
 
-- [ ] 3.1 Add `app/approvals.py` and the API routes. Verify with `tests/test_approvals_api.py` for: the queue, approve, edit and approve, reject with and without a reason, and acting twice.
+- [x] 3.1 Add `app/approvals.py` and the API routes. Verify with `tests/test_approvals_api.py` for: the queue, approve, edit and approve, reject with and without a reason, and acting twice.
 
 ## 4. Decision and real runs
 
