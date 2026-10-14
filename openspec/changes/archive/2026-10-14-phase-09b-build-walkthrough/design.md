@@ -22,7 +22,7 @@
 ## Decisions
 
 ### D1. Generate into a committed JSON file
-Recorded in [decision record 0014](../../../docs/decisions/0014-walkthrough-generated-into-a-committed-file.md).
+Recorded in [decision record 0014](../../../../docs/decisions/0014-walkthrough-generated-into-a-committed-file.md).
 - `uv run python -m scripts.walkthrough` (from `backend/`) writes `frontend/content/walkthrough.json`. The pages import it and are fully static.
 - *Alternatives:*
   - generating during the frontend build (the build context is `frontend/` only);
