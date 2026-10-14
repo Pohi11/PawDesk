@@ -39,7 +39,7 @@ Processing a request SHALL continue from its current state, using saved step res
 - **THEN** extraction runs again, and the request ends with exactly one saved result per step
 
 #### Scenario: Finished request
-- **WHEN** a request that has already reached `drafting` is processed again
+- **WHEN** a request that has already reached `sent` is processed again
 - **THEN** nothing changes and no model is called
 
 ### Requirement: Checks combine every source
@@ -119,3 +119,22 @@ Processing a request in `resolving` SHALL run the resolution step and save its r
 #### Scenario: Model unavailable during resolution
 - **WHEN** every model attempt during resolution fails
 - **THEN** the request is `failed` with the failed step `resolving`, and processing it again retries the resolution
+
+### Requirement: Clean requests are approved and sent without waiting
+Processing SHALL continue past drafting:
+- a request in `ready` SHALL be approved by the system;
+- a request in `approved` or `rejected` SHALL be sent.
+
+Sending SHALL record exactly one outbound message per request, in the same transaction as the move to `sent`. For a confirmed boarding request, sending SHALL also reserve a free kennel of the pet's size class in that transaction. If no kennel is free any more, the request SHALL move to `failed` without a reservation or a message.
+
+#### Scenario: Clean boarding request runs to sent
+- **WHEN** a clean boarding request is processed
+- **THEN** it ends in `sent`, with one reservation for the stay and one outbound message containing the drafted reply
+
+#### Scenario: Kennel taken before sending
+- **WHEN** the last free kennel is reserved by someone else between drafting and sending
+- **THEN** the request is `failed` with the failed step `approved`, and no reservation or message is recorded for it
+
+#### Scenario: Waiting request is left alone
+- **WHEN** a request in `needs_review` is processed
+- **THEN** nothing changes and no model is called

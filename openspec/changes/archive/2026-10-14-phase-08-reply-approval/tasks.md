@@ -14,7 +14,7 @@
 
 ## 4. Decision and real runs
 
-- [x] 4.1 Write [decision record 0011](../../../docs/decisions/0011-human-gate-before-sending.md). Verify it exists and that design D1 links to it.
+- [x] 4.1 Write [decision record 0011](../../../../docs/decisions/0011-human-gate-before-sending.md). Verify it exists and that design D1 links to it.
 - [x] 4.2 Real runs: a clean request processed to `sent`, and a flagged request approved through the API to `sent`. Verify by recording the states, the drafted replies, the promise-check findings, and cost.
 
 ## 5. Integration

@@ -24,7 +24,7 @@
 ## Decisions
 
 ### D1. Where the human gate sits
-Recorded in [decision record 0011](../../../docs/decisions/0011-human-gate-before-sending.md).
+Recorded in [decision record 0011](../../../../docs/decisions/0011-human-gate-before-sending.md).
 - The gate is the `needs_review` state, *after* the reply is drafted and *before* anything is sent or reserved. Staff see the full picture (checks, resolution, draft) and act once.
 - Clean requests skip the gate. Every check was deterministic and passed, intake raised no issue (including no instruction-like text), and the draft passed the promise check.
 
