@@ -10,4 +10,4 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Run every backend suite and lint, then check the real API with Windows PowerShell's `Invoke-RestMethod`.
+- [x] 3.1 Run every backend suite and lint, then check the real API with Windows PowerShell's `Invoke-RestMethod`.
