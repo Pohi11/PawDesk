@@ -12,6 +12,7 @@ Fenced in on every side:
 import json
 import uuid
 from collections.abc import Awaitable, Callable
+from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from enum import StrEnum
@@ -423,8 +424,13 @@ def not_attempted(scope: Scope) -> Resolution:
     return Resolution(ResolutionOutcome.NOT_ATTEMPTED, "nothing for the resolver to fix")
 
 
+# Opens a short session for one tool call or one verification. In production this is the
+# sessionmaker; no connection is held while the model thinks. Tests pass their own session.
+SessionFactory = Callable[[], AbstractAsyncContextManager[AsyncSession]]
+
+
 async def resolve(
-    session: AsyncSession,
+    sessions: SessionFactory,
     ctx: ToolContext,
     facts: RequestFacts,
     scope: Scope,
@@ -457,10 +463,11 @@ async def resolve(
                 return stop(f"stuck: repeated {call.name} with the same arguments", turn)
             seen.add(key)
 
-            content, offer = await _run_call(session, ctx, call)
+            content, offer = await _run_call(sessions, ctx, call)
             calls.append({"name": call.name, "arguments": call.arguments} | _error_of(content))
             if offer is not None:
-                options = [await verify_option(session, ctx, o) for o in offer.options]
+                async with sessions() as session:
+                    options = [await verify_option(session, ctx, o) for o in offer.options]
                 proposal = {"summary": offer.summary, "options": options}
                 return Resolution(ResolutionOutcome.PROPOSED, "proposed", proposal, turn, calls)
             messages.append(
@@ -482,7 +489,7 @@ def _error_of(content: dict[str, Any]) -> dict[str, Any]:
 
 
 async def _run_call(
-    session: AsyncSession, ctx: ToolContext, call: ToolCall
+    sessions: SessionFactory, ctx: ToolContext, call: ToolCall
 ) -> tuple[dict[str, Any], ProposeOffer | None]:
     """Run one requested call in its own `tool` span. Anything the model got wrong comes
     back as {"error": ...} for it to read; only a bug in our code raises."""
@@ -497,7 +504,9 @@ async def _run_call(
                 content = {"accepted": True}
             elif call.name in READ_TOOLS:
                 args_model, tool = READ_TOOLS[call.name]
-                content = await tool(session, ctx, args_model.model_validate(raw))
+                args = args_model.model_validate(raw)
+                async with sessions() as session:
+                    content = await tool(session, ctx, args)
             else:
                 available = ", ".join([*READ_TOOLS, PROPOSE])
                 content = {"error": f"unknown tool {call.name!r}; available: {available}"}

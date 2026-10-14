@@ -1,6 +1,7 @@
 """Spec: booking-resolution, the resolver's tools against a real database."""
 
 import json
+from contextlib import nullcontext
 from datetime import date
 
 import httpx
@@ -188,7 +189,7 @@ def run_resolver(session, tracer):
         scope = Scope(capacity_full=True)
         async with tracer.start_trace("resolver test"):
             resolution = await resolve(
-                session,
+                lambda: nullcontext(session),
                 ctx,
                 facts,
                 scope,

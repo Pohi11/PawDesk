@@ -12,7 +12,7 @@
 
 ## 3. Orchestration
 
-- [ ] 3.1 Add the `resolution` step (migration for the step constraint) and the resolving step to the orchestrator: saved with the move to `drafting`, failures to `failed`, and retry. Update the existing orchestration tests for the new end state. Verify with `tests/test_orchestrator.py` for: resolution saved with the move, not attempted with no model call, model unavailable then retried.
+- [x] 3.1 Add the `resolution` step (migration for the step constraint) and the resolving step to the orchestrator: saved with the move to `drafting`, failures to `failed`, and retry. Update the existing orchestration tests for the new end state. Verify with `tests/test_orchestrator.py` for: resolution saved with the move, not attempted with no model call, model unavailable then retried.
 
 ## 4. Decision and real runs
 

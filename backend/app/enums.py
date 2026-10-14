@@ -59,3 +59,4 @@ class Step(StrEnum):
     RECORDS = "records"
     CHECKS = "checks"
     ROUTE = "route"
+    RESOLUTION = "resolution"

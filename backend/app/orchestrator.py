@@ -1,15 +1,20 @@
-"""Drives a booking request through extraction, checks, and routing (spec:
-booking-orchestration; decision records 0008 and 0009).
+"""Drives a booking request through extraction, checks, routing, and resolution (spec:
+booking-orchestration; decision records 0008, 0009, and 0010).
 
 A hybrid workflow: code fixes the order of the steps, the models only read (intake and
-records), and every decision after that is plain code. Each step's result is saved in the
-same transaction as the state change that follows it, so a crashed run resumes from the
+records), and every decision after that is plain code. The one agent (the resolver) runs
+inside a fenced step and can only propose. Each step's result is saved in the same
+transaction as the state change that follows it, so a crashed run resumes from the
 request's state and reads saved results instead of redoing finished work.
 
-    received --start--> extracting --extract--> checking --check+route--> drafting | resolving
-                            |  model failure                              (stop here: later
-                            v                                               phases continue)
+    received --start--> extracting --extract--> checking --check+route--> drafting
+                            |                                  |              ^
+                            |                                  v              |
+                            |                              resolving --resolve
+                            v  model failure (extracting or resolving)
                           failed --retry (next run)--> back to the step that failed
+
+Processing stops at `drafting`; the reply and approval steps come later.
 """
 
 import asyncio
@@ -32,6 +37,14 @@ from app.lifecycle import Actor, State
 from app.llm import LLMError
 from app.models import BookingRequest, BookingStepResult, Facility, Pet
 from app.records import RecordsResult, pet_name_mismatch, run_records
+from app.resolver import (
+    RequestFacts,
+    ToolContext,
+    not_attempted,
+    request_facts,
+    resolution_scope,
+    resolve,
+)
 from app.structured import InvalidModelOutput
 from app.tracing import Tracer, span
 from app.transitions import transition
@@ -260,10 +273,70 @@ async def _check_and_route(run: _Run) -> State:
     return target
 
 
+async def _resolve(run: _Run) -> State:
+    # As in extraction: read first, then let the session go. The loop's tools open short
+    # sessions of their own, so no connection waits on the model.
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        saved = await _saved_results(session, request.id)
+        scope = resolution_scope(saved[Step.INTAKE], saved[Step.RECORDS], saved[Step.CHECKS])
+        inputs = (
+            await _resolver_inputs(session, request, saved, run.today) if scope.eligible else None
+        )
+
+    async with span("resolve", SpanKind.CODE, input={"eligible": scope.eligible}) as s:
+        if inputs is None:
+            resolution = not_attempted(scope)  # code decided: no model call at all
+        else:
+            ctx, facts = inputs
+            resolution = await resolve(run.sessions, ctx, facts, scope, **run.llm_kwargs)
+        s.output = {
+            "outcome": str(resolution.outcome),
+            "reason": resolution.reason,
+            "turns": resolution.turns,
+        }
+
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        session.add(
+            BookingStepResult(
+                booking_request_id=request.id, step=Step.RESOLUTION, output=resolution.to_json()
+            )
+        )
+        reason = f"resolution {resolution.outcome}: {resolution.reason}"
+        await transition(session, request, State.DRAFTING, Actor.SYSTEM, reason=reason)
+        await session.commit()
+    return State.DRAFTING
+
+
+async def _resolver_inputs(
+    session: AsyncSession, request: BookingRequest, saved: dict[Step, dict], today: date | None
+) -> tuple[ToolContext, RequestFacts]:
+    pet = await session.get_one(Pet, request.pet_id)
+    facility = await session.get_one(Facility, request.facility_id)
+    today = today or facility_date(facility.timezone, datetime.now(UTC))
+    facts = request_facts(saved[Step.INTAKE], str(pet.species), str(pet.size_class), today)
+    service = Service(facts.service)
+    on_file = await load_evidence(session, pet.id)
+    ctx = ToolContext(
+        facility_id=facility.id,
+        species=pet.species,
+        size_class=pet.size_class,
+        service=service,
+        start=facts.start,
+        end=facts.end,
+        today=today,
+        required=await load_requirements(session, facility.id, service, pet.species),
+        evidence=tuple(on_file + _evidence(saved[Step.RECORDS])),
+    )
+    return ctx, facts
+
+
 STEPS = {
     State.RECEIVED: _start,
     State.EXTRACTING: _extract,
     State.CHECKING: _check_and_route,
+    State.RESOLVING: _resolve,
 }
 
 
