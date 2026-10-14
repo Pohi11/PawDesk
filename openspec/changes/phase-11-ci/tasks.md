@@ -12,7 +12,7 @@
 
 - [x] 3.1 Extract `scripts/lab_database.py` from the comparison lab, and add `scripts/e2e_server.py`. Verify that the comparison tests still pass.
 - [x] 3.2 Add Playwright with two spec-tagged tests and JUnit output. Record the responses once against the real model, then verify the tests pass in replay mode.
-- [ ] 3.3 Teach the walkthrough generator the `e2e` suite. Verify with a generator test where only an end-to-end test verifies a requirement.
+- [x] 3.3 Teach the walkthrough generator the `e2e` suite. Verify with a generator test where only an end-to-end test verifies a requirement.
 
 ## 4. Pipeline and README
 

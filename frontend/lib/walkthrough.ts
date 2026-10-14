@@ -3,7 +3,7 @@
 export type RequirementStatus = "verified" | "failing" | "untested";
 
 export interface LinkedTest {
-  suite: "backend" | "frontend";
+  suite: "backend" | "frontend" | "e2e";
   id: string;
   status: "passed" | "failed" | "skipped";
   seconds: number;
@@ -46,12 +46,12 @@ export interface Decision {
 
 export interface Walkthrough {
   generated_at: string;
-  reports: Record<"backend" | "frontend", string | null>;
+  reports: Partial<Record<"backend" | "frontend" | "e2e", string | null>>;
   totals: {
     changes: number;
     requirements: number;
     verified: number;
-    tests: Record<"backend" | "frontend", number>;
+    tests: Record<"backend" | "frontend", number> & { e2e?: number };
     linked_tests: number;
   };
   changes: Change[];

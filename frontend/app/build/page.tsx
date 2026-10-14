@@ -33,14 +33,15 @@ export default function BuildPage() {
         />
         <Stat
           label="Tests"
-          value={totals.tests.backend + totals.tests.frontend}
-          hint={`${totals.tests.backend} backend · ${totals.tests.frontend} frontend · ${totals.linked_tests} linked to a requirement`}
+          value={totals.tests.backend + totals.tests.frontend + (totals.tests.e2e ?? 0)}
+          hint={`${totals.tests.backend} backend · ${totals.tests.frontend} frontend · ${totals.tests.e2e ?? 0} end-to-end · ${totals.linked_tests} linked to a requirement`}
         />
         <Stat label="Decision records" value={walkthrough.decisions.length} />
       </div>
       <p className="mt-2 text-xs text-zinc-500">
         Generated {new Date(walkthrough.generated_at).toLocaleString()} · backend report{" "}
-        {walkthrough.reports.backend ?? "missing"} · frontend report {walkthrough.reports.frontend ?? "missing"}
+        {walkthrough.reports.backend ?? "missing"} · frontend report {walkthrough.reports.frontend ?? "missing"} ·
+        end-to-end report {walkthrough.reports.e2e ?? "missing"}
       </p>
 
       <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">

@@ -290,3 +290,17 @@ def test_titles_read_naturally():
     assert humanize("phase-03-llm-tracing") == "Phase 3 · LLM tracing"
     assert humanize("phase-09b-build-walkthrough") == "Phase 9b · Build walkthrough"
     assert humanize("certificate-benchmark-v2") == "Certificate benchmark v2"
+
+
+@spec("build-walkthrough", "Requirements link to their tests and latest results")
+def test_end_to_end_tests_count(repo):
+    junit_backend(repo / "backend.xml", [])
+    junit_frontend(repo / "frontend.xml", [])
+    junit_frontend(repo / "e2e.xml", ["[spec alpha: Alpha is documented] demo runs"])
+
+    data = build(Sources.of(repo, repo / "backend.xml", repo / "frontend.xml", repo / "e2e.xml"))
+
+    req = requirement(data, "Alpha is documented")
+    assert req["status"] == "verified"
+    assert [(t["suite"], t["id"]) for t in req["tests"]] == [("e2e", "lib/a.test.ts::demo runs")]
+    assert data["totals"]["tests"] == {"backend": 0, "frontend": 0, "e2e": 1}
