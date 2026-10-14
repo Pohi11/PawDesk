@@ -89,3 +89,14 @@ The API key and request headers SHALL never be stored in any trace or span. Inli
 #### Scenario: Image replaced by its hash
 - **WHEN** a request message contains an inline base64 image
 - **THEN** the span's recorded messages contain the image's SHA-256 hash and byte size instead of the image data
+
+### Requirement: Structured requests go only to endpoints that support them
+When a model call requests a response format, the request SHALL ask the provider to route only to endpoints that support every requested parameter. When no response format is requested, the request SHALL carry no such routing restriction.
+
+#### Scenario: Response format requested
+- **WHEN** a model call includes a JSON-schema response format
+- **THEN** the request body asks the provider to require support for all requested parameters
+
+#### Scenario: Plain request
+- **WHEN** a model call has no response format
+- **THEN** the request body contains no provider routing preferences
