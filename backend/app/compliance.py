@@ -2,14 +2,20 @@
 
 `check()` is pure: plain values in, plain values out, no I/O. Records from the database
 and records extracted from a certificate image both arrive as `VaccineEvidence`.
+The loaders at the bottom are the only part that touches the database.
 """
 
+import uuid
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from enum import StrEnum
 
-from app.enums import Vaccine
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.enums import Service, Species, Vaccine
+from app.models import Pet, VaccineRecord, VaccineRule
 
 
 class VaccineStatus(StrEnum):
@@ -101,3 +107,40 @@ def check(
     else:
         outcome = Outcome.COMPLIANT
     return ComplianceResult(outcome=outcome, checks=checks)
+
+
+# --- Database loaders (design D5) -----------------------------------------------------
+
+
+async def load_requirements(
+    session: AsyncSession, facility_id: uuid.UUID, service: Service, species: Species
+) -> frozenset[Vaccine]:
+    rows = await session.scalars(
+        select(VaccineRule.vaccine).where(
+            VaccineRule.facility_id == facility_id,
+            VaccineRule.service == service,
+            VaccineRule.species == species,
+        )
+    )
+    return frozenset(rows)
+
+
+async def load_evidence(session: AsyncSession, pet_id: uuid.UUID) -> list[VaccineEvidence]:
+    rows = await session.execute(
+        select(VaccineRecord.vaccine, VaccineRecord.administered_on, VaccineRecord.expires_on)
+        .where(VaccineRecord.pet_id == pet_id)
+        .order_by(VaccineRecord.administered_on)
+    )
+    return [VaccineEvidence(*row) for row in rows]
+
+
+async def check_pet(
+    session: AsyncSession,
+    pet: Pet,
+    facility_id: uuid.UUID,
+    service: Service,
+    start: date,
+    end: date,
+) -> ComplianceResult:
+    required = await load_requirements(session, facility_id, service, pet.species)
+    return check(required, await load_evidence(session, pet.id), start, end)

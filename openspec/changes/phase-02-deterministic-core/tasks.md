@@ -12,7 +12,7 @@
 
 ## 3. Compliance loader
 
-- [ ] 3.1 Add `load_requirements()`, `load_evidence()`, and `check_pet()`. Verify with `tests/test_compliance_db.py`, covering the seeded Pepper (`expired`, `not_compliant`) and Olive (`unknown_expiry`, `needs_review`) scenarios against the seeded test database.
+- [x] 3.1 Add `load_requirements()`, `load_evidence()`, and `check_pet()`. Verify with `tests/test_compliance_db.py`, covering the seeded Pepper (`expired`, `not_compliant`) and Olive (`unknown_expiry`, `needs_review`) scenarios against the seeded test database.
 
 ## 4. Kennel capacity
 
