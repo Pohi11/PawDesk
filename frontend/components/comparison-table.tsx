@@ -2,47 +2,49 @@ import { type Architecture, type ArchitectureHeadline, comparisonRows } from "@/
 import { formatCost } from "@/lib/format";
 import type { EvalReport } from "@/lib/types";
 
-import { Card } from "./ui";
-
 export function ComparisonTable({ report }: { report: EvalReport }) {
   const headline = report.headline as unknown as Record<Architecture, ArchitectureHeadline>;
   const rows = comparisonRows(headline);
   const cell = (side: Architecture, better: Architecture | null, value: string) => (
-    <td className={`px-4 py-2 text-right tabular-nums ${better === side ? "font-semibold text-emerald-700" : ""}`}>
+    <td className={`px-5 py-3 text-right ${better === side ? "font-semibold text-kennel" : "text-muted"}`}>
       {value}
+      {better === side && <span className="sr-only"> (better)</span>}
     </td>
   );
 
   return (
-    <Card
-      title={`Architecture comparison: ${headline.hybrid.cases} cases, ${report.run_at ? new Date(report.run_at).toLocaleString() : ""}`}
-    >
-      <p className="mb-3 max-w-3xl text-sm text-zinc-600">
-        The same booking cases, the same model, and the same deterministic checking tools. Expected
-        outcomes come from running the checks on each case&apos;s true facts. An unsafe confirmation
-        is a booking confirmed that should not have been.
-      </p>
-      <table className="w-full max-w-2xl text-sm">
-        <thead className="text-left text-xs uppercase tracking-wide text-zinc-500">
-          <tr>
-            <th className="px-4 py-2">Metric</th>
-            <th className="px-4 py-2 text-right">Hybrid workflow</th>
-            <th className="px-4 py-2 text-right">Autonomous agent</th>
+    <section className="rounded-2xl bg-surface ring-1 ring-rule">
+      <div className="px-6 pt-6">
+        <h2 className="text-2xl font-bold">PawDesk against a single autonomous agent</h2>
+        <p className="mt-2 max-w-2xl text-muted">
+          The same {headline.hybrid.cases} booking requests, the same model, and the same checking tools.
+          The right answer for each request comes from running the checks on its true facts. An unsafe
+          confirmation is a booking confirmed that should not have been.
+        </p>
+      </div>
+      <table className="mt-4 w-full">
+        <thead>
+          <tr className="border-b border-rule text-left text-sm text-muted">
+            <th className="px-6 py-2 font-medium">
+              <span className="sr-only">Measure</span>
+            </th>
+            <th className="px-5 py-2 text-right font-medium text-ink">PawDesk</th>
+            <th className="px-5 py-2 text-right font-medium text-ink">Autonomous agent</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-100">
+        <tbody className="divide-y divide-rule">
           {rows.map((r) => (
-            <tr key={r.label}>
-              <td className="px-4 py-2">{r.label}</td>
+            <tr key={r.label} className={r.label === "Unsafe confirmations" ? "bg-signal-soft/50" : undefined}>
+              <td className="px-6 py-3">{r.label}</td>
               {cell("hybrid", r.better, r.hybrid)}
               {cell("autonomous", r.better, r.autonomous)}
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="mt-3 text-xs text-zinc-500">
-        Total cost of the run {formatCost(report.cost_usd)} · {report.prompt_version} · {report.model}
+      <p className="px-6 py-4 text-sm text-faint">
+        One run, {report.run_at ? new Date(report.run_at).toLocaleDateString() : "date unknown"}, costing {formatCost(report.cost_usd)} in total.
       </p>
-    </Card>
+    </section>
   );
 }

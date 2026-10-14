@@ -1,20 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { formatCost, formatSeconds, formatTokens, spanDurationMs } from "@/lib/format";
+import { formatCost, formatSeconds, formatService, formatStay, formatTokens, spanDurationMs } from "@/lib/format";
 import { NODES, type NodeId, nodeStatuses } from "@/lib/graph";
+import { optionText, outcome } from "@/lib/story";
 import { layout } from "@/lib/timeline";
 import type { RequestDetail, Snapshot, SpanDetail } from "@/lib/types";
 
 import { RunGraph } from "./run-graph";
-import { Card, Json, KIND_STYLE, KindDot, StatusBadge } from "./ui";
-
-const SPAN_STATUS: Record<SpanDetail["status"], string> = {
-  running: "bg-blue-100 text-blue-800",
-  ok: "bg-emerald-100 text-emerald-800",
-  error: "bg-red-100 text-red-800",
-};
+import { Json, KIND_STYLE, KindDot, Panel, StateTag, stateLabel } from "./ui";
 
 function snapshotOf(detail: RequestDetail): Snapshot {
   const reply = detail.steps.reply as { target?: string } | undefined;
@@ -33,9 +29,8 @@ export function RunView({ initial }: { initial: RequestDetail }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [traceId, setTraceId] = useState<string | null>(null);
 
-  // Live updates: one snapshot per change, then refetch the full detail for the inspector.
-  // Opened in an effect and closed in its cleanup: hidden pages keep their state but not
-  // their effects, so a background tab holds no stream.
+  // One snapshot per change, then the full detail for the inspector. The stream lives in an
+  // effect and closes in its cleanup, so a hidden page holds no connection.
   useEffect(() => {
     const source = new EventSource(`/api/requests/${initial.id}/events`);
     source.onopen = () => setLive(true);
@@ -59,100 +54,107 @@ export function RunView({ initial }: { initial: RequestDetail }) {
     return () => clearInterval(timer);
   }, [live]);
 
-  const snap = useMemo(() => snapshotOf(detail), [detail]);
-  const statuses = useMemo(() => nodeStatuses(snap), [snap]);
-  const trace = detail.traces.find((t) => t.id === traceId) ?? detail.traces.at(-1);
-  const allSpans = detail.traces.flatMap((t) => t.spans);
-  const selected = allSpans.find((s) => s.id === selectedId) ?? null;
+  const statuses = useMemo(() => nodeStatuses(snapshotOf(detail)), [detail]);
+  const spans = detail.traces.flatMap((t) => t.spans);
+  // Runs that did work; a run that only sent an approved reply has no steps to show.
+  const runs = detail.traces.filter((t) => t.spans.length > 0);
+  const trace = runs.find((t) => t.id === traceId) ?? runs.at(-1);
+  const selected = spans.find((s) => s.id === selectedId) ?? null;
+  const cost = spans.reduce((sum, s) => sum + Number(s.cost_usd ?? 0), 0);
+  const modelCalls = spans.filter((s) => s.kind === "llm").length;
+  const intent = (detail.steps.intake as { intent?: { service?: string; start_date?: string; end_date?: string } } | undefined)?.intent;
 
   const selectNode = (node: NodeId) => {
     const name = NODES.find((n) => n.id === node)?.span;
-    const span = allSpans.filter((s) => s.name === name).at(-1);
+    const span = spans.filter((s) => s.name === name).at(-1);
     if (span) {
       setSelectedId(span.id);
       setTraceId(span.trace_id);
     }
   };
 
-  const cost = allSpans.reduce((sum, s) => sum + Number(s.cost_usd ?? 0), 0);
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {detail.pet ?? "Unknown pet"} <span className="text-zinc-400">·</span> {detail.owner}
-        </h1>
-        <StatusBadge status={detail.status} />
-        {live && (
-          <span className="inline-flex items-center gap-1.5 text-xs text-blue-700">
-            <span className="h-2 w-2 animate-ping rounded-full bg-blue-500" /> live
-          </span>
-        )}
-        <span className="ml-auto text-sm text-zinc-500">
-          {allSpans.filter((s) => s.kind === "llm").length} model calls · {formatCost(cost)}
-        </span>
+    <div className="space-y-8">
+      <div>
+        <Link href="/" className="text-sm text-muted hover:text-ink">
+          All requests
+        </Link>
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <h1 className="text-4xl font-extrabold sm:text-5xl">{detail.pet ?? "Pet not on file"}</h1>
+          <StateTag status={detail.status} />
+          {live && (
+            <span className="inline-flex items-center gap-2 text-sm text-code">
+              <span className="h-2 w-2 rounded-full bg-code motion-safe:animate-ping" /> Live
+            </span>
+          )}
+        </div>
+        <p className="mt-2 text-muted">
+          {detail.owner}, {formatService(intent?.service ?? null).toLowerCase()},{" "}
+          {formatStay(intent?.start_date ?? null, intent?.end_date ?? null).replace(/^Dates/, "dates")}
+        </p>
+        <div className="mt-5 flex flex-wrap items-baseline justify-between gap-4 border-l-4 border-ink pl-4">
+          <p className="max-w-2xl font-display text-xl font-medium">{outcome(detail)}</p>
+          <p className="text-sm text-muted">
+            {modelCalls} model {modelCalls === 1 ? "call" : "calls"}, {formatCost(cost)}
+          </p>
+        </div>
       </div>
 
-      <Card
-        title={
-          <span className="flex items-center gap-4">
-            Workflow
-            <span className="flex gap-3 text-xs font-normal text-zinc-500">
-              {(["llm", "code", "tool", "human"] as const).map((k) => (
-                <span key={k} className="inline-flex items-center gap-1">
-                  <KindDot kind={k} /> {KIND_STYLE[k].label}
-                </span>
-              ))}
-            </span>
+      <Panel
+        title="The desk's path"
+        aside={
+          <span className="flex flex-wrap gap-x-4 gap-y-1">
+            {(["llm", "code", "tool", "human"] as const).map((k) => (
+              <span key={k} className="inline-flex items-center gap-1.5">
+                <KindDot kind={k} /> {KIND_STYLE[k].label}
+              </span>
+            ))}
           </span>
         }
       >
         <RunGraph statuses={statuses} onSelect={selectNode} />
-      </Card>
+        <p className="mt-2 text-sm text-faint">Select a step to see exactly what it was given and what it returned.</p>
+      </Panel>
 
       <div className="grid gap-6 lg:grid-cols-5">
-        <Card
+        <Panel
           className="lg:col-span-3"
-          title={
-            <span className="flex items-center gap-3">
-              Timeline
-              {detail.traces.length > 1 && (
+          title="Timeline"
+          aside={
+            runs.length > 1 && (
+              <label className="flex items-center gap-2">
+                Run
                 <select
-                  className="rounded border border-zinc-300 px-1 py-0.5 text-xs font-normal"
+                  className="rounded-md bg-wash px-2 py-1 text-ink ring-1 ring-rule"
                   value={trace?.id}
                   onChange={(e) => setTraceId(e.target.value)}
                 >
-                  {detail.traces.map((t, i) => (
+                  {runs.map((t, i) => (
                     <option key={t.id} value={t.id}>
-                      run {i + 1}
+                      {i + 1} of {runs.length}
                     </option>
                   ))}
                 </select>
-              )}
-            </span>
+              </label>
+            )
           }
         >
           {trace ? (
-            <Timeline
-              spans={trace.spans}
-              now={now}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-            />
+            <Timeline spans={trace.spans} now={now} selectedId={selectedId} onSelect={setSelectedId} />
           ) : (
-            <p className="text-sm text-zinc-500">Not processed yet.</p>
+            <p className="text-sm text-muted">Not started yet.</p>
           )}
-        </Card>
-        <Card className="lg:col-span-2" title="Span inspector">
+        </Panel>
+        <Panel className="lg:col-span-2" title="Step details">
           {selected ? (
             <Inspector span={selected} now={now} />
           ) : (
-            <p className="text-sm text-zinc-500">Select a step in the graph or a bar in the timeline.</p>
+            <p className="text-sm text-muted">Choose a step in the path or a bar in the timeline.</p>
           )}
-        </Card>
+        </Panel>
       </div>
 
-      <RunFacts detail={detail} />
+      <Story detail={detail} />
     </div>
   );
 }
@@ -170,179 +172,150 @@ function Timeline({
 }) {
   const { bars, totalMs } = layout(spans, now);
   return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-[10px] text-zinc-400">
-        <span>0 s</span>
-        <span>{formatSeconds(totalMs)}</span>
+    <div>
+      <div className="mb-2 flex justify-end text-xs text-faint">{formatSeconds(totalMs)} in total</div>
+      <div className="space-y-0.5">
+        {bars.map(({ span, offsetMs, widthMs, depth }) => (
+          <button
+            key={span.id}
+            type="button"
+            onClick={() => onSelect(span.id)}
+            className={`flex w-full items-center gap-3 rounded-md px-2 py-1 text-left text-sm hover:bg-wash ${selectedId === span.id ? "bg-wash ring-1 ring-rule" : ""}`}
+          >
+            <span className="w-40 shrink-0 truncate" style={{ paddingLeft: depth * 14 }}>
+              {span.name}
+            </span>
+            <span className="relative h-3 flex-1">
+              <span
+                className={`absolute top-0 h-3 rounded-full ${span.status === "running" ? "motion-safe:animate-pulse" : ""}`}
+                style={{
+                  left: `${(offsetMs / totalMs) * 100}%`,
+                  width: `max(${(widthMs / totalMs) * 100}%, 3px)`,
+                  background: span.status === "error" ? "#c42b3e" : KIND_STYLE[span.kind].color,
+                }}
+              />
+            </span>
+            <span className="w-14 shrink-0 text-right text-xs text-muted">{formatSeconds(widthMs)}</span>
+          </button>
+        ))}
       </div>
-      {bars.map(({ span, offsetMs, widthMs, depth }) => (
-        <button
-          key={span.id}
-          type="button"
-          onClick={() => onSelect(span.id)}
-          className={`group flex w-full items-center gap-2 rounded px-1 text-left text-xs hover:bg-zinc-50 ${selectedId === span.id ? "bg-zinc-100" : ""}`}
-        >
-          <span className="w-40 shrink-0 truncate" style={{ paddingLeft: depth * 12 }}>
-            {span.name}
-          </span>
-          <span className="relative h-4 flex-1 rounded bg-zinc-50">
-            <span
-              className={`absolute top-0.5 h-3 rounded ${span.status === "running" ? "animate-pulse" : ""}`}
-              style={{
-                left: `${(offsetMs / totalMs) * 100}%`,
-                width: `max(${(widthMs / totalMs) * 100}%, 2px)`,
-                background: span.status === "error" ? "#ef4444" : KIND_STYLE[span.kind].border,
-              }}
-            />
-          </span>
-          <span className="w-14 shrink-0 text-right tabular-nums text-zinc-500">
-            {formatSeconds(widthMs)}
-          </span>
-        </button>
-      ))}
     </div>
   );
 }
 
 function Inspector({ span, now }: { span: SpanDetail; now: number }) {
   return (
-    <div className="space-y-3 text-sm">
-      <div className="flex items-center gap-2">
+    <div className="space-y-4 text-sm">
+      <div className="flex flex-wrap items-center gap-2">
         <KindDot kind={span.kind} />
-        <span className="font-mono font-semibold">{span.name}</span>
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ${SPAN_STATUS[span.status]}`}
-        >
-          {span.status}
+        <span className="font-semibold">{span.name}</span>
+        <span className={span.status === "error" ? "text-error" : span.status === "ok" ? "text-kennel" : "text-code"}>
+          {span.status === "ok" ? "succeeded" : span.status === "error" ? "failed" : "running"}
         </span>
       </div>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-        <dt className="text-zinc-500">Duration</dt>
-        <dd className="tabular-nums">{formatSeconds(spanDurationMs(span, now))}</dd>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1">
+        <dt className="text-muted">Took</dt>
+        <dd>{formatSeconds(spanDurationMs(span, now))}</dd>
         {span.model && (
           <>
-            <dt className="text-zinc-500">Model</dt>
-            <dd className="font-mono">{span.model}</dd>
-            <dt className="text-zinc-500">Tokens</dt>
-            <dd className="tabular-nums">{formatTokens(span)}</dd>
-            <dt className="text-zinc-500">Cost</dt>
-            <dd className="tabular-nums">{formatCost(span.cost_usd)}</dd>
+            <dt className="text-muted">Model</dt>
+            <dd className="break-all">{span.model}</dd>
+            <dt className="text-muted">Tokens</dt>
+            <dd>{formatTokens(span)}</dd>
+            <dt className="text-muted">Cost</dt>
+            <dd>{formatCost(span.cost_usd)}</dd>
           </>
         )}
       </dl>
-      {span.error && (
-        <p className="rounded-lg bg-red-50 p-2 font-mono text-xs text-red-800">{span.error}</p>
-      )}
-      <Section title="Input" value={span.input} />
-      <Section title="Output" value={span.output} />
-      {Object.keys(span.attributes ?? {}).length > 0 && (
-        <Section title="Attributes" value={span.attributes} />
-      )}
+      {span.error && <p className="rounded-lg bg-error-soft p-3 text-error">{span.error}</p>}
+      <Payload title="Given" value={span.input} open />
+      <Payload title="Returned" value={span.output} open />
+      {Object.keys(span.attributes ?? {}).length > 0 && <Payload title="Attributes" value={span.attributes} />}
     </div>
   );
 }
 
-function Section({ title, value }: { title: string; value: unknown }) {
+function Payload({ title, value, open = false }: { title: string; value: unknown; open?: boolean }) {
   if (value === null || value === undefined) return null;
   return (
-    <details open={title !== "Attributes"}>
-      <summary className="cursor-pointer text-xs font-medium text-zinc-600">{title}</summary>
-      <div className="mt-1">
+    <details open={open}>
+      <summary className="cursor-pointer font-medium">{title}</summary>
+      <div className="mt-2">
         <Json value={value} />
       </div>
     </details>
   );
 }
 
-function RunFacts({ detail }: { detail: RequestDetail }) {
+function Story({ detail }: { detail: RequestDetail }) {
   const route = detail.steps.route as { target?: string; reasons?: string[] } | undefined;
   const resolution = detail.steps.resolution as
-    | { outcome?: string; reason?: string; proposal?: { summary: string; options: Record<string, unknown>[] } | null }
+    | { outcome?: string; proposal?: { summary: string; options: (Record<string, unknown> & { kind: string; verified?: boolean; remaining_problems?: string[] })[] } | null }
     | undefined;
-  const reply = detail.steps.reply as
-    | { situation?: string; flags?: string[]; draft?: { subject: string; body: string } }
-    | undefined;
+  const reply = detail.steps.reply as { flags?: string[]; draft?: { subject: string; body: string } } | undefined;
+  const letter = detail.message ?? (reply?.draft ? { ...reply.draft, kind: "draft" } : null);
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <Card title="Message received">
-        <p className="whitespace-pre-wrap text-sm text-zinc-700">{detail.raw_message}</p>
-      </Card>
-      <Card title="Decision trail">
-        <ol className="space-y-1 text-xs">
-          {detail.transitions.map((t, i) => (
-            <li key={i} className="flex gap-2">
-              <span className="w-20 shrink-0 tabular-nums text-zinc-400">
-                {new Date(t.at).toLocaleTimeString()}
-              </span>
-              <span className="font-medium">{t.to.replace("_", " ")}</span>
-              <span className="text-zinc-400">{t.actor}</span>
-              {t.reason && <span className="truncate text-zinc-600" title={t.reason}>{t.reason}</span>}
-            </li>
-          ))}
-        </ol>
-        {detail.last_error && (
-          <p className="mt-2 rounded bg-red-50 p-2 font-mono text-xs text-red-800">{detail.last_error}</p>
+      <div className="space-y-6">
+        <Panel title="What they asked">
+          <p className="whitespace-pre-wrap leading-relaxed">{detail.raw_message}</p>
+        </Panel>
+        {letter && (
+          <Panel title={detail.message ? "What was sent" : "Reply waiting to be sent"}>
+            <p className="font-medium">{letter.subject}</p>
+            <p className="mt-2 whitespace-pre-wrap leading-relaxed text-muted">{letter.body}</p>
+          </Panel>
         )}
-      </Card>
-      {route && (
-        <Card title={`Routing → ${route.target}`}>
-          {route.reasons && route.reasons.length > 0 ? (
-            <ul className="list-disc space-y-1 pl-5 text-sm">
-              {route.reasons.map((r) => (
-                <li key={r}>{r}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-zinc-600">Every check passed.</p>
-          )}
-        </Card>
-      )}
-      {resolution && (
-        <Card title={`Resolver: ${resolution.outcome}`}>
-          <p className="text-sm text-zinc-600">{resolution.reason}</p>
-          {resolution.proposal && (
-            <>
-              <p className="mt-2 text-sm">{resolution.proposal.summary}</p>
-              <ul className="mt-2 space-y-1 text-xs">
-                {resolution.proposal.options.map((o, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className={o.verified ? "text-emerald-700" : "text-red-700"}>
-                      {o.verified ? "verified" : "not verified"}
-                    </span>
-                    <span className="font-mono">{JSON.stringify(o)}</span>
+      </div>
+      <div className="space-y-6">
+        {route && (
+          <Panel title="Why it went this way">
+            {route.reasons?.length ? (
+              <ul className="space-y-1.5">
+                {route.reasons.map((r) => (
+                  <li key={r} className="flex gap-2">
+                    <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-signal" />
+                    {r}
                   </li>
                 ))}
               </ul>
-            </>
-          )}
-        </Card>
-      )}
-      {reply?.draft && (
-        <Card title={`Reply draft (${reply.situation})`}>
-          {reply.flags && reply.flags.length > 0 && (
-            <ul className="mb-2 space-y-1 text-xs text-amber-800">
-              {reply.flags.map((f) => (
-                <li key={f}>⚑ {f}</li>
-              ))}
-            </ul>
-          )}
-          <p className="text-sm font-medium">{reply.draft.subject}</p>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-700">{reply.draft.body}</p>
-        </Card>
-      )}
-      {detail.message && (
-        <Card title={`Sent: ${detail.message.kind}`}>
-          <p className="text-sm font-medium">{detail.message.subject}</p>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-700">{detail.message.body}</p>
-          {detail.approvals.map((a, i) => (
-            <p key={i} className="mt-2 text-xs text-zinc-500">
-              {a.action.replaceAll("_", " ")} by {a.staff_name}
-              {a.reason ? `: ${a.reason}` : ""}
-            </p>
-          ))}
-        </Card>
-      )}
+            ) : (
+              <p>Every check passed.</p>
+            )}
+            {resolution?.proposal && (
+              <div className="mt-5">
+                <p className="font-medium">Options found</p>
+                <p className="mt-1 text-sm text-muted">{resolution.proposal.summary}</p>
+                <ul className="mt-3 space-y-2">
+                  {resolution.proposal.options.map((o, i) => (
+                    <li key={i} className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg bg-wash px-3 py-2">
+                      <span>{optionText(o)}</span>
+                      <span className={`text-sm ${o.verified ? "text-kennel" : "text-error"}`}>
+                        {o.verified ? "Checked and works" : `Still blocked: ${o.remaining_problems?.join(", ")}`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </Panel>
+        )}
+        <Panel title="Every step it took">
+          <ol className="space-y-2 text-sm">
+            {detail.transitions.map((t, i) => (
+              <li key={i} className="grid grid-cols-[6.5rem_1fr] gap-3">
+                <span className="text-faint">{new Date(t.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+                <span>
+                  <span className="font-medium">{stateLabel(t.to)}</span>
+                  {t.actor === "staff" && <span className="ml-2 text-signal">by staff</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+          {detail.last_error && <p className="mt-3 rounded-lg bg-error-soft p-3 text-sm text-error">{detail.last_error}</p>}
+        </Panel>
+      </div>
     </div>
   );
 }

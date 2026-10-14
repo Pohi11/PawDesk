@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { ComparisonTable } from "@/components/comparison-table";
-import { Loading, PageHeader } from "@/components/ui";
+import { Loading, PageTitle } from "@/components/ui";
 import { backendJson } from "@/lib/backend";
 import { formatCost } from "@/lib/format";
 import type { EvalReport } from "@/lib/types";
@@ -9,78 +9,68 @@ import type { EvalReport } from "@/lib/types";
 export default function EvalsPage() {
   return (
     <>
-      <PageHeader title="Evals">
-        Every evaluation run, oldest first. Each is a dated report from a real run over a labeled
-        benchmark of synthetic data; nothing is estimated. Decision agreement and silent
-        disagreements (wrong and not flagged) are the safety numbers for vaccine reading.
-      </PageHeader>
-      <Suspense fallback={<Loading label="Loading reports…" />}>
+      <PageTitle title="Evals">
+        How well the model steps do on labeled, synthetic examples. Each result comes from one dated run
+        with real model calls.
+      </PageTitle>
+      <Suspense fallback={<Loading label="Loading results" />}>
         <Reports />
       </Suspense>
     </>
   );
 }
 
+const KIND: Record<string, string> = {
+  intake: "Reading booking messages",
+  records: "Reading vaccine certificates",
+};
+
+const MEASURE: Record<string, string> = {
+  cases_fully_matched: "Messages read completely right",
+  injections_sent_to_review: "Injection attempts sent to a person",
+  decision_agreement: "Decisions that match the truth",
+  silent_disagreements: "Wrong decisions nobody would notice",
+  vaccine_recall: "Vaccines found",
+  expiry_accuracy: "Expiry dates read right",
+  invented_expiries: "Expiry dates made up",
+  sent_to_review: "Certificates sent to a person",
+  errors: "Failed runs",
+};
+
 async function Reports() {
   const reports = await backendJson<EvalReport[]>("/evals");
   const comparison = reports.filter((r) => r.kind === "comparison").at(-1);
+  const readings = reports.filter((r) => r.kind !== "comparison").reverse();
   return (
-    <div className="space-y-6">
+    <div className="space-y-12">
       {comparison && <ComparisonTable report={comparison} />}
-      <ReportTable reports={reports} />
-    </div>
-  );
-}
-
-function ReportTable({ reports }: { reports: EvalReport[] }) {
-  return (
-    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-      <table className="w-full text-sm">
-        <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500">
-          <tr>
-            <th className="px-4 py-2">Run</th>
-            <th className="px-4 py-2">Kind</th>
-            <th className="px-4 py-2">Benchmark</th>
-            <th className="px-4 py-2">Prompt</th>
-            <th className="px-4 py-2">Results</th>
-            <th className="px-4 py-2 text-right">Cost</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-zinc-100 align-top">
-          {reports.map((r) => (
-            <tr key={r.file}>
-              <td className="px-4 py-2 text-zinc-500">
-                {r.run_at ? new Date(r.run_at).toLocaleString() : "—"}
-              </td>
-              <td className="px-4 py-2 font-medium">{r.kind}</td>
-              <td className="px-4 py-2">{r.benchmark ?? "—"}</td>
-              <td className="px-4 py-2 font-mono text-xs">
-                {r.prompt_version}
-                <div className="text-zinc-400">{r.model}</div>
-              </td>
-              <td className="px-4 py-2">
-                {r.kind === "comparison" ? (
-                  <span className="text-xs text-zinc-500">side by side above</span>
-                ) : (
-                <dl className="grid grid-cols-[auto_auto] gap-x-3 text-xs">
-                  {Object.entries(r.headline).map(([key, value]) => (
-                    <div key={key} className="contents">
-                      <dt className="text-zinc-500">{key.replaceAll("_", " ")}</dt>
-                      <dd
-                        className={`tabular-nums ${key === "silent_disagreements" && Number(value) > 0 ? "font-semibold text-red-700" : ""}`}
-                      >
-                        {String(value)}
-                      </dd>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold">Reading accuracy</h2>
+        <div className="grid gap-6 md:grid-cols-2">
+          {readings.map((r) => (
+            <article key={r.file} className="rounded-2xl bg-surface p-6 ring-1 ring-rule">
+              <h3 className="text-lg font-semibold">
+                {KIND[r.kind] ?? r.kind}
+                {r.benchmark && <span className="font-normal text-muted">, benchmark {r.benchmark}</span>}
+              </h3>
+              <p className="text-sm text-faint">
+                {r.run_at ? new Date(r.run_at).toLocaleDateString() : "Date unknown"}, prompt {r.prompt_version}, {formatCost(r.cost_usd)}
+              </p>
+              <dl className="mt-4 space-y-1.5">
+                {Object.entries(r.headline).map(([key, value]) => {
+                  const alarming = (key === "silent_disagreements" || key === "invented_expiries") && Number(value) > 0;
+                  return (
+                    <div key={key} className="flex justify-between gap-4">
+                      <dt className="text-muted">{MEASURE[key] ?? key.replaceAll("_", " ")}</dt>
+                      <dd className={alarming ? "font-semibold text-signal" : "font-medium"}>{String(value)}</dd>
                     </div>
-                  ))}
-                </dl>
-                )}
-              </td>
-              <td className="px-4 py-2 text-right tabular-nums">{formatCost(r.cost_usd)}</td>
-            </tr>
+                  );
+                })}
+              </dl>
+            </article>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </section>
     </div>
   );
 }

@@ -25,48 +25,49 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
       const edited = messages[sample.id] !== sample.message ? messages[sample.id] : undefined;
       router.push(await submitDemo(sample.id, edited));
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(e instanceof Error ? `Not sent: ${e.message}. Is the API running?` : String(e));
       setBusy(false);
     }
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="space-y-3">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <fieldset className="space-y-2">
+        <legend className="mb-2 text-sm font-medium">Choose a sample</legend>
         {samples.map((s) => (
-          <button
+          <label
             key={s.id}
-            type="button"
-            onClick={() => setChosen(s.id)}
-            className={`block w-full rounded-xl border p-4 text-left shadow-sm transition ${chosen === s.id ? "border-blue-500 bg-blue-50" : "border-zinc-200 bg-white hover:border-zinc-300"}`}
+            className={`block cursor-pointer rounded-2xl p-4 ring-1 ${chosen === s.id ? "bg-surface ring-2 ring-ink" : "ring-rule hover:bg-surface"}`}
           >
-            <div className="font-semibold">{s.title}</div>
-            <div className="mt-1 text-sm text-zinc-600">{s.expect}</div>
-            {s.certificate && (
-              <div className="mt-1 text-xs text-zinc-400">with certificate {s.certificate}</div>
-            )}
-          </button>
+            <input type="radio" name="sample" value={s.id} checked={chosen === s.id} onChange={() => setChosen(s.id)} className="sr-only" />
+            <span className="block font-display text-lg font-semibold">{s.title}</span>
+            <span className="mt-1 block text-sm text-muted">{s.expect}</span>
+          </label>
         ))}
-      </div>
+      </fieldset>
       {sample && (
-        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <label className="block text-sm">
-            <span className="text-xs font-medium text-zinc-600">Message from the pet parent</span>
+        <div className="rounded-2xl bg-surface p-6 ring-1 ring-rule">
+          <label className="block">
+            <span className="text-sm font-medium">Message from the pet parent</span>
             <textarea
-              className="mt-1 h-48 w-full rounded-lg border border-zinc-300 p-2 text-sm"
+              className="mt-2 h-48 w-full rounded-lg bg-wash p-3 leading-relaxed ring-1 ring-rule"
               value={messages[sample.id]}
               onChange={(e) => setMessages({ ...messages, [sample.id]: e.target.value })}
             />
           </label>
+          <p className="mt-2 text-sm text-faint">
+            {sample.certificate ? "A vaccine certificate photo is attached." : "No certificate is attached."} You can edit the
+            message before sending.
+          </p>
           <button
             type="button"
             disabled={busy || !messages[sample.id]?.trim()}
             onClick={submit}
-            className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+            className="mt-5 rounded-full bg-ink px-6 py-2.5 font-medium text-white disabled:opacity-40"
           >
-            {busy ? "Submitting…" : "Submit and watch the run"}
+            {busy ? "Sending" : "Send and watch it run"}
           </button>
-          {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+          {error && <p className="mt-3 text-error">{error}</p>}
         </div>
       )}
     </div>
