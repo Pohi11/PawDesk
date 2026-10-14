@@ -2,7 +2,7 @@
 
 ## 1. Generator
 
-- [ ] 1.1 Add `app/demo_generator.py` (request, scenario, and records from a seed) and `app/certificate_card.py` (the card drawn with Pillow), and move Pillow to the runtime dependencies. Verify with `tests/test_demo_generator.py` against a seeded database: same seed gives an identical request and image, seeds vary pets, services, and scenarios, the card names the pet and owner, and scenario dates checked alone give the expected compliance status.
+- [x] 1.1 Add `app/demo_generator.py` (request, scenario, and records from a seed) and `app/certificate_card.py` (the card drawn with Pillow), and move Pillow to the runtime dependencies. Verify with `tests/test_demo_generator.py` against a seeded database: same seed gives an identical request and image, seeds vary pets, services, and scenarios, the card names the pet and owner, and scenario dates checked alone give the expected compliance status.
 
 ## 2. API
 
