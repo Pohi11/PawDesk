@@ -7,6 +7,9 @@ same transaction as the state change that follows it, so a crashed run resumes f
 request's state and reads saved results instead of redoing finished work.
 
     received --start--> extracting --extract--> checking --check+route--> drafting | resolving
+                            |  model failure                              (stop here: later
+                            v                                               phases continue)
+                          failed --retry (next run)--> back to the step that failed
 """
 
 import asyncio
@@ -26,14 +29,28 @@ from app.documents import load_certificate
 from app.enums import Service, SpanKind, Step, Vaccine
 from app.intake import BookingIntent, IntakeResult, load_pets, run_intake
 from app.lifecycle import Actor, State
+from app.llm import LLMError
 from app.models import BookingRequest, BookingStepResult, Facility, Pet
 from app.records import RecordsResult, pet_name_mismatch, run_records
+from app.structured import InvalidModelOutput
 from app.tracing import Tracer, span
 from app.transitions import transition
 
 NO_CERTIFICATE = "no certificate provided"
 PET_UNKNOWN = "pet unknown: compliance and capacity not checked"
 STAY_UNUSABLE = "service or dates unusable: compliance and capacity not checked"
+
+MAX_ERROR_CHARS = 1000
+
+# Expected ways for a step to fail: the model was unavailable, or its output stayed invalid
+# after the repair attempt. These move the request to `failed`, to be retried. Anything else
+# is a bug: it propagates and leaves the request in its working state (design D6).
+STEP_ERRORS = (LLMError, InvalidModelOutput)
+
+
+class StepFailed(Exception):
+    """One or both extraction steps failed in an expected way (see STEP_ERRORS)."""
+
 
 # Called with the state whose work just committed (tests and the command line use it to
 # stop a run at a chosen checkpoint, like a killed process would).
@@ -67,27 +84,62 @@ async def process_request(
     `today` is the facility-local date (computed from the facility's time zone when None).
     `llm_kwargs` pass through to the model client (client, settings, policy) for tests.
     """
-    status = await _status(sessions, request_id)
-    if status not in STEPS:
+    status, failed_step = await _status(sessions, request_id)
+    retryable = status == State.FAILED and failed_step in STEPS
+    if status not in STEPS and not retryable:
         return status  # finished or waiting on a later phase: nothing to do, nothing traced
 
     run = _Run(request_id, sessions, today, crash_after, llm_kwargs)
     tracer = tracer or Tracer(sessions)
     async with tracer.start_trace("process booking", booking_request_id=request_id):
+        if retryable:
+            status = await _retry(run, failed_step)
         while status in STEPS:
-            previous, status = status, await STEPS[status](run)
+            previous = status
+            try:
+                status = await STEPS[status](run)
+            except (StepFailed, *STEP_ERRORS) as exc:
+                # Stop here. Retrying straight away would usually fail the same way; the
+                # next run retries from the failed step.
+                return await _fail(run, exc)
             run.checkpoint(previous)
     return status
 
 
-async def _status(sessions: async_sessionmaker[AsyncSession], request_id: uuid.UUID) -> State:
+async def _status(
+    sessions: async_sessionmaker[AsyncSession], request_id: uuid.UUID
+) -> tuple[State, State | None]:
     async with sessions() as session:
-        status = await session.scalar(
-            select(BookingRequest.status).where(BookingRequest.id == request_id)
-        )
-    if status is None:
+        row = (
+            await session.execute(
+                select(BookingRequest.status, BookingRequest.failed_step).where(
+                    BookingRequest.id == request_id
+                )
+            )
+        ).one_or_none()
+    if row is None:
         raise LookupError(f"no booking request {request_id}")
-    return status
+    return row.status, row.failed_step
+
+
+async def _retry(run: _Run, failed_step: State) -> State:
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        await transition(session, request, failed_step, Actor.SYSTEM, reason="retry")
+        await session.commit()
+    return failed_step
+
+
+async def _fail(run: _Run, exc: Exception) -> State:
+    # A fresh session: whatever the failed step had in flight was never committed.
+    error = str(exc) if isinstance(exc, StepFailed) else f"{type(exc).__name__}: {exc}"
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        await transition(
+            session, request, State.FAILED, Actor.SYSTEM, error=error[:MAX_ERROR_CHARS]
+        )
+        await session.commit()
+    return State.FAILED
 
 
 # --- Steps: each one commits its work and the state change together -------------------
@@ -137,9 +189,7 @@ async def _extract(run: _Run) -> State:
             _records_or_skip(inputs, today, run.llm_kwargs),
             return_exceptions=True,  # let both finish, so neither leaves a span open
         )
-        for result in (intake, records):
-            if isinstance(result, BaseException):
-                raise result
+        _raise_failures(intake=intake, records=records)
         outputs = {Step.INTAKE: _intake_output(intake), Step.RECORDS: _records_output(records)}
         s.output = {str(step): out["outcome"] for step, out in outputs.items()}
 
@@ -153,6 +203,19 @@ async def _extract(run: _Run) -> State:
         await transition(session, request, State.CHECKING, Actor.SYSTEM)
         await session.commit()
     return State.CHECKING
+
+
+def _raise_failures(**results: object) -> None:
+    """Re-raise a bug or a cancellation as is; report expected failures from either step
+    together, so the recorded error names every step that failed."""
+    expected = []
+    for name, result in results.items():
+        if isinstance(result, STEP_ERRORS):
+            expected.append(f"{name}: {type(result).__name__}: {result}")
+        elif isinstance(result, BaseException):
+            raise result
+    if expected:
+        raise StepFailed("; ".join(expected))
 
 
 async def _records_or_skip(

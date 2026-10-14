@@ -397,3 +397,163 @@ async def test_traced_run(committed, submit, process):
     }
     assert sum(s.cost_usd or Decimal(0) for s in spans) > 0
     assert len({s.trace_id for s in spans}) == 1
+
+
+# --- A crashed run resumes without repeating finished work -----------------------------
+
+
+class Crash(BaseException):
+    """Stands in for a killed process: a BaseException skips every `except Exception`."""
+
+
+def crash_after(state):
+    def hook(finished):
+        if finished == state:
+            raise Crash(f"killed after {state}")
+
+    return hook
+
+
+async def trace_count(committed, request_id) -> int:
+    async with committed() as s:
+        rows = await s.scalars(select(Trace.id).where(Trace.booking_request_id == request_id))
+        return len(list(rows))
+
+
+@spec("booking-orchestration", "A crashed run resumes without repeating finished work")
+async def test_crash_after_extraction_resumes_without_model_calls(committed, submit, process):
+    request_id = await submit()
+    with pytest.raises(Crash):
+        await process(request_id, FakeModel(), crash_after=crash_after(State.EXTRACTING))
+    assert set(await saved(committed, request_id)) == {Step.INTAKE, Step.RECORDS}
+
+    second = FakeModel()
+    state = await process(request_id, second)
+
+    assert state == State.DRAFTING
+    assert second.total_calls == 0
+    assert set(await saved(committed, request_id)) == set(Step)
+
+
+@spec("booking-orchestration", "A crashed run resumes without repeating finished work")
+async def test_crash_during_extraction_repeats_only_extraction(committed, submit, process):
+    request_id = await submit()
+    with pytest.raises(Crash):
+        await process(request_id, FakeModel(), crash_after=crash_after(State.RECEIVED))
+    assert await saved(committed, request_id) == {}
+
+    second = FakeModel()
+    state = await process(request_id, second)
+
+    async with committed() as s:
+        steps = list(
+            await s.scalars(
+                select(BookingStepResult.step).where(
+                    BookingStepResult.booking_request_id == request_id
+                )
+            )
+        )
+    assert state == State.DRAFTING
+    assert second.calls == {"intake": 1, "records": 1}
+    assert sorted(steps) == sorted(Step)  # exactly one result per step
+    assert await states(committed, request_id) == [
+        State.EXTRACTING,
+        State.CHECKING,
+        State.DRAFTING,
+    ]
+
+
+@spec("booking-orchestration", "A crashed run resumes without repeating finished work")
+async def test_finished_request_is_left_alone(committed, submit, process):
+    request_id = await submit()
+    await process(request_id, FakeModel())
+    before = (await states(committed, request_id), await trace_count(committed, request_id))
+
+    again = FakeModel()
+    state = await process(request_id, again)
+
+    assert state == State.DRAFTING
+    assert again.total_calls == 0
+    assert (await states(committed, request_id), await trace_count(committed, request_id)) == (
+        before
+    )
+
+
+# --- Step failures are recorded and retried --------------------------------------------
+
+
+async def request_row(committed, request_id) -> BookingRequest:
+    async with committed() as s:
+        return await s.get(BookingRequest, request_id)
+
+
+@spec("booking-orchestration", "Step failures are recorded and retried")
+async def test_model_unavailable_during_extraction(committed, submit, process):
+    request_id = await submit()
+    model = FakeModel(intake=503)
+
+    state = await process(request_id, model)
+
+    request = await request_row(committed, request_id)
+    assert state == request.status == State.FAILED
+    assert request.failed_step == State.EXTRACTING
+    assert request.last_error.startswith("intake: LLMError:")
+    assert model.calls == {"intake": 2, "records": 1}  # records still ran to completion
+    assert await saved(committed, request_id) == {}
+    spans = await spans_of(committed, request_id)
+    assert all(s.status != "running" for s in spans)
+    assert {s.name: s.status for s in spans}["extract"] == "error"
+
+
+@spec("booking-orchestration", "Step failures are recorded and retried")
+async def test_both_failures_are_recorded(committed, submit, process):
+    request_id = await submit()
+
+    await process(request_id, FakeModel(intake=503, records=401))
+
+    error = (await request_row(committed, request_id)).last_error
+    assert "intake: LLMError" in error and "records: LLMError" in error
+
+
+@spec("booking-orchestration", "Step failures are recorded and retried")
+async def test_output_still_invalid_after_repair_fails_the_step(committed, submit, process):
+    request_id = await submit()
+
+    await process(request_id, FakeModel(intake={"approved": True}))
+
+    request = await request_row(committed, request_id)
+    assert (request.status, request.failed_step) == (State.FAILED, State.EXTRACTING)
+    assert "IntakeInvalidOutput" in request.last_error
+
+
+@spec("booking-orchestration", "Step failures are recorded and retried")
+async def test_retry_after_failure(committed, submit, process):
+    request_id = await submit()
+    await process(request_id, FakeModel(intake=503))
+
+    state = await process(request_id, FakeModel())
+
+    request = await request_row(committed, request_id)
+    assert state == State.DRAFTING
+    assert (request.failed_step, request.last_error) == (None, None)
+    assert await states(committed, request_id) == [
+        State.EXTRACTING,
+        State.FAILED,
+        State.EXTRACTING,
+        State.CHECKING,
+        State.DRAFTING,
+    ]
+
+
+@spec("booking-orchestration", "Step failures are recorded and retried")
+async def test_a_bug_is_not_hidden_as_a_failed_step(committed, submit, process, monkeypatch):
+    request_id = await submit()
+
+    async def broken(*args, **kwargs):
+        raise KeyError("bug in the records step")
+
+    monkeypatch.setattr(orchestrator, "run_records", broken)
+    with pytest.raises(KeyError):
+        await process(request_id, FakeModel())
+
+    assert (await request_row(committed, request_id)).status == State.EXTRACTING
