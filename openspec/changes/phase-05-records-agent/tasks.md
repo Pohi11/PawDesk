@@ -12,7 +12,7 @@
 ## 3. Synthetic certificates
 
 - [x] 3.1 Add `playwright` and `pillow` as dev dependencies, install Chromium, vendor OFL fonts with their licenses, and implement the pure ground-truth generator. Verify with `tests/test_certificates.py`, covering deterministic truth, variant coverage, synthetic marking in the rendered HTML, and fictional names.
-- [ ] 3.2 Render the 36-certificate set with `uv run python -m scripts.generate_certificates`. Verify that 36 PNGs and `truth.json` exist, and that the loaded-set test (each image has truth, at least 30) passes.
+- [x] 3.2 Render the 36-certificate set with `uv run python -m scripts.generate_certificates`. Verify that 36 PNGs and `truth.json` exist, and that the loaded-set test (each image has truth, at least 30) passes.
 
 ## 4. Evaluation
 
