@@ -2,7 +2,7 @@
 
 ## 1. Database access layer
 
-- [ ] 1.1 Add `sqlalchemy[asyncio]`, `alembic`, and `pytest-asyncio` to the backend. Verify with `uv sync` and `uv run python -c "import sqlalchemy, alembic"`.
+- [x] 1.1 Add `sqlalchemy[asyncio]`, `alembic`, and `pytest-asyncio` to the backend. Verify with `uv sync` and `uv run python -c "import sqlalchemy, alembic"`.
 - [x] 1.2 Add `app/db.py`: an async engine and session factory built from `DATABASE_URL`, rewriting the scheme to `postgresql+psycopg://`. Verify with `tests/test_db.py::test_engine_executes_select_1`.
 - [ ] 1.3 Write [decision record 0003](../../../docs/decisions/0003-async-database-access.md) (async database access). Verify the file exists and that design D1 links to it.
 

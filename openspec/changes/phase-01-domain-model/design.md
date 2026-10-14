@@ -25,8 +25,9 @@ Later phases constrain this design:
 
 ## Decisions
 
-### D1. Async SQLAlchemy 2 with the psycopg 3 driver
-Database access uses SQLAlchemy 2's async engine (`postgresql+psycopg://`), so the asyncio orchestrator never blocks the event loop on a database call. Relationships default to `lazy="raise"`. An accidental implicit load fails loudly instead of triggering a hidden query, which async SQLAlchemy cannot run anyway.
+### D1. Async SQLAlchemy 2 with the asyncpg driver
+Database access uses SQLAlchemy 2's async engine with the asyncpg driver (`postgresql+asyncpg://`), so the asyncio orchestrator never blocks the event loop on a database call. Relationships default to `lazy="raise"`. An accidental implicit load fails loudly instead of triggering a hidden query, which async SQLAlchemy cannot run anyway.
+- *Driver:* psycopg 3's async mode refuses Windows' default `ProactorEventLoop`, which would require loop workarounds in the tests, Alembic, scripts, and uvicorn on Windows hosts. asyncpg works on both event loops and is the most widely used async driver with SQLAlchemy. The sync `/health/db` probe keeps using psycopg.
 - *Alternatives:* sync SQLAlchemy run in a thread pool (simpler, but every database call from async code needs wrapping); SQLModel (thin layer on SQLAlchemy that lags behind it); raw SQL (no unit of work, no migrations autogenerate).
 - This choice applies to every later change. It is recorded as [decision record 0003](../../../docs/decisions/0003-async-database-access.md).
 

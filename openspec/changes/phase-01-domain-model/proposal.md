@@ -30,7 +30,7 @@ None. This is the first change with spec-level behavior.
 
 ## Impact
 
-- **Backend:** New dependencies: SQLAlchemy 2 (async), Alembic, and an async pytest plugin. New modules for the ORM models, the lifecycle guard and transition service, a seed command, and Alembic migrations.
+- **Backend:** New dependencies: SQLAlchemy 2 (async) with the asyncpg driver, Alembic, and an async pytest plugin. New modules for the ORM models, the lifecycle guard and transition service, a seed command, and Alembic migrations.
 - **Database:** Postgres 18 with the `btree_gist` extension (needed for the reservation-overlap constraint). Primary keys use Postgres 18's built-in `uuidv7()`.
 - **Tests:** A separate test database, created and migrated automatically. Tests now run against a real Postgres schema.
 - **Out of scope:** HTTP endpoints for these records, the compliance and capacity logic (Phase 2), step orchestration and crash resume (Phase 6), and pet-parent cancellation.
