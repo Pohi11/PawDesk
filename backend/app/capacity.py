@@ -22,21 +22,40 @@ async def find_kennel(
     Advisory only: another transaction can take the kennel before it is reserved. The
     exclusion constraint on reservations remains the real guarantee against double-booking.
     """
-    if end <= start:
-        raise ValueError(f"a stay needs at least one night (got {start} to {end})")
-
-    stay = func.daterange(literal(start, Date), literal(end, Date), NIGHTS)
-    booked = select(Reservation.id).where(
-        Reservation.kennel_id == Kennel.id,  # correlated to the outer kennel row
-        func.daterange(Reservation.start_date, Reservation.end_date, NIGHTS).op("&&")(stay),
-    )
     return await session.scalar(
         select(Kennel)
         .where(
             Kennel.facility_id == facility_id,
             Kennel.size_class == size_class,
-            ~exists(booked),
+            ~_booked(start, end),
         )
         .order_by(Kennel.name)
         .limit(1)
+    )
+
+
+async def free_kennel_counts(
+    session: AsyncSession, facility_id: uuid.UUID, start: date, end: date
+) -> dict[SizeClass, int]:
+    """How many kennels of each size class the facility has free for every night of the
+    stay. Size classes the facility has but can't offer appear with 0."""
+    free = func.count().filter(~_booked(start, end))
+    rows = await session.execute(
+        select(Kennel.size_class, free)
+        .where(Kennel.facility_id == facility_id)
+        .group_by(Kennel.size_class)
+    )
+    return {SizeClass(size): count for size, count in rows}
+
+
+def _booked(start: date, end: date):
+    """EXISTS a reservation on the outer kennel row that shares a night with the stay."""
+    if end <= start:
+        raise ValueError(f"a stay needs at least one night (got {start} to {end})")
+    stay = func.daterange(literal(start, Date), literal(end, Date), NIGHTS)
+    return exists(
+        select(Reservation.id).where(
+            Reservation.kennel_id == Kennel.id,  # correlated to the outer kennel row
+            func.daterange(Reservation.start_date, Reservation.end_date, NIGHTS).op("&&")(stay),
+        )
     )

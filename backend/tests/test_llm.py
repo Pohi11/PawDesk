@@ -138,6 +138,25 @@ def ok(**kw):
     return httpx.Response(200, json=ok_body(**kw))
 
 
+def tool_calls(*calls, cost=0.0001):
+    """A response asking for tool calls: each call is (name, arguments as a dict or raw str)."""
+    body = ok_body(text=None, cost=cost)
+    message = body["choices"][0]["message"]
+    message["tool_calls"] = [
+        {
+            "id": f"call-{n}",
+            "type": "function",
+            "function": {
+                "name": name,
+                "arguments": args if isinstance(args, str) else json.dumps(args),
+            },
+        }
+        for n, (name, args) in enumerate(calls, 1)
+    ]
+    body["choices"][0]["finish_reason"] = "tool_calls"
+    return httpx.Response(200, json=body)
+
+
 def fail(status, retry_after=None):
     headers = {"retry-after": str(retry_after)} if retry_after is not None else {}
     body = {"error": {"code": status, "message": "nope"}}
@@ -418,3 +437,62 @@ async def test_slow_attempt_is_cut_off_by_wall_clock(tracer):
     assert calls == 2
     assert raised.value.attempts == 2
     assert "timeout" in str(raised.value)
+
+
+TOOL = {
+    "type": "function",
+    "function": {
+        "name": "check_kennel_sizes",
+        "description": "Free kennels per size class.",
+        "parameters": {"type": "object", "properties": {}, "additionalProperties": False},
+    },
+}
+
+
+@spec("llm-client", "Model calls can offer tools")
+async def test_model_requests_a_tool(tracer, engine):
+    script = Script(tool_calls(("check_kennel_sizes", {"start_date": "2027-03-10"})))
+    settings = fake_settings()
+    client = make_client(settings, transport=httpx.MockTransport(script))
+
+    async with tracer.start_trace("t"):
+        result = await complete(
+            [{"role": "user", "content": "hi"}],
+            name="x",
+            tools=[TOOL],
+            client=client,
+            settings=settings,
+        )
+
+    [call] = result.tool_calls
+    assert (call.id, call.name, json.loads(call.arguments)) == (
+        "call-1",
+        "check_kennel_sizes",
+        {"start_date": "2027-03-10"},
+    )
+    assert result.assistant_message["tool_calls"][0]["id"] == "call-1"
+    assert json.loads(script.requests[0].content)["tools"] == [TOOL]
+    async with make_sessionmaker(engine)() as s:
+        stored = await s.get(Span, result.span_id)
+    assert stored.output["tool_calls"] == [
+        {"name": "check_kennel_sizes", "arguments": call.arguments}
+    ]
+
+
+@spec("llm-client", "Model calls can offer tools")
+async def test_tools_require_supporting_endpoints(tracer):
+    script = Script(ok())
+    settings = fake_settings()
+    client = make_client(settings, transport=httpx.MockTransport(script))
+
+    async with tracer.start_trace("t"):
+        result = await complete(
+            [{"role": "user", "content": "hi"}],
+            name="x",
+            tools=[TOOL],
+            client=client,
+            settings=settings,
+        )
+
+    assert json.loads(script.requests[0].content)["provider"] == {"require_parameters": True}
+    assert (result.tool_calls, result.assistant_message["role"]) == ((), "assistant")
