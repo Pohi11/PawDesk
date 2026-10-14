@@ -1,25 +1,35 @@
 """Spec: booking-resolution, the resolver's tools against a real database."""
 
+import json
 from datetime import date
 
+import httpx
 import pytest
 from pydantic import ValidationError
 
 from app.compliance import VaccineEvidence
 from app.enums import Service, SizeClass, Species, Vaccine
+from app.llm import RetryPolicy, make_client
 from app.models import Facility, Kennel, Owner, Pet, Reservation
 from app.resolver import (
+    MAX_TURNS,
+    PROPOSE,
     CheckKennelSizes,
     FindAlternativeDates,
     ListMissingVaccines,
     ProposeOffer,
+    RequestFacts,
+    ResolutionOutcome,
+    Scope,
     ToolContext,
     ToolError,
     check_kennel_sizes,
     check_offer,
     find_alternative_dates,
     list_missing_vaccines,
+    resolve,
 )
+from tests.test_llm import Script, fake_settings, ok, tool_calls
 
 spec = pytest.mark.spec
 TODAY = date(2027, 3, 3)
@@ -157,3 +167,192 @@ async def test_kennel_that_is_not_larger_is_refused(ctx, size):
 
     with pytest.raises(ToolError, match="larger than medium"):
         check_offer(ctx, offer)
+
+
+# --- The loop, against scripted model turns ----------------------------------------------
+
+
+@pytest.fixture
+def covered(ctx):
+    """The same request, with bordetella covering every window."""
+    return ToolContext(**(vars(ctx) | {"evidence": evidence(date(2027, 9, 1))}))
+
+
+@pytest.fixture
+def run_resolver(session, tracer):
+    async def run(ctx, *turns):
+        script = Script(*turns)
+        settings = fake_settings()
+        client = make_client(settings, transport=httpx.MockTransport(script))
+        facts = RequestFacts("boarding", "dog", "medium", START, END, TODAY)
+        scope = Scope(capacity_full=True)
+        async with tracer.start_trace("resolver test"):
+            resolution = await resolve(
+                session,
+                ctx,
+                facts,
+                scope,
+                client=client,
+                settings=settings,
+                policy=RetryPolicy(max_attempts=1),
+            )
+        return resolution, script
+
+    return run
+
+
+def sent(script, n) -> list[dict]:
+    """The messages of the n-th model request (0-based)."""
+    return json.loads(script.requests[n].content)["messages"]
+
+
+FIND = ("find_alternative_dates", {"max_shift_days": 7})
+LATER = {"kind": "alternative_dates", "start_date": "2027-03-13", "end_date": "2027-03-16"}
+
+
+def propose(*options, summary="Same stay three days later; M1 is free."):
+    return ("propose_offer", {"options": list(options), "summary": summary})
+
+
+@spec("booking-resolution", "The loop stops when done, stuck, or out of steps")
+async def test_proposal_ends_the_loop(run_resolver, covered):
+    resolution, script = await run_resolver(covered, tool_calls(FIND), tool_calls(propose(LATER)))
+
+    assert (resolution.outcome, resolution.turns, len(script.requests)) == (
+        ResolutionOutcome.PROPOSED,
+        2,
+        2,
+    )
+    assert [c["name"] for c in resolution.tool_calls] == ["find_alternative_dates", PROPOSE]
+    windows = json.loads(sent(script, 1)[-1]["content"])["windows"]
+    assert windows[0]["start_date"] == "2027-03-13"  # the tool result went back to the model
+
+
+@spec("booking-resolution", "The loop stops when done, stuck, or out of steps")
+async def test_repeated_call_is_stuck(run_resolver, covered):
+    resolution, script = await run_resolver(
+        covered, tool_calls(FIND), tool_calls(FIND), tool_calls(propose(LATER))
+    )
+
+    assert resolution.outcome == ResolutionOutcome.ESCALATED
+    assert resolution.reason == "stuck: repeated find_alternative_dates with the same arguments"
+    assert len(script.requests) == 2  # no further model call
+    assert script.steps  # the third answer was never asked for
+
+
+@spec("booking-resolution", "The loop stops when done, stuck, or out of steps")
+async def test_repeat_is_caught_even_with_other_calls_in_between(run_resolver, covered):
+    window = {"start_date": "2027-03-13", "end_date": "2027-03-16"}
+    resolution, script = await run_resolver(
+        covered,
+        tool_calls(FIND),
+        tool_calls(("check_kennel_sizes", window)),
+        tool_calls(("find_alternative_dates", '{ "max_shift_days" : 7 }')),  # same, reformatted
+    )
+
+    assert resolution.reason.startswith("stuck: repeated find_alternative_dates")
+    assert len(script.requests) == 3
+
+
+@spec("booking-resolution", "The loop stops when done, stuck, or out of steps")
+async def test_step_limit(run_resolver, covered):
+    turns = [tool_calls(("find_alternative_dates", {"max_shift_days": n})) for n in range(1, 8)]
+
+    resolution, script = await run_resolver(covered, *turns)
+
+    assert resolution.outcome == ResolutionOutcome.ESCALATED
+    assert resolution.reason == f"step limit: {MAX_TURNS} model calls"
+    assert len(script.requests) == MAX_TURNS == 6
+
+
+@spec("booking-resolution", "The loop stops when done, stuck, or out of steps")
+async def test_tool_call_limit(run_resolver, covered):
+    many = [("find_alternative_dates", {"max_shift_days": n}) for n in range(1, 15)]
+
+    resolution, _ = await run_resolver(covered, tool_calls(*many))
+
+    assert resolution.reason == "step limit: 12 tool calls"
+    assert len(resolution.tool_calls) == 12
+
+
+@spec("booking-resolution", "The loop stops when done, stuck, or out of steps")
+async def test_answer_without_a_proposal(run_resolver, covered):
+    resolution, _ = await run_resolver(covered, ok(text="Sorry, I can't find anything."))
+
+    assert resolution.outcome == ResolutionOutcome.ESCALATED
+    assert resolution.reason.startswith("no proposal")
+
+
+@spec("booking-resolution", "Tools only read and are bound to the request")
+async def test_unknown_tool_is_answered_and_nothing_is_approved(run_resolver, covered):
+    resolution, script = await run_resolver(
+        covered,
+        tool_calls(("approve_booking", {"approved": True})),
+        tool_calls(propose(LATER)),
+    )
+
+    error = json.loads(sent(script, 1)[-1]["content"])["error"]
+    assert error.startswith("unknown tool 'approve_booking'")
+    assert resolution.tool_calls[0]["error"] == error
+    assert resolution.outcome == ResolutionOutcome.PROPOSED  # the loop went on
+
+
+@spec("booking-resolution", "Tools only read and are bound to the request")
+async def test_invalid_arguments_are_answered_with_an_error(run_resolver, covered):
+    backwards = {"start_date": "2027-03-13", "end_date": "2027-03-10"}
+    resolution, script = await run_resolver(
+        covered,
+        tool_calls(("list_missing_vaccines", backwards)),
+        tool_calls(("list_missing_vaccines", "not json")),
+        tool_calls(propose(LATER)),
+    )
+
+    assert "end_date is before start_date" in json.loads(sent(script, 1)[-1]["content"])["error"]
+    assert json.loads(sent(script, 2)[-1]["content"]) == {"error": "arguments are not valid JSON"}
+    assert resolution.outcome == ResolutionOutcome.PROPOSED
+
+
+@spec("booking-resolution", "Proposals are verified by code and never approve")
+async def test_verified_alternative(run_resolver, covered):
+    resolution, _ = await run_resolver(covered, tool_calls(propose(LATER)))
+
+    [option] = resolution.proposal["options"]
+    assert option == LATER | {"verified": True, "remaining_problems": []}
+
+
+@spec("booking-resolution", "Proposals are verified by code and never approve")
+async def test_unverified_alternative(run_resolver, ctx):
+    requested = {"kind": "alternative_dates", "start_date": "2027-03-10", "end_date": "2027-03-13"}
+    upgrade = {"kind": "larger_kennel", "size_class": "large"}
+    resolution, _ = await run_resolver(ctx, tool_calls(propose(requested, upgrade, LATER)))
+
+    full, larger, later = resolution.proposal["options"]
+    assert full["verified"] is False
+    assert full["remaining_problems"] == [
+        "capacity: no free medium kennel for 2027-03-10 to 2027-03-13"
+    ]
+    assert (larger["verified"], larger["remaining_problems"]) == (True, [])
+    assert later["remaining_problems"] == ["vaccine bordetella: expires_during_stay"]
+
+
+@spec("booking-resolution", "Proposals are verified by code and never approve")
+async def test_vaccine_update_must_name_exactly_the_failing_vaccines(run_resolver, ctx):
+    exact = {"kind": "vaccine_update", "vaccines": ["bordetella"]}
+    resolution, _ = await run_resolver(ctx, tool_calls(propose(exact)))
+
+    # Bordetella covers the requested stay, so nothing is failing and the update is wrong.
+    [option] = resolution.proposal["options"]
+    assert option["verified"] is False
+    assert any("failing vaccines are []" in p for p in option["remaining_problems"])
+
+
+@spec("booking-resolution", "Proposals are verified by code and never approve")
+async def test_smaller_kennel_is_answered_and_the_loop_continues(run_resolver, covered):
+    smaller = {"kind": "larger_kennel", "size_class": "small"}
+    resolution, script = await run_resolver(
+        covered, tool_calls(propose(smaller)), tool_calls(propose(LATER))
+    )
+
+    assert "larger than medium" in json.loads(sent(script, 1)[-1]["content"])["error"]
+    assert resolution.outcome == ResolutionOutcome.PROPOSED
+    assert resolution.turns == 2

@@ -9,6 +9,7 @@ Fenced in on every side:
 - every proposed option is re-checked by code, and nothing it returns can approve.
 """
 
+import json
 import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
@@ -16,14 +17,24 @@ from datetime import date, timedelta
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    ValidationError,
+    model_validator,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.capacity import find_kennel, free_kennel_counts
 from app.compliance import VaccineEvidence, VaccineStatus, check
-from app.enums import Service, SizeClass, Species, Vaccine
+from app.enums import Service, SizeClass, SpanKind, Species, Vaccine
 from app.intake import BOOKING_HORIZON_DAYS
-from app.structured import strict_json_schema
+from app.llm import ToolCall, complete
+from app.prompts.resolver import PROMPT_VERSION, build_messages
+from app.structured import strict_json_schema, validation_errors
+from app.tracing import span
 
 # Vaccine problems an alternative can address: other dates, or an updated record. An
 # unknown expiry needs a person to read the record, so it is not on this list.
@@ -138,7 +149,7 @@ MAX_WINDOWS = 5
 DOG_SIZES = (SizeClass.SMALL, SizeClass.MEDIUM, SizeClass.LARGE, SizeClass.XLARGE)
 
 
-class ToolError(Exception):
+class ToolError(ValueError):
     """A problem the model can fix by calling differently. Returned to it as data."""
 
 
@@ -344,3 +355,162 @@ PROPOSE = "propose_offer"
 TOOL_SCHEMAS = [tool_schema(name, args) for name, (args, _) in READ_TOOLS.items()] + [
     tool_schema(PROPOSE, ProposeOffer)
 ]
+
+
+# --- Verification: code re-checks every proposed option (design D6) --------------------
+
+
+async def verify_option(session: AsyncSession, ctx: ToolContext, option: Option) -> dict[str, Any]:
+    """The problems that would remain if the customer took this option. Verified = none."""
+    start, end, size = ctx.start, ctx.end, ctx.size_class
+    if isinstance(option, AlternativeDatesOption):
+        start, end = option.start_date, option.end_date
+    if isinstance(option, LargerKennelOption):
+        size = option.size_class
+
+    remaining = []
+    if ctx.service == Service.BOARDING:
+        if end <= start:
+            remaining.append("capacity: a kennel stay needs at least one night")
+        elif await find_kennel(session, ctx.facility_id, size, start, end) is None:
+            remaining.append(f"capacity: no free {size} kennel for {start} to {end}")
+
+    failing = _failing(ctx, start, end)
+    if isinstance(option, VaccineUpdateOption):
+        # An updated record can fix exactly the failing vaccines, no more and no fewer.
+        named, needed = sorted(set(option.vaccines)), sorted(f["vaccine"] for f in failing)
+        if named != needed:
+            remaining.append(f"vaccine_update names {named}, but the failing vaccines are {needed}")
+    else:
+        remaining += [f"vaccine {f['vaccine']}: {f['status']}" for f in failing]
+
+    return option.model_dump(mode="json") | {
+        "verified": not remaining,
+        "remaining_problems": remaining,
+    }
+
+
+# --- The loop (design D5) -----------------------------------------------------------------
+
+MAX_TURNS = 6
+MAX_TOOL_CALLS = 12
+
+
+@dataclass
+class Resolution:
+    outcome: ResolutionOutcome
+    reason: str
+    proposal: dict[str, Any] | None = None
+    turns: int = 0
+    tool_calls: list[dict[str, Any]] = field(default_factory=list)
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "outcome": str(self.outcome),
+            "reason": self.reason,
+            "proposal": self.proposal,
+            "turns": self.turns,
+            "tool_calls": self.tool_calls,
+            "prompt_version": PROMPT_VERSION,
+        }
+
+
+def not_attempted(scope: Scope) -> Resolution:
+    if scope.needs_person:
+        return Resolution(
+            ResolutionOutcome.NOT_ATTEMPTED, "needs a person: " + "; ".join(scope.needs_person)
+        )
+    return Resolution(ResolutionOutcome.NOT_ATTEMPTED, "nothing for the resolver to fix")
+
+
+async def resolve(
+    session: AsyncSession,
+    ctx: ToolContext,
+    facts: RequestFacts,
+    scope: Scope,
+    **llm_kwargs: Any,
+) -> Resolution:
+    """Call the model, run the tools it asks for, append the results, repeat, until it
+    proposes, repeats itself, stops calling tools, or runs out of steps."""
+    messages = build_messages(prompt_context(facts, scope))
+    seen: set[tuple[str, str]] = set()
+    calls: list[dict[str, Any]] = []
+
+    def stop(reason: str, turn: int) -> Resolution:
+        return Resolution(ResolutionOutcome.ESCALATED, reason, None, turn, calls)
+
+    for turn in range(1, MAX_TURNS + 1):
+        result = await complete(
+            messages, name="resolver.turn", tools=TOOL_SCHEMAS, temperature=0, **llm_kwargs
+        )
+        if not result.tool_calls:
+            return stop("no proposal: the model answered without calling a tool", turn)
+        messages.append(result.assistant_message)
+
+        for call in result.tool_calls:
+            if len(calls) == MAX_TOOL_CALLS:
+                return stop(f"step limit: {MAX_TOOL_CALLS} tool calls", turn)
+            # Tools are deterministic within a run: the same call can only return the same
+            # answer, so any repeat (not just of the previous call) means no progress.
+            key = (call.name, _canonical(call.arguments))
+            if key in seen:
+                return stop(f"stuck: repeated {call.name} with the same arguments", turn)
+            seen.add(key)
+
+            content, offer = await _run_call(session, ctx, call)
+            calls.append({"name": call.name, "arguments": call.arguments} | _error_of(content))
+            if offer is not None:
+                options = [await verify_option(session, ctx, o) for o in offer.options]
+                proposal = {"summary": offer.summary, "options": options}
+                return Resolution(ResolutionOutcome.PROPOSED, "proposed", proposal, turn, calls)
+            messages.append(
+                {"role": "tool", "tool_call_id": call.id, "content": json.dumps(content)}
+            )
+
+    return stop(f"step limit: {MAX_TURNS} model calls", MAX_TURNS)
+
+
+def _canonical(arguments: str) -> str:
+    try:
+        return json.dumps(json.loads(arguments), sort_keys=True)
+    except ValueError:
+        return arguments
+
+
+def _error_of(content: dict[str, Any]) -> dict[str, Any]:
+    return {"error": content["error"]} if "error" in content else {}
+
+
+async def _run_call(
+    session: AsyncSession, ctx: ToolContext, call: ToolCall
+) -> tuple[dict[str, Any], ProposeOffer | None]:
+    """Run one requested call in its own `tool` span. Anything the model got wrong comes
+    back as {"error": ...} for it to read; only a bug in our code raises."""
+    async with span(call.name, SpanKind.TOOL, input={"arguments": call.arguments}) as s:
+        content: dict[str, Any]
+        offer = None
+        try:
+            raw = json.loads(call.arguments or "{}")
+            if call.name == PROPOSE:
+                offer = ProposeOffer.model_validate(raw)
+                check_offer(ctx, offer)
+                content = {"accepted": True}
+            elif call.name in READ_TOOLS:
+                args_model, tool = READ_TOOLS[call.name]
+                content = await tool(session, ctx, args_model.model_validate(raw))
+            else:
+                available = ", ".join([*READ_TOOLS, PROPOSE])
+                content = {"error": f"unknown tool {call.name!r}; available: {available}"}
+        except ValueError as exc:  # bad JSON, failed validation, or a ToolError
+            offer = None
+            content = {"error": _describe(exc)}
+        s.output = content
+        return content, offer
+
+
+def _describe(exc: ValueError) -> str:
+    if isinstance(exc, ValidationError):
+        return "invalid arguments:\n" + validation_errors(exc)
+    if isinstance(exc, json.JSONDecodeError):
+        return "arguments are not valid JSON"
+    return str(exc)
