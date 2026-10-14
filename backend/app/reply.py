@@ -164,7 +164,10 @@ DATE_PATTERNS = [
     ("numeric", re.compile(r"\b(\d{1,2})/(\d{1,2})(?:/\d{2,4})?\b")),
 ]
 COMMITMENT = re.compile(r"\b(booked|confirmed|reserved|approved)\b", re.IGNORECASE)
-MONEY = re.compile(r"(\$\s?\d|\bUSD\s?\d|\b\d+(?:[.,]\d+)?\s?(?:dollars|usd)\b)", re.IGNORECASE)
+_AMOUNT = r"\d+(?:[.,]\d+)?"
+MONEY = re.compile(
+    rf"(\$\s?{_AMOUNT}|\bUSD\s?{_AMOUNT}|\b{_AMOUNT}\s?(?:dollars|usd)\b)", re.IGNORECASE
+)
 
 
 def mentioned_dates(body: str) -> list[tuple[str, int, int]]:

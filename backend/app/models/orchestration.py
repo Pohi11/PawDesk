@@ -5,7 +5,15 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import CheckConstraint, ForeignKey, Integer, LargeBinary, String, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -56,4 +64,23 @@ class BookingStepResult(UUIDPrimaryKey, Base):
     booking_request_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("booking_requests.id"))
     step: Mapped[Step] = mapped_column(str_enum(Step, "step"))
     output: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = created_at_column()
+
+
+class OutboundMessage(UUIDPrimaryKey, Base):
+    """The message sent for a request: the reply, or a decline. Recorded, not delivered
+    (no email integration yet). One per request, so a retried send can't send twice."""
+
+    __tablename__ = "outbound_messages"
+    __table_args__ = (
+        CheckConstraint("kind IN ('reply', 'decline')", name="kind_known"),
+        CheckConstraint("btrim(body) <> ''", name="body_not_blank"),
+    )
+
+    booking_request_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("booking_requests.id"), unique=True
+    )
+    kind: Mapped[str] = mapped_column(String(16))
+    subject: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at_column()

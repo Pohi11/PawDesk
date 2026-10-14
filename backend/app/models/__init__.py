@@ -11,7 +11,7 @@ from app.models.domain import (
     VaccineRecord,
     VaccineRule,
 )
-from app.models.orchestration import BookingDocument, BookingStepResult
+from app.models.orchestration import BookingDocument, BookingStepResult, OutboundMessage
 from app.models.tracing import Span, Trace
 
 __all__ = [
@@ -23,6 +23,7 @@ __all__ = [
     "BookingTransition",
     "Facility",
     "Kennel",
+    "OutboundMessage",
     "Owner",
     "Pet",
     "Reservation",

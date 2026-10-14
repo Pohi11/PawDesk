@@ -110,7 +110,7 @@ def test_commitment_without_confirmation():
 def test_price(price):
     issues = promise_issues(f"Biscuit is confirmed for March 10. It costs {price}.", facts())
 
-    assert len(issues) == 1 and issues[0].startswith("mentions a price")
+    assert issues == [f"mentions a price: {price.removesuffix(' per night')!r}"]
 
 
 @spec("booking-reply", "Replies never promise what the checks didn't confirm")

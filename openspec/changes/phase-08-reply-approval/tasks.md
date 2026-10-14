@@ -6,7 +6,7 @@
 
 ## 2. Orchestration
 
-- [ ] 2.1 Add the `reply` step result and `outbound_messages` (migration), and the drafting, ready, approved, and rejected steps in the orchestrator. Update the existing orchestration tests. Verify with `tests/test_orchestrator.py` for: clean boarding request to `sent` with one reservation and one message, a resolved request waiting in `needs_review` with a resolution reason, a failed promise check waiting, a kennel taken before sending, a waiting request left alone, and the customer's message text never reaching the reply model.
+- [x] 2.1 Add the `reply` step result and `outbound_messages` (migration), and the drafting, ready, approved, and rejected steps in the orchestrator. Update the existing orchestration tests. Verify with `tests/test_orchestrator.py` for: clean boarding request to `sent` with one reservation and one message, a resolved request waiting in `needs_review` with a resolution reason, a failed promise check waiting, a kennel taken before sending, a waiting request left alone, and the customer's message text never reaching the reply model.
 
 ## 3. Staff approval
 

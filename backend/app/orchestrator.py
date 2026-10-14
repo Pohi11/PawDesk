@@ -1,20 +1,19 @@
-"""Drives a booking request through extraction, checks, routing, and resolution (spec:
-booking-orchestration; decision records 0008, 0009, and 0010).
+"""Drives a booking request from arrival to the message sent (spec: booking-orchestration;
+decision records 0008 to 0011).
 
 A hybrid workflow: code fixes the order of the steps, the models only read (intake and
-records), and every decision after that is plain code. The one agent (the resolver) runs
-inside a fenced step and can only propose. Each step's result is saved in the same
-transaction as the state change that follows it, so a crashed run resumes from the
-request's state and reads saved results instead of redoing finished work.
+records) or write (the reply), and every decision is plain code. The one agent (the
+resolver) runs inside a fenced step and can only propose. Each step's result is saved in
+the same transaction as the state change that follows it, so a crashed run resumes from
+the request's state and reads saved results instead of redoing finished work.
 
-    received --start--> extracting --extract--> checking --check+route--> drafting
-                            |                                  |              ^
-                            |                                  v              |
-                            |                              resolving --resolve
-                            v  model failure (extracting or resolving)
-                          failed --retry (next run)--> back to the step that failed
+    received -> extracting -> checking -> drafting -> ready -> approved -> sent
+                                  |          ^      |                ^          ^
+                                  v          |      v                | staff    |
+                              resolving -----'   needs_review -------+----> rejected
 
-Processing stops at `drafting`; the reply and approval steps come later.
+Any working step can fail; the next run retries it. `needs_review` is not a step: a
+request waiting there is left alone until a staff action moves it on.
 """
 
 import asyncio
@@ -25,18 +24,30 @@ from datetime import UTC, date, datetime
 from typing import Any
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.capacity import find_kennel
 from app.compliance import Outcome, VaccineEvidence, check, load_evidence, load_requirements
 from app.dates import facility_date
 from app.documents import load_certificate
-from app.enums import Service, SpanKind, Step, Vaccine
+from app.enums import ApprovalAction, Service, SpanKind, Step, Vaccine
 from app.intake import BookingIntent, IntakeResult, load_pets, run_intake
 from app.lifecycle import Actor, State
 from app.llm import LLMError
-from app.models import BookingRequest, BookingStepResult, Facility, Pet
+from app.models import (
+    Approval,
+    BookingRequest,
+    BookingStepResult,
+    Facility,
+    OutboundMessage,
+    Owner,
+    Pet,
+    Reservation,
+)
+from app.prompts.reply import PROMPT_VERSION as REPLY_PROMPT_VERSION
 from app.records import RecordsResult, pet_name_mismatch, run_records
+from app.reply import Situation, draft_reply, reply_facts
 from app.resolver import (
     RequestFacts,
     ToolContext,
@@ -332,11 +343,158 @@ async def _resolver_inputs(
     return ctx, facts
 
 
+async def _draft(run: _Run) -> State:
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        saved = await _saved_results(session, request.id)
+        owner = await session.get_one(Owner, request.owner_id)
+        facility = await session.get_one(Facility, request.facility_id)
+        pet = await session.get(Pet, request.pet_id) if request.pet_id else None
+        facts = reply_facts(
+            owner_name=owner.full_name,
+            pet_name=pet.name if pet else None,
+            facility=facility.name,
+            intake=saved[Step.INTAKE],
+            route=saved[Step.ROUTE],
+            resolution=saved.get(Step.RESOLUTION),
+        )
+
+    result = await draft_reply(facts, **run.llm_kwargs)  # no session held during the call
+
+    # Code decides who sends it (decision record 0011): anything that needed resolving, or
+    # a draft that over-promises, waits for a person.
+    flags = []
+    if saved[Step.ROUTE]["target"] == State.RESOLVING:
+        resolution = saved.get(Step.RESOLUTION) or {}
+        flags.append(
+            f"came through resolving: {resolution.get('outcome')} ({resolution.get('reason')})"
+        )
+    flags += [f"reply: {issue}" for issue in result.promise_issues]
+    target = State.NEEDS_REVIEW if flags else State.READY
+
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        session.add(
+            BookingStepResult(
+                booking_request_id=request.id,
+                step=Step.REPLY,
+                output={
+                    "situation": str(facts.situation),
+                    "facts": facts.to_json(),
+                    "draft": result.draft.model_dump(),
+                    "promise_issues": result.promise_issues,
+                    "flags": flags,
+                    "target": str(target),
+                    "prompt_version": REPLY_PROMPT_VERSION,
+                },
+            )
+        )
+        reason = (
+            "; ".join(flags)
+            if flags
+            else "clean: every check passed and the reply promises nothing more"
+        )
+        await transition(session, request, target, Actor.SYSTEM, reason=reason)
+        await session.commit()
+    return target
+
+
+async def _auto_approve(run: _Run) -> State:
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        await transition(
+            session,
+            request,
+            State.APPROVED,
+            Actor.SYSTEM,
+            reason="clean request: approved by the checks",
+        )
+        await session.commit()
+    return State.APPROVED
+
+
+async def _send(run: _Run) -> State:
+    """Record the outbound message (and, for a confirmed stay, the reservation) together
+    with the move to `sent`. Both are unique per request, so a retry can't double up."""
+    async with run.sessions() as session:
+        request = await session.get_one(BookingRequest, run.request_id)
+        saved = await _saved_results(session, request.id)
+        reply = saved[Step.REPLY]
+
+        if request.status == State.APPROVED:
+            approval = await session.scalar(
+                select(Approval)
+                .where(Approval.booking_request_id == request.id)
+                .order_by(Approval.created_at.desc(), Approval.id.desc())
+                .limit(1)
+            )
+            edited = approval is not None and approval.action == ApprovalAction.EDIT_AND_APPROVE
+            kind, subject = "reply", reply["draft"]["subject"]
+            body = approval.edited_reply if edited else reply["draft"]["body"]
+            await _reserve_if_confirmed(session, request, reply)
+        else:
+            kind, (subject, body) = "decline", decline_message(reply["facts"])
+
+        session.add(
+            OutboundMessage(booking_request_id=request.id, kind=kind, subject=subject, body=body)
+        )
+        await transition(session, request, State.SENT, Actor.SYSTEM, reason=f"{kind} sent")
+        await session.commit()
+    return State.SENT
+
+
+async def _reserve_if_confirmed(
+    session: AsyncSession, request: BookingRequest, reply: dict
+) -> None:
+    facts = reply["facts"]
+    if reply["situation"] != Situation.CONFIRMED or facts["service"] != Service.BOARDING:
+        return
+    start, end = date.fromisoformat(facts["start_date"]), date.fromisoformat(facts["end_date"])
+    pet = await session.get_one(Pet, request.pet_id)
+    # Checked again now: the kennel found during checking may have been taken since.
+    kennel = await find_kennel(session, request.facility_id, pet.size_class, start, end)
+    if kennel is None:
+        raise StepFailed(f"no free {pet.size_class} kennel at send time")
+    session.add(
+        Reservation(
+            kennel_id=kennel.id,
+            pet_id=pet.id,
+            booking_request_id=request.id,
+            start_date=start,
+            end_date=end,
+        )
+    )
+    try:
+        await session.flush()
+    except IntegrityError as exc:
+        # Another transaction reserved the same kennel between our search and this insert;
+        # the exclusion constraint is the real guarantee against double-booking.
+        if "ex_reservations_no_overlapping_stays" not in str(exc):
+            raise
+        raise StepFailed("kennel taken at send time by another booking") from exc
+
+
+def decline_message(facts: dict) -> tuple[str, str]:
+    """A fixed decline filled by code. The staff member's internal reason is never sent."""
+    subject = "Your booking request"
+    body = (
+        f"Hi {facts['owner_first_name']},\n\n"
+        f"Thank you for your request for {facts['pet_name']}. Unfortunately, we aren't able "
+        "to accept this booking request. If anything changes, a member of our team will be "
+        f"in touch.\n\nThe {facts['facility']} team"
+    )
+    return subject, body
+
+
 STEPS = {
     State.RECEIVED: _start,
     State.EXTRACTING: _extract,
     State.CHECKING: _check_and_route,
     State.RESOLVING: _resolve,
+    State.DRAFTING: _draft,
+    State.READY: _auto_approve,
+    State.APPROVED: _send,
+    State.REJECTED: _send,
 }
 
 
