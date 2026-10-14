@@ -2,7 +2,7 @@
 
 ## 1. Autonomous agent
 
-- [ ] 1.1 Implement `app/autonomous.py` and `app/prompts/autonomous.py`: bound read-only tools, the loop with limits and the stuck guard, and the final decision. Verify with `tests/test_autonomous.py` against scripted turns: confirm after four calls with nothing written, a repeated call stopping as `needs_human`, and a vaccine check combining on-file and certificate records.
+- [x] 1.1 Implement `app/autonomous.py` and `app/prompts/autonomous.py`: bound read-only tools, the loop with limits and the stuck guard, and the final decision. Verify with `tests/test_autonomous.py` against scripted turns: confirm after four calls with nothing written, a repeated call stopping as `needs_human`, and a vaccine check combining on-file and certificate records.
 
 ## 2. Comparison
 
