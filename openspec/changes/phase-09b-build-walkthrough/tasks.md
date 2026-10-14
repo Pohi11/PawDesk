@@ -11,7 +11,7 @@
 
 ## 3. Decision and real data
 
-- [ ] 3.1 Write [decision record 0014](../../../docs/decisions/0014-walkthrough-generated-into-a-committed-file.md). Verify it exists and that design D1 links to it.
+- [x] 3.1 Write [decision record 0014](../../../docs/decisions/0014-walkthrough-generated-into-a-committed-file.md). Verify it exists and that design D1 links to it.
 - [ ] 3.2 Generate the real `walkthrough.json` from fresh test reports, run `--check`, and verify in a browser that every archived change is on the timeline and that following a requirement reaches its tests and results.
 
 ## 4. Integration
