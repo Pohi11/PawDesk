@@ -14,6 +14,14 @@ rules:
     - Every requirement has at least one WHEN/THEN scenario that can become an automated test
   design:
     - Link to docs/decisions/NNNN-*.md for cross-change decisions instead of repeating them
+  tasks:
+    - Each task leaves the system runnable and names the test that proves it
+
+operations:
+  apply:
+    guidance:
+      - Run tests and lint after each task; commit only when both pass
+      - One Conventional Commit per completed task (type(scope) summary, imperative, max 72 chars)
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
