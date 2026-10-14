@@ -66,7 +66,7 @@ async def list_requests(session: AsyncSession, limit: int = 50) -> list[dict[str
         .scalar_subquery()
     )
     rows = await session.execute(
-        select(BookingRequest, Owner.full_name, Pet.name, cost, reply, intake)
+        select(BookingRequest, Owner.full_name, Pet, cost, reply, intake)
         .join(Owner, Owner.id == BookingRequest.owner_id)
         .outerjoin(Pet, Pet.id == BookingRequest.pet_id)
         .order_by(BookingRequest.created_at.desc(), BookingRequest.id.desc())
@@ -81,7 +81,7 @@ async def list_requests(session: AsyncSession, limit: int = 50) -> list[dict[str
                 "status": str(request.status),
                 "created_at": _iso(request.created_at),
                 "owner": owner,
-                "pet": pet,
+                **pet_json(pet),
                 "service": intent.get("service"),
                 "start_date": intent.get("start_date"),
                 "end_date": intent.get("end_date"),
@@ -90,6 +90,16 @@ async def list_requests(session: AsyncSession, limit: int = 50) -> list[dict[str
             }
         )
     return result
+
+
+def pet_json(pet: Pet | None) -> dict[str, Any]:
+    """The matched pet's name, id, species, and breed (all None before a pet is matched)."""
+    return {
+        "pet": pet.name if pet else None,
+        "pet_id": str(pet.id) if pet else None,
+        "pet_species": str(pet.species) if pet else None,
+        "pet_breed": pet.breed if pet else None,
+    }
 
 
 def span_json(span: Span) -> dict[str, Any]:
@@ -155,7 +165,7 @@ async def request_detail(session: AsyncSession, request_id: uuid.UUID) -> dict[s
         "last_error": request.last_error,
         "created_at": _iso(request.created_at),
         "owner": owner.full_name,
-        "pet": pet.name if pet else None,
+        **pet_json(pet),
         "raw_message": request.raw_message,
         "transitions": [
             {

@@ -2,7 +2,7 @@
 
 ## 1. API
 
-- [ ] 1.1 Add `pet_id`, `pet_species`, and `pet_breed` to `list_requests` and `request_detail` (null when no pet is matched), and to `RequestRow` and `RequestDetail` in `frontend/lib/types.ts`. Verify with API tests tagged `observability-api` / "Requests identify the matched pet" for a matched and an unmatched request, plus the existing API suite and the frontend type check.
+- [x] 1.1 Add `pet_id`, `pet_species`, and `pet_breed` to `list_requests` and `request_detail` (null when no pet is matched), and to `RequestRow` and `RequestDetail` in `frontend/lib/types.ts`. Verify with API tests tagged `observability-api` / "Requests identify the matched pet" for a matched and an unmatched request, plus the existing API suite and the frontend type check.
 
 ## 2. Photo set
 
