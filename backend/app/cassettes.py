@@ -58,7 +58,14 @@ class CassetteTransport(httpx.AsyncBaseTransport):
                 encoding="utf-8",
                 newline="\n",
             )
-        return httpx.Response(response.status_code, headers=response.headers, content=content)
+        # `content` is already decoded, so the encoding and length headers no longer describe
+        # it; passing them on would make the client try to un-gzip plain text.
+        headers = {
+            k: v
+            for k, v in response.headers.items()
+            if k.lower() not in ("content-encoding", "content-length", "transfer-encoding")
+        }
+        return httpx.Response(response.status_code, headers=headers, content=content)
 
     async def aclose(self) -> None:
         if self._upstream is not None:

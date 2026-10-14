@@ -1,11 +1,14 @@
 """Spec: llm-client, recording and replaying model responses."""
 
+import gzip
+import json
+
 import httpx
 import pytest
 
 from app.cassettes import CassetteTransport
 from app.llm import LLMError, RetryPolicy, cassette_transport, complete, make_client
-from tests.test_llm import TEST_KEY, Script, fake_settings, image_message, ok
+from tests.test_llm import TEST_KEY, Script, fake_settings, image_message, ok, ok_body
 
 spec = pytest.mark.spec
 REQ = "Model responses can be recorded and replayed"
@@ -89,3 +92,23 @@ def test_settings_choose_the_transport(tmp_path):
     assert isinstance(replay, CassetteTransport) and replay.mode == "replay"
     with pytest.raises(ValueError, match="llm_cassette_dir"):
         cassette_transport(fake_settings(llm_cassette_mode="replay"))
+
+
+@spec("llm-client", REQ)
+async def test_recording_a_compressed_response(tracer, tmp_path):
+    """Real providers gzip their responses; the recorder hands on decoded content."""
+    body = json.dumps(ok_body(text="Compressed and fine.")).encode()
+
+    def gzipped(request):
+        return httpx.Response(
+            200,
+            content=gzip.compress(body),
+            headers={"content-encoding": "gzip", "content-type": "application/json"},
+        )
+
+    recorded = await call(
+        tracer, CassetteTransport(tmp_path, "record", httpx.MockTransport(gzipped))
+    )
+    replayed = await call(tracer, CassetteTransport(tmp_path, "replay"))
+
+    assert recorded.text == replayed.text == "Compressed and fine."
