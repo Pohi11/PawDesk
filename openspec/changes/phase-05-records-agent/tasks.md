@@ -2,7 +2,7 @@
 
 ## 1. Shared structured extraction
 
-- [ ] 1.1 Add `app/structured.py` (`extract()`, `InvalidModelOutput`, strict schema and response format moved from intake). Switch `app/intake.py` to it, with `IntakeInvalidOutput` subclassing `InvalidModelOutput`. Verify that every existing intake test passes unchanged, and add `tests/test_structured.py` for the helper.
+- [x] 1.1 Add `app/structured.py` (`extract()`, `InvalidModelOutput`, strict schema and response format moved from intake). Switch `app/intake.py` to it, with `IntakeInvalidOutput` subclassing `InvalidModelOutput`. Verify that every existing intake test passes unchanged, and add `tests/test_structured.py` for the helper.
 
 ## 2. Records step
 

@@ -4,7 +4,6 @@ Spec: booking-intake. The model only *describes* the request; code decides ident
 (pet matching), timing (date checks), and whether a person must look (issues).
 """
 
-import copy
 import re
 import uuid
 from collections.abc import Sequence
@@ -13,14 +12,15 @@ from datetime import date, timedelta
 from enum import StrEnum
 from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.enums import Service, SpanKind
-from app.llm import complete
 from app.models import Pet
 from app.prompts.intake import PROMPT_VERSION, build_messages
+from app.structured import InvalidModelOutput, extract, response_format_for
+from app.structured import strict_json_schema as _strict_json_schema
 from app.tracing import span
 
 Ambiguity = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
@@ -47,51 +47,12 @@ class BookingIntent(BaseModel):
     )
 
 
-# Keys some providers' strict modes reject. Pydantic still enforces the real constraints.
-_DROP_KEYS = {
-    "title",
-    "default",
-    "format",
-    "minimum",
-    "maximum",
-    "maxLength",
-    "minLength",
-    "maxItems",
-    "minItems",
-}
-
-
-def _strictify(node: Any, defs: dict[str, Any]) -> Any:
-    if isinstance(node, list):
-        return [_strictify(item, defs) for item in node]
-    if not isinstance(node, dict):
-        return node
-    if "$ref" in node:  # inline $defs: simplest form for every provider
-        return _strictify(copy.deepcopy(defs[node["$ref"].rsplit("/", 1)[-1]]), defs)
-    out = {k: _strictify(v, defs) for k, v in node.items() if k not in _DROP_KEYS}
-    if out.get("type") == "object" and "properties" in out:
-        out["required"] = list(out["properties"])  # strict mode: every field required
-        out["additionalProperties"] = False
-    return out
-
-
 def strict_json_schema(model: type[BaseModel]) -> dict[str, Any]:
-    """The provider-side schema, derived from the same model that validates (design D1)."""
-    schema = model.model_json_schema()
-    defs = schema.pop("$defs", {})
-    schema.pop("description", None)  # the class docstring is for developers, not the model
-    return _strictify(schema, defs)
+    return _strict_json_schema(model)
 
 
 def response_format() -> dict[str, Any]:
-    return {
-        "type": "json_schema",
-        "json_schema": {
-            "name": "booking_intent",
-            "strict": True,
-            "schema": strict_json_schema(BookingIntent),
-        },
-    }
+    return response_format_for(BookingIntent, "booking_intent")
 
 
 # --- The pipeline (design D2–D6) ------------------------------------------------------
@@ -126,7 +87,7 @@ class IntakeOutcome(StrEnum):
     NEEDS_REVIEW = "needs_review"
 
 
-class IntakeInvalidOutput(Exception):
+class IntakeInvalidOutput(InvalidModelOutput):
     """The model's output failed validation, and so did the one repair attempt."""
 
 
@@ -180,34 +141,6 @@ def match_pet(name: str | None, pets: Sequence[PetRef]) -> tuple[uuid.UUID | Non
     return None, f"several pets named {name.strip()!r} on file"
 
 
-def _validation_errors(exc: ValidationError) -> str:
-    lines = [f"- {'.'.join(map(str, e['loc'])) or 'output'}: {e['msg']}" for e in exc.errors()]
-    return "\n".join(lines)[:1000]
-
-
-async def _extract(messages: list[dict[str, str]], **llm_kwargs: Any) -> tuple[BookingIntent, bool]:
-    """Call the model, validate, and repair once (design D3). Returns (intent, repaired)."""
-    common = {"response_format": response_format(), "temperature": 0, **llm_kwargs}
-    first = await complete(messages, name="intake.extract", **common)
-    try:
-        return BookingIntent.model_validate_json(first.text), False
-    except ValidationError as exc:
-        errors = _validation_errors(exc)
-
-    repair_messages = [
-        *messages,
-        {"role": "assistant", "content": first.text},
-        {"role": "user", "content": REPAIR_INSTRUCTION.format(errors=errors)},
-    ]
-    second = await complete(repair_messages, name="intake.repair", **common)
-    try:
-        return BookingIntent.model_validate_json(second.text), True
-    except ValidationError as exc:
-        raise IntakeInvalidOutput(
-            f"intake output invalid after repair: {_validation_errors(exc)}"
-        ) from exc
-
-
 async def run_intake(
     message: str,
     *,
@@ -235,7 +168,14 @@ async def run_intake(
         if instruction_like(message):  # decided in code, before the model sees anything
             issues.append(INSTRUCTION_LIKE_ISSUE)
 
-        intent, repaired = await _extract(build_messages(message, today, timezone), **llm_kwargs)
+        intent, repaired = await extract(
+            BookingIntent,
+            build_messages(message, today, timezone),
+            name="intake",
+            schema_name="booking_intent",
+            error_cls=IntakeInvalidOutput,
+            **llm_kwargs,
+        )
 
         issues += date_issues(intent, today)
         pet_id, pet_issue = match_pet(intent.pet_name, pets)
