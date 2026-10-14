@@ -9,7 +9,7 @@
 ## 2. Test infrastructure and traceability
 
 - [x] 2.1 Add the `pawdesk_test` database fixture. It creates the database if missing, runs `alembic downgrade base` then `alembic upgrade head`, and gives each test a session inside a transaction that is rolled back afterward. Verify with `tests/test_isolation.py`: a row committed in one test is absent in the next.
-- [ ] 2.2 Register the `spec(capability, requirement)` pytest marker and add a `conftest.py` hook that writes it into JUnit XML properties. Verify that `uv run pytest --junitxml=…` output contains the marker properties for a marked test.
+- [x] 2.2 Register the `spec(capability, requirement)` pytest marker and add a `conftest.py` hook that writes it into JUnit XML properties. Verify that `uv run pytest --junitxml=…` output contains the marker properties for a marked test.
 - [ ] 2.3 Write [decision record 0004](../../../docs/decisions/0004-spec-test-traceability.md) (spec-to-test traceability). Verify the file exists and that design D13 links to it.
 
 ## 3. Booking domain schema

@@ -20,6 +20,22 @@ TEST_DB_NAME = "pawdesk_test"
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 
 
+def pytest_collection_modifyitems(items):
+    """Copy each `@pytest.mark.spec(capability, requirement)` into the test's user properties.
+
+    pytest writes user properties into JUnit XML (`--junitxml`), so a test report can be
+    joined back to the OpenSpec requirement each test verifies (decision record 0004).
+    """
+    for item in items:
+        for marker in item.iter_markers(name="spec"):
+            if len(marker.args) != 2 or not all(isinstance(a, str) and a for a in marker.args):
+                raise pytest.UsageError(
+                    f"{item.nodeid}: use @pytest.mark.spec('<capability>', '<requirement>')"
+                )
+            capability, requirement = marker.args
+            item.user_properties.append(("spec", f"{capability}: {requirement}"))
+
+
 def _test_database_url() -> str:
     url = make_url(get_settings().database_url).set(database=TEST_DB_NAME)
     return url.render_as_string(hide_password=False)
