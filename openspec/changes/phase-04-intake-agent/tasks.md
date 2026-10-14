@@ -20,7 +20,7 @@
 
 ## 5. Integration
 
-- [ ] 5.1 Run the full suite, lint, and the spec-coverage check. Verify that all pass and every requirement in this change has a test with a matching `spec` marker.
+- [x] 5.1 Run the full suite, lint, and the spec-coverage check. Verify that all pass and every requirement in this change has a test with a matching `spec` marker.
 
 ## Workflow follow-up
 
