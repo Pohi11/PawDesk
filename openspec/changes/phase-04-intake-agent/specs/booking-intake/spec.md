@@ -88,7 +88,7 @@ Intake SHALL match the intent's pet name to the owner's pets case-insensitively,
 - **THEN** intake returns no pet and reports a pet issue
 
 ### Requirement: Doubt goes to a person
-Intake SHALL report an issue when the confidence is below 0.7 or the model lists any ambiguity. Its outcome SHALL be `needs_review` when any issue was reported, and `clear` otherwise. Confidence SHALL only ever add an issue, never remove one.
+Intake SHALL report an issue when the confidence is below 0.7, the model lists any ambiguity, or the service is missing. Its outcome SHALL be `needs_review` when any issue was reported, and `clear` otherwise. Confidence SHALL only ever add an issue, never remove one.
 
 #### Scenario: Low confidence
 - **WHEN** an otherwise clean intent has confidence 0.5
@@ -96,6 +96,10 @@ Intake SHALL report an issue when the confidence is below 0.7 or the model lists
 
 #### Scenario: Reported ambiguity
 - **WHEN** the intent lists the ambiguity "two different date ranges mentioned"
+- **THEN** the outcome is `needs_review`
+
+#### Scenario: Missing service
+- **WHEN** the intent's service is empty
 - **THEN** the outcome is `needs_review`
 
 #### Scenario: High confidence does not hide a problem
