@@ -2,7 +2,7 @@
 
 ## 1. Reply
 
-- [ ] 1.1 Add `promise_issues()`, `reply_facts()`, and the situation rules in `app/reply.py`, with the prompt in `app/prompts/reply.py`. Verify with `tests/test_reply.py` for: unconfirmed date, commitment without confirmation, price, clean reply, only verified options in the facts, `under_review` when nothing is offered.
+- [x] 1.1 Add `promise_issues()`, `reply_facts()`, and the situation rules in `app/reply.py`, with the prompt in `app/prompts/reply.py`. Verify with `tests/test_reply.py` for: unconfirmed date, commitment without confirmation, price, clean reply, only verified options in the facts, `under_review` when nothing is offered.
 
 ## 2. Orchestration
 
