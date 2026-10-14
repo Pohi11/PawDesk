@@ -6,7 +6,7 @@
 
 ## 2. Records step
 
-- [ ] 2.1 Add `CertificateExtraction` / `ExtractedRecord` and the versioned prompt (`app/prompts/records.py`). Verify with schema tests (extra fields rejected, confidence range, strict schema) and prompt tests (no-inference rule, vocabulary, image part present).
+- [x] 2.1 Add `CertificateExtraction` / `ExtractedRecord` and the versioned prompt (`app/prompts/records.py`). Verify with schema tests (extra fields rejected, confidence range, strict schema) and prompt tests (no-inference rule, vocabulary, image part present).
 - [ ] 2.2 Implement `run_records()` in `app/records.py`: image type and size checks by magic bytes, the model call through the shared helper, code checks (dates, unmapped labels, pet name, no records), doubt issues, the outcome, conversion to `VaccineEvidence`, and the `records` span with prompt version and image hash. Verify with `tests/test_records.py` against scripted answers, covering every vaccine-records-extraction scenario.
 
 ## 3. Synthetic certificates
