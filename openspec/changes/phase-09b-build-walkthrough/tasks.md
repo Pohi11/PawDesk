@@ -2,8 +2,8 @@
 
 ## 1. Generator
 
-- [ ] 1.1 Implement `scripts/walkthrough.py`: parse archived changes, specs, decisions, and both JUnit reports from the listed sources only, and write the JSON. Verify with `tests/test_walkthrough.py` against a synthetic repository: every change in date order with tasks and requirement deltas, private marker absent, verified, failing, and untested requirements, decision links.
-- [ ] 1.2 Add `--check`. Verify with tests for a gap (untested, unknown name) exiting 1 and for complete coverage exiting 0.
+- [x] 1.1 Implement `scripts/walkthrough.py`: parse archived changes, specs, decisions, and both JUnit reports from the listed sources only, and write the JSON. Verify with `tests/test_walkthrough.py` against a synthetic repository: every change in date order with tasks and requirement deltas, private marker absent, verified, failing, and untested requirements, decision links.
+- [x] 1.2 Add `--check`. Verify with tests for a gap (untested, unknown name) exiting 1 and for complete coverage exiting 0.
 
 ## 2. Pages
 
