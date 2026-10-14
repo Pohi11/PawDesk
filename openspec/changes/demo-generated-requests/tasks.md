@@ -6,7 +6,7 @@
 
 ## 2. API
 
-- [ ] 2.1 Add the preview routes and accept `{seed}` on demo submission. Verify with API tests: a generated certificate PNG equal to the one attached on send, 404 for a sample without a certificate, and sending a seed stores the request with its card and processes it with a scripted model.
+- [x] 2.1 Add the preview routes and accept `{seed}` on demo submission. Verify with API tests: a generated certificate PNG equal to the one attached on send, 404 for a sample without a certificate, and sending a seed stores the request with its card and processes it with a scripted model.
 
 ## 3. Dashboard
 

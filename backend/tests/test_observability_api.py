@@ -11,12 +11,13 @@ from sqlalchemy import func, select
 
 from app.api import StreamTiming, get_llm_kwargs, get_results_dir, get_stream_timing
 from app.db import get_sessionmaker
-from app.demo import SAMPLES
-from app.documents import attach_certificate
+from app.demo import DEMO_TODAY, SAMPLES
+from app.documents import attach_certificate, load_certificate
 from app.llm import RetryPolicy, make_client
 from app.main import app
 from app.models import BookingRequest, Owner
 from app.orchestrator import process_request
+from scripts.seed import seed
 from tests.test_llm import fake_settings
 from tests.test_orchestrator import (
     CERTIFICATE,
@@ -331,3 +332,63 @@ async def test_unknown_sample(api, committed, demo_owner):
     assert response.status_code == 404
     async with committed() as s:
         assert await s.scalar(select(func.count()).select_from(BookingRequest)) == 0
+
+
+# --- Generated demo requests (spec: demo-generator) -------------------------------------
+
+
+@pytest.fixture
+async def full_seed(committed):
+    async with committed() as s:
+        await seed(s, DEMO_TODAY)
+        await s.commit()
+
+
+@spec("demo-generator", "Certificates can be viewed before sending")
+async def test_generated_preview_and_image(api, full_seed):
+    preview = (await api.get("/demo/generate", params={"seed": 42})).json()
+    image = await api.get(preview["certificate_url"])
+
+    assert preview["seed"] == 42 and preview["pet"] in preview["message"]
+    assert preview["scenario"] in {"current", "expired", "expires_during_stay", "missing"}
+    assert (image.status_code, image.headers["content-type"]) == (200, "image/png")
+    assert image.content.startswith(b"\x89PNG")
+    random_seed = (await api.get("/demo/generate")).json()["seed"]
+    assert isinstance(random_seed, int)
+
+
+@spec("demo-generator", "Certificates can be viewed before sending")
+async def test_sample_certificates(api):
+    with_card = await api.get("/demo/samples/clean/certificate.png")
+    without = await api.get("/demo/samples/unknown-pet/certificate.png")
+    unknown = await api.get("/demo/samples/no-such/certificate.png")
+
+    assert (with_card.status_code, with_card.headers["content-type"]) == (200, "image/png")
+    assert (without.status_code, unknown.status_code) == (404, 404)
+
+
+@spec("demo-generator", "A generated request runs like a sample")
+@spec("demo-generator", "Certificates can be viewed before sending")
+async def test_send_a_generated_request(api, committed, full_seed, scripted_background):
+    preview = (await api.get("/demo/generate", params={"seed": 42})).json()
+    image = (await api.get(preview["certificate_url"])).content
+
+    response = await api.post("/demo/requests", json={"seed": 42})
+
+    assert response.status_code == 202
+    request_id = uuid.UUID(response.json()["id"])
+    status = await wait_for(committed, request_id, {"needs_review", "sent", "failed", "drafting"})
+    assert status != "received"  # it was processed in the background
+    async with committed() as s:
+        request = await s.get(BookingRequest, request_id)
+        owner = await s.get(Owner, request.owner_id)
+        stored = await load_certificate(s, request_id)
+    assert request.raw_message == preview["message"]
+    assert owner.full_name == preview["owner"]
+    assert stored.content == image  # the same card that was previewed
+
+
+async def test_sample_and_seed_together_are_refused(api):
+    response = await api.post("/demo/requests", json={"sample": "clean", "seed": 1})
+
+    assert response.status_code == 422

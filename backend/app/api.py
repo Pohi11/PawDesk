@@ -7,6 +7,7 @@ belongs to the deployment work, before this API is reachable by anyone else.
 
 import asyncio
 import json
+import secrets
 import uuid
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -14,13 +15,15 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from fastapi.responses import Response, StreamingResponse
+from pydantic import BaseModel, ConfigDict, StringConstraints, model_validator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.approvals import NotWaiting, decide, review_queue
+from app.certificate_card import render as render_certificate
 from app.db import get_sessionmaker
-from app.demo import DEMO_TODAY, SAMPLES, submit_sample
+from app.demo import DEMO_TODAY, SAMPLES, sample_certificate, store_request, submit_sample
+from app.demo_generator import generate
 from app.enums import ApprovalAction
 from app.observability import (
     RESULTS_DIR,
@@ -35,6 +38,7 @@ from app.orchestrator import process_request
 from app.transitions import TransitionConflict
 
 router = APIRouter()
+MAX_SEED = 2**31 - 1
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
 Reason = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
@@ -92,8 +96,19 @@ class RejectBody(_Body):
 
 
 class DemoBody(_Body):
-    sample: str
+    """A fixed sample by id, or a generated request by its seed (exactly one)."""
+
+    sample: str | None = None
+    seed: int | None = None
     message: MessageText | None = None
+
+    @model_validator(mode="after")
+    def _one_source(self):
+        if (self.sample is None) == (self.seed is None):
+            raise ValueError("send either a sample or a seed")
+        if self.seed is not None and not 0 <= self.seed <= MAX_SEED:
+            raise ValueError(f"seed must be between 0 and {MAX_SEED}")
+        return self
 
 
 @router.get("/requests")
@@ -166,13 +181,53 @@ async def demo_samples() -> list[dict[str, Any]]:
     return [sample.to_json() for sample in SAMPLES.values()]
 
 
+@router.get("/demo/samples/{sample_id}/certificate.png")
+async def demo_sample_certificate(sample_id: str) -> Response:
+    image = sample_certificate(sample_id)
+    if image is None:
+        raise HTTPException(status_code=404, detail="this sample has no certificate")
+    return Response(content=image, media_type="image/png")
+
+
+@router.get("/demo/generate")
+async def demo_generate(
+    sessions: Sessions, seed: Annotated[int | None, Query(ge=0, le=MAX_SEED)] = None
+) -> dict[str, Any]:
+    """A random request with a matching certificate. Nothing is stored: the seed alone
+    reproduces it for the preview image and for sending."""
+    async with sessions() as session:
+        request = await generate(session, secrets.randbelow(MAX_SEED + 1) if seed is None else seed)
+    return request.to_json() | {
+        "certificate_url": f"/demo/generated/{request.seed}/certificate.png"
+    }
+
+
+@router.get("/demo/generated/{seed}/certificate.png")
+async def demo_generated_certificate(seed: int, sessions: Sessions) -> Response:
+    if not 0 <= seed <= MAX_SEED:
+        raise HTTPException(status_code=404, detail="no such generated request")
+    async with sessions() as session:
+        request = await generate(session, seed)
+    return Response(content=render_certificate(request), media_type="image/png")
+
+
 @router.post("/demo/requests", status_code=202)
 async def demo_request(
     body: DemoBody, sessions: Sessions, background: BackgroundTasks, llm_kwargs: LLMKwargs
 ) -> dict[str, str]:
     """Store the sample as a new request and answer at once; processing runs afterward."""
     try:
-        request_id = await submit_sample(sessions, body.sample, body.message)
+        if body.seed is not None:
+            async with sessions() as session:
+                generated = await generate(session, body.seed)
+            request_id = await store_request(
+                sessions,
+                generated.owner_email,
+                body.message or generated.message,
+                render_certificate(generated),
+            )
+        else:
+            request_id = await submit_sample(sessions, body.sample, body.message)
     except LookupError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     background.add_task(
