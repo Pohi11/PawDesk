@@ -1,0 +1,81 @@
+"""Shared fixtures: a migrated test database and per-test transactional isolation.
+
+Tests that need the database take the `session` fixture. Everything a test writes,
+including commits, is rolled back when the test ends.
+"""
+
+from pathlib import Path
+
+import psycopg
+import pytest
+from alembic import command
+from alembic.config import Config
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config import get_settings
+from app.db import make_engine
+
+TEST_DB_NAME = "pawdesk_test"
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+
+
+def _test_database_url() -> str:
+    url = make_url(get_settings().database_url).set(database=TEST_DB_NAME)
+    return url.render_as_string(hide_password=False)
+
+
+def _ensure_test_database_exists() -> None:
+    # CREATE DATABASE can't run inside a transaction, hence autocommit, and it has to run
+    # from a connection to some *other* database (the default `postgres` one).
+    admin_url = make_url(get_settings().database_url).set(
+        database="postgres", drivername="postgresql"
+    )
+    with psycopg.connect(admin_url.render_as_string(hide_password=False), autocommit=True) as conn:
+        exists = conn.execute(
+            "SELECT 1 FROM pg_database WHERE datname = %s", (TEST_DB_NAME,)
+        ).fetchone()
+        if not exists:
+            conn.execute(f'CREATE DATABASE "{TEST_DB_NAME}"')
+
+
+@pytest.fixture(scope="session")
+def test_database_url() -> str:
+    """Create the test database if needed and run every migration down, then up.
+
+    Running the downgrade path on each session catches broken downgrades early.
+    """
+    _ensure_test_database_exists()
+    url = _test_database_url()
+    cfg = Config(str(BACKEND_DIR / "alembic.ini"))
+    cfg.set_main_option("script_location", str(BACKEND_DIR / "migrations"))
+    cfg.set_main_option("sqlalchemy.url", url.replace("%", "%%"))
+    command.downgrade(cfg, "base")
+    command.upgrade(cfg, "head")
+    return url
+
+
+@pytest.fixture(scope="session")
+async def engine(test_database_url):
+    engine = make_engine(test_database_url)
+    yield engine
+    await engine.dispose()
+
+
+@pytest.fixture
+async def session(engine):
+    """A session inside an outer transaction that is always rolled back.
+
+    join_transaction_mode="create_savepoint" turns the code-under-test's commit() into a
+    savepoint release, so code can commit normally without anything reaching the database.
+    """
+    async with engine.connect() as conn:
+        outer = await conn.begin()
+        session = AsyncSession(
+            bind=conn, join_transaction_mode="create_savepoint", expire_on_commit=False
+        )
+        try:
+            yield session
+        finally:
+            await session.close()
+            await outer.rollback()
