@@ -22,7 +22,7 @@
 ## Decisions
 
 ### D1. Live updates: server-sent events fed by polling the database
-Recorded in [decision record 0013](../../../docs/decisions/0013-live-updates-sse-from-database.md).
+Recorded in [decision record 0013](../../../../docs/decisions/0013-live-updates-sse-from-database.md).
 - `GET /requests/{id}/events` is a `text/event-stream`. Its generator reads a light snapshot (state, plus each span's id, parent, name, kind, status, start, end, and cost) every 0.5 s.
 - It sends the snapshot only when its fingerprint changed.
 - It stops when the request is resting (`sent`, `needs_review`, `failed`) and no span is running, or after 5 minutes.
@@ -85,7 +85,7 @@ Recorded in [decision record 0013](../../../docs/decisions/0013-live-updates-sse
 - `format.ts`: dollars to at least 6 decimals for small costs, durations in seconds, and token counts.
 
 ### D6. Frontend tests linked to specs
-Recorded in [decision record 0012](../../../docs/decisions/0012-frontend-test-traceability.md).
+Recorded in [decision record 0012](../../../../docs/decisions/0012-frontend-test-traceability.md).
 - Vitest with the JUnit reporter.
 - A helper `specTest(capability, requirement, name, fn)` prefixes the test name with `[spec <capability>: <requirement>]`.
 - The coverage check reads both JUnit files.
