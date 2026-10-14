@@ -16,7 +16,7 @@
 
 ## 4. Live check
 
-- [ ] 4.1 Register a `live` marker excluded by default, add `tests/test_llm_live.py`, and rewrite `scripts/hello_openrouter.py` as a traced call. Verify that `uv run pytest` skips it, that `uv run python -m scripts.hello_openrouter` prints a span id, and that the span row in the dev database has the model, tokens, cost, and status `ok`.
+- [x] 4.1 Register a `live` marker excluded by default, add `tests/test_llm_live.py`, and rewrite `scripts/hello_openrouter.py` as a traced call. Verify that `uv run pytest` skips it, that `uv run python -m scripts.hello_openrouter` prints a span id, and that the span row in the dev database has the model, tokens, cost, and status `ok`.
 
 ## 5. Integration
 

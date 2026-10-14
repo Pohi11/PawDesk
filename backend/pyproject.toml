@@ -26,9 +26,11 @@ dev = [
 pythonpath = ["."]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = ["--strict-markers", "-p", "pytester"]
+# Live tests call the real model and cost money: opt in with `pytest -m live`.
+addopts = ["--strict-markers", "-p", "pytester", "-m", "not live"]
 markers = [
     "spec(capability, requirement): links a test to the OpenSpec requirement it verifies",
+    "live: calls the real model provider (costs money; run with -m live)",
 ]
 asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
