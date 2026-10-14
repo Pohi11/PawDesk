@@ -8,7 +8,7 @@
 ## 2. Rewrite
 
 - [x] 2.1 Rewrite `outcome()` and `flagText()` in `lib/story.ts` (design D4), after confirming in `backend/app/orchestrator.py` that running a failed request again resumes from `failed_step`. Verify with `lib/story.test.ts`, tagged to "Outcome sentences name who decided" and "Failure sentences name the step in plain words", covering every row of the D4 table and a state missing from the map.
-- [ ] 2.2 Rewrite the demo sample titles and descriptions in `backend/app/demo.py`, and add `tests/test_demo_copy.py`, tagged to "Demo sample descriptions follow the same rules", which reads the shared list. Verify with `uv run pytest`, and with a temporary extra word in the list that makes both suites fail (scenario "One list for both checks").
+- [x] 2.2 Rewrite the demo sample titles and descriptions in `backend/app/demo.py`, and add `tests/test_demo_copy.py`, tagged to "Demo sample descriptions follow the same rules", which reads the shared list. Verify with `uv run pytest`, and with a temporary extra word in the list that makes both suites fail (scenario "One list for both checks").
 - [ ] 2.3 Rewrite the remaining dashboard copy page by page (design D5) and turn on the "current dashboard passes" test. Update `e2e/demo.spec.ts` to the new wording in the same commit. Verify with `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm e2e`.
 
 ## 3. Integration
