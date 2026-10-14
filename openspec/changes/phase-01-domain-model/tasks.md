@@ -34,7 +34,7 @@
 
 ## 7. Seed data
 
-- [ ] 7.1 Implement `scripts/seed.py`: the host allowlist, a single `TRUNCATE … CASCADE`, and the fixed fictional dataset with dates relative to today, all in one transaction. Verify with `tests/test_seed.py`, covering every table populated, all five kennel size classes, the three vaccine edge cases, identical counts after two runs, and a non-local host refused with no changes.
+- [x] 7.1 Implement `scripts/seed.py`: the host allowlist, a single `TRUNCATE … CASCADE`, and the fixed fictional dataset with dates relative to today, all in one transaction. Verify with `tests/test_seed.py`, covering every table populated, all five kennel size classes, the three vaccine edge cases, identical counts after two runs, and a non-local host refused with no changes.
 - [ ] 7.2 Run the seed against the development database. Verify with `uv run python -m scripts.seed`, which prints per-table counts.
 
 ## 8. Integration
