@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-10-15T03:04:05+00:00",
+ "generated_at": "2026-10-15T03:04:09+00:00",
  "reports": {
   "backend": "2026-10-14T21:59:15.906426-05:00",
   "frontend": "2026-10-15T03:01:20.417Z",
   "e2e": "2026-10-15T03:01:54.896Z"
  },
  "totals": {
-  "changes": 19,
-  "requirements": 140,
-  "verified": 140,
+  "changes": 20,
+  "requirements": 142,
+  "verified": 142,
   "tests": {
    "backend": 884,
    "frontend": 65,
@@ -2131,6 +2131,95 @@
      "capability": "observability-api",
      "kind": "added",
      "name": "JSON responses declare UTF-8"
+    }
+   ],
+   "decisions": []
+  },
+  {
+   "id": "2026-10-14-demo-new-pets",
+   "slug": "demo-new-pets",
+   "title": "Demo new pets",
+   "date": "2026-10-14",
+   "archived_at": null,
+   "why": "The Try page's generated requests draw their pet from the eight seeded pets, so the same names keep coming back: generate a few requests and Biscuit or Moose shows up again, often a name that already has a request in the list. A demo that is meant to show the desk handling requests it was never tuned on keeps showing it the same few pets.",
+   "what_changes": "- **A generated request brings a new pet:**\n  - a seeded owner, as before;\n  - a pet invented for that owner: a name from a pool of over 100 dog names and 50 cat names, a breed, and a weight that fits the breed.\n- **Sending adds the pet to its owner** before the request is stored, so intake matches it like any pet on file. Sending the same seed again reuses that pet.\n- **Fresh names.** When the server picks the seed, it skips any draw whose pet name is already on file (which covers every earlier request's pet) or was generated recently in this browser.\n- **The Try page remembers recent names.** It sends the last 10 names it generated in this browser session with each new generation.\n- **Still reproducible:** a seed alone still fixes the request, so the preview, the card, and the send stay the same.\n- **Simpler scenarios.** A new pet has no vaccine records on file, so the card is the only evidence and every scenario holds as described.",
+   "tasks": [
+    {
+     "title": "1. Generator",
+     "items": [
+      {
+       "id": "1.1",
+       "done": true,
+       "text": "Invent the pet from the seed (species, pool name, breed, weight), show the breed on the card, and add choosing a fresh seed. Verify with tests: pool sizes and clearance, same request before and after sending, names vary, fresh seeds skip names on file and recent names, a given seed is kept, and the scenario checks still pass."
+      }
+     ]
+    },
+    {
+     "title": "2. API",
+     "items": [
+      {
+       "id": "2.1",
+       "done": true,
+       "text": "Accept `avoid` on `GET /demo/generate` and add the pet on send. Verify with API tests: a name on file and recent names are skipped, sending adds one pet with the generated details, and sending twice reuses it."
+      }
+     ]
+    },
+    {
+     "title": "3. Dashboard",
+     "items": [
+      {
+       "id": "3.1",
+       "done": true,
+       "text": "Keep the last 10 generated names in session storage and send them with each generation. Verify with a frontend test of the request URL, then lint, type check, build, and the end-to-end demo."
+      },
+      {
+       "id": "3.2",
+       "done": true,
+       "text": "Try it in a browser: generate several requests, check the names don't repeat and the cards match, and send one. Verify with a screenshot and the run's outcome."
+      }
+     ]
+    },
+    {
+     "title": "4. Integration",
+     "items": [
+      {
+       "id": "4.1",
+       "done": true,
+       "text": "Run every suite and the coverage check, then regenerate the walkthrough."
+      }
+     ]
+    }
+   ],
+   "requirements": [
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "Generated pets are new"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "New names avoid names in use"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "modified",
+     "name": "Random requests are reproducible"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "modified",
+     "name": "The certificate matches its request"
+    },
+    {
+     "capability": "demo-generator",
+     "kind": "modified",
+     "name": "Scenarios hold with the records on file"
+    },
+    {
+     "capability": "run-dashboard",
+     "kind": "modified",
+     "name": "The Try page previews a request and its certificate"
     }
    ],
    "decisions": []
@@ -7916,20 +8005,20 @@
    "requirements": [
     {
      "name": "Random requests are reproducible",
-     "text": "Given a seed, the generator SHALL produce a request for a seeded owner and one of their pets. The request SHALL include:\n- a service the facility has vaccine rules for, for that species;\n- a stay starting 5 to 40 days after the demo day (boarding lasts 2 to 6 nights; other services take one day);\n- a message in the pet parent's words;\n- a certificate scenario.\n\nThe same seed SHALL always give the same request and certificate.",
+     "text": "Given a seed, the generator SHALL produce a request from a seeded owner for a new pet. The request SHALL include:\n- a service the facility has vaccine rules for, for that species;\n- a stay starting 5 to 40 days after the demo day (boarding lasts 2 to 6 nights; other services take one day);\n- a message in the pet parent's words;\n- a certificate scenario.\n\nThe same seed SHALL always give the same request and certificate, including after it has been sent.",
      "scenarios": [
       {
        "name": "Same seed, same request",
        "steps": [
-        "**WHEN** a request is generated twice with seed 42",
+        "**WHEN** a request is generated twice with seed 42, once before and once after sending it",
         "**THEN** both are identical, and both certificate images are byte-for-byte equal"
        ]
       },
       {
        "name": "Seeds vary the request",
        "steps": [
-        "**WHEN** requests are generated for seeds 1 to 40",
-        "**THEN** they include more than one pet, more than one service, and every scenario"
+        "**WHEN** requests are generated for seeds 1 to 80",
+        "**THEN** they include many pet names, both species, more than one service, and every scenario"
        ]
       }
      ],
@@ -7951,13 +8040,13 @@
     },
     {
      "name": "The certificate matches its request",
-     "text": "The certificate SHALL name the request's pet and owner, and list the vaccines the facility requires for that service and species, dated by its scenario:\n- `current`: every vaccine was given before the stay and expires after it;\n- `expired`: one required vaccine expired before the stay;\n- `expires_during_stay`: one required vaccine expires on a day of the stay before checkout;\n- `missing`: one required vaccine is left off the card.\n\nThe scenario SHALL be described in plain words with the request.",
+     "text": "The certificate SHALL name the request's pet, its species and breed, and its owner, and list the vaccines the facility requires for that service and species, dated by its scenario:\n- `current`: every vaccine was given before the stay and expires after it;\n- `expired`: one required vaccine expired before the stay;\n- `expires_during_stay`: one required vaccine expires on a day of the stay before checkout;\n- `missing`: one required vaccine is left off the card.\n\nThe scenario SHALL be described in plain words with the request.",
      "scenarios": [
       {
        "name": "Matching pet and owner",
        "steps": [
-        "**WHEN** a request is generated for Biscuit",
-        "**THEN** its certificate names Biscuit and Biscuit's owner"
+        "**WHEN** a request is generated",
+        "**THEN** its certificate names the generated pet, its breed, and a seeded owner"
        ]
       },
       {
@@ -7986,13 +8075,13 @@
     },
     {
      "name": "Scenarios hold with the records on file",
-     "text": "The desk checks a card together with the pet's records on file, so the generator SHALL change only a vaccine for which that combined check gives the scenario's status. When no draw of pet, service, and stay allows it, the request SHALL use `current`.",
+     "text": "The desk checks a card together with the pet's records on file. A generated pet is new and has none, so the scenario SHALL hold for the card alone and for the combined check.",
      "scenarios": [
       {
        "name": "A record on file would cover the card",
        "steps": [
         "**WHEN** requests are generated for seeds 1 to 80",
-        "**THEN** checking each card together with its pet's records on file gives `compliant` for `current`, and otherwise exactly one failing vaccine with that scenario's status"
+        "**THEN** checking each card together with its pet's records on file (none for a new pet) gives `compliant` for `current`, and otherwise exactly one failing vaccine with that scenario's status"
        ]
       }
      ],
@@ -8065,6 +8154,108 @@
        "id": "tests.test_observability_api::test_send_a_generated_request",
        "status": "passed",
        "seconds": 0.693
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "Generated pets are new",
+     "text": "The generator SHALL invent the request's pet for a seeded owner: a species, a name from a pool of at least 100 dog names and 50 cat names, a breed, and a weight that fits the breed. No pool name SHALL be a seeded pet's name or appear in a fixed sample's message. Sending SHALL add the pet to its owner before storing the request, or reuse that owner's pet with the same name.",
+     "scenarios": [
+      {
+       "name": "Send adds the pet",
+       "steps": [
+        "**WHEN** seed 42 is sent",
+        "**THEN** the owner has a pet with the generated name, species, breed, and weight, and intake can match the request to it"
+       ]
+      },
+      {
+       "name": "Same seed sent twice",
+       "steps": [
+        "**WHEN** seed 42 is sent twice",
+        "**THEN** both requests belong to one pet"
+       ]
+      },
+      {
+       "name": "The pool stays clear of other names",
+       "steps": [
+        "**WHEN** the name pool is checked",
+        "**THEN** it has at least 100 dog names and 50 cat names, no duplicates, no seeded pet's name, and no name from a sample's message"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_the_pool_stays_clear_of_other_names",
+       "status": "passed",
+       "seconds": 0.001
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_the_pet_is_new_with_a_fitting_breed_and_weight",
+       "status": "passed",
+       "seconds": 0.559
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_sending_adds_the_pet_once",
+       "status": "passed",
+       "seconds": 1.19
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "New names avoid names in use",
+     "text": "When the server picks the seed, it SHALL skip any draw whose pet name matches, ignoring case, a pet on file or one of up to 20 recent names sent by the client. After 200 draws without a fresh name it SHALL use the last draw. A seed given by the client SHALL be used as is.",
+     "scenarios": [
+      {
+       "name": "A name on file is skipped",
+       "steps": [
+        "**WHEN** a request is generated without a seed after a pet named Juno is on file",
+        "**THEN** the generated pet is not named Juno"
+       ]
+      },
+      {
+       "name": "Recent names are skipped",
+       "steps": [
+        "**WHEN** a request is generated without a seed and with recent names",
+        "**THEN** the generated pet's name is none of them"
+       ]
+      },
+      {
+       "name": "A given seed is kept",
+       "steps": [
+        "**WHEN** a request is generated with seed 42 and recent names that include seed 42's pet name",
+        "**THEN** the request for seed 42 is returned unchanged"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_a_name_on_file_is_skipped",
+       "status": "passed",
+       "seconds": 0.165
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_recent_names_are_skipped",
+       "status": "passed",
+       "seconds": 0.155
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_demo_generator::test_a_used_up_pool_still_gives_a_seed",
+       "status": "passed",
+       "seconds": 0.159
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_generated_names_avoid_pets_on_file_and_recent_names",
+       "status": "passed",
+       "seconds": 0.507
       }
      ],
      "status": "verified"
@@ -9768,7 +9959,7 @@
     },
     {
      "name": "The Try page previews a request and its certificate",
-     "text": "The Try page SHALL let the visitor generate a random request, and show its message (editable), its scenario in plain words, and its certificate image before sending. A new request can be generated at any time. Fixed samples SHALL show their certificate too, when they have one.",
+     "text": "The Try page SHALL let the visitor generate a random request, and show its message (editable), its scenario in plain words, and its certificate image before sending. A new request can be generated at any time. Each generation SHALL send the pet names generated earlier in this browser session, the latest 10, so the next name is fresh. Fixed samples SHALL show their certificate too, when they have one.",
      "scenarios": [
       {
        "name": "Generate and preview",
@@ -9782,6 +9973,13 @@
        "steps": [
         "**WHEN** the visitor sends a generated request",
         "**THEN** it is submitted by its seed, and the browser opens its live run view"
+       ]
+      },
+      {
+       "name": "Recent names go with each generation",
+       "steps": [
+        "**WHEN** the visitor generates a request after generating Juno and Pickle",
+        "**THEN** the page asks for the new request with Juno and Pickle as names to avoid"
        ]
       }
      ],
