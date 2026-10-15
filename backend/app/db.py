@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -14,10 +15,19 @@ def async_url(url: str) -> str:
     """Point a plain postgresql:// URL at SQLAlchemy's asyncpg driver.
 
     .env keeps the driver-neutral form so the same value works for psql and other tools.
+    Hosted providers add libpq options that SQLAlchemy would pass to asyncpg as keyword
+    arguments, which asyncpg rejects: `sslmode` becomes asyncpg's `ssl` (same values), and
+    `channel_binding` is dropped (spec: demo-hosting, design D2).
     """
     for prefix in ("postgresql+asyncpg://", "postgresql://", "postgres://"):
         if url.startswith(prefix):
-            return "postgresql+asyncpg://" + url.removeprefix(prefix)
+            parts = urlsplit("postgresql+asyncpg://" + url.removeprefix(prefix))
+            options = [
+                ("ssl" if key == "sslmode" else key, value)
+                for key, value in parse_qsl(parts.query, keep_blank_values=True)
+                if key != "channel_binding"
+            ]
+            return urlunsplit(parts._replace(query=urlencode(options)))
     raise ValueError("DATABASE_URL must start with postgresql://")
 
 
