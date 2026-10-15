@@ -119,8 +119,8 @@ export default function Home() {
       </section>
 
       <HowItWorks />
-      <About />
       <Method />
+      <Skills />
 
       <p className="mt-24 border-t border-rule pt-6 text-sm text-faint">
         The pet parents, pets, and vaccine cards on this site are made up.
@@ -134,33 +134,55 @@ async function Samples() {
   return <DemoPanel samples={samples} />;
 }
 
+const FEATURES: { skill: string; what: string }[] = [
+  { skill: "Python and FastAPI", what: "the API and the workflow that runs each request" },
+  { skill: "React and TypeScript", what: "this dashboard, which shows each run live" },
+  { skill: "PostgreSQL and Docker", what: "migrations, and the full stack in Docker Compose" },
+  { skill: "Testing and CI", what: "pytest, Vitest, and Playwright, run by GitHub Actions" },
+  { skill: "AI-assisted development", what: "each change specified, reviewed, and tested before it ships" },
+];
+
 function Intro() {
   return (
-    <section className="mb-20 grid items-start gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
-      <div className="lg:pt-6">
-        <h1 className="text-4xl leading-[1.05] font-extrabold sm:text-5xl">
-          PawDesk reads booking requests and drafts the replies.
+    <section className="mb-20 grid items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12">
+      <div className="max-w-2xl lg:pt-4">
+        <h1 className="text-4xl leading-[1.05] font-semibold sm:text-5xl">
+          PawDesk handles pet care bookings and asks a person when it isn&apos;t sure.
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
-          Pet parents write in to book boarding, daycare, or grooming, with a photo of the vaccine
-          card attached. PawDesk checks the vaccines against your rules, finds a free kennel, and
-          writes back. When a vaccine has lapsed or someone hides instructions in a message, the
-          reply waits for someone on your staff.
+          It&apos;s a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
+          request and the photo of the vaccine card, plain code checks the vaccines and finds a free
+          kennel, and another agent writes the reply.
         </p>
-        <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <p className="mt-4 text-lg leading-relaxed text-muted">
+          When every check passes, PawDesk books the stay and sends the reply. When something is
+          unclear or breaks a rule, the request waits in a review queue for someone on staff.
+        </p>
+        <p className="mt-4 text-lg leading-relaxed">
+          I built it to show full stack work and AI-driven
+          development, with the skills the posting lists:
+        </p>
+        <ul className="mt-4 space-y-2">
+          {FEATURES.map((f) => (
+            <li key={f.skill} className="flex gap-3 leading-relaxed">
+              <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-kennel" />
+              <span>
+                <span className="font-medium">{f.skill}:</span> <span className="text-muted">{f.what}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
           <a href="#try" className="rounded-full bg-ink px-5 py-2.5 font-medium text-white hover:brightness-125">
             Try a request
           </a>
           <a href="#how" className={link}>
             How it works
           </a>
-        </div>
-        <p className="mt-8 text-sm text-muted">
-          I built PawDesk to show full stack work and AI-driven development.{" "}
-          <a href="#about" className={link}>
-            Why and how
+          <a href="#skills" className={link}>
+            Skills in detail
           </a>
-        </p>
+        </div>
       </div>
       <WorkedExample />
     </section>
@@ -185,7 +207,7 @@ function WorkedExample() {
   return (
     <figure aria-label="One request from start to finish" className="rounded-2xl bg-surface p-5 ring-1 ring-rule sm:p-7">
       <p className="text-sm text-faint">Avery Lindqvist wrote, with a photo attached:</p>
-      <blockquote className="mt-2 font-display text-xl leading-snug font-medium sm:text-2xl">
+      <blockquote className="mt-2 font-display text-xl leading-snug font-medium sm:text-2xl lg:text-xl">
         Hi! Could <Read>Biscuit</Read> <Read>board</Read> with you from <Read>March 24 to March 27</Read>?
         He eats grain-free food twice a day. His <Read>vaccine card</Read> is attached.
       </blockquote>
@@ -279,19 +301,14 @@ function HowItWorks() {
   );
 }
 
-function About() {
+function Skills() {
   return (
-    <Section id="about" title="Why I built PawDesk">
-      <div className="mt-5 max-w-2xl space-y-4 text-lg leading-relaxed">
-        <p>
-          I built PawDesk to show that I work across the stack and use AI tools every day
-          while checking what they produce.
-        </p>
-        <p className="text-muted">
-          I wanted one working product that shows both, small enough that I can walk you through any
-          part of it. The table pairs the posting&apos;s skills with the parts of PawDesk that use them.
-        </p>
-      </div>
+    <Section id="skills" title="Skills from the posting">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        The posting asks for someone who works across the stack and uses AI tools every day while
+        checking what they produce. Each row pairs one of its skills with the parts of PawDesk that
+        use it.
+      </p>
 
       <table className="mt-10 w-full max-w-4xl border-t border-ink text-left">
         <thead className="sr-only">
