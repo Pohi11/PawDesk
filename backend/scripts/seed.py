@@ -4,10 +4,12 @@ Run from backend/:  uv run python -m scripts.seed
 
 Deletes every row in the domain tables, then loads a fixed, fictional dataset in one
 transaction. Dates are relative to today, so "expires during an upcoming stay" stays true
-whenever the seed is run. Refuses anything but a local database.
+whenever the seed is run. Refuses anything but a local database, or the one remote host
+named in PAWDESK_SEED_ALLOWED_HOST (the hosted demo resets itself on start).
 """
 
 import asyncio
+import os
 import sys
 from datetime import date, timedelta
 from decimal import Decimal
@@ -41,9 +43,14 @@ class SeedRefused(Exception):
     """The target database is not a local development or test database."""
 
 
-def ensure_local(database_url: str) -> None:
+def ensure_local(database_url: str, allowed_host: str | None = None) -> None:
+    """Refuse every host but a local one or exactly `allowed_host`.
+
+    Naming the host, rather than a yes/no switch, means a mistyped DATABASE_URL is still
+    refused (change public-demo-hosting, design D4).
+    """
     host = make_url(database_url).host
-    if host not in LOCAL_HOSTS:
+    if host not in LOCAL_HOSTS and not (allowed_host and host == allowed_host):
         raise SeedRefused(f"refusing to seed non-local database host {host!r}")
 
 
@@ -265,8 +272,8 @@ async def table_counts(session: AsyncSession) -> dict[str, int]:
     }
 
 
-async def run(database_url: str, today: date) -> dict[str, int]:
-    ensure_local(database_url)  # before connecting: a refused run touches nothing
+async def run(database_url: str, today: date, allowed_host: str | None = None) -> dict[str, int]:
+    ensure_local(database_url, allowed_host)  # before connecting: a refused run touches nothing
     engine = make_engine(database_url)
     try:
         async with make_sessionmaker(engine)() as session, session.begin():
@@ -278,7 +285,13 @@ async def run(database_url: str, today: date) -> dict[str, int]:
 
 def main() -> None:
     try:
-        counts = asyncio.run(run(get_settings().database_url, date.today()))
+        counts = asyncio.run(
+            run(
+                get_settings().database_url,
+                date.today(),
+                os.environ.get("PAWDESK_SEED_ALLOWED_HOST"),
+            )
+        )
     except SeedRefused as exc:
         sys.exit(f"seed: {exc}")
     for table, count in counts.items():

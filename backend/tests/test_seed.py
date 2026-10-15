@@ -8,7 +8,7 @@ from sqlalchemy import and_, func, select
 
 from app.enums import SizeClass
 from app.models import Kennel, Reservation, VaccineRecord
-from scripts.seed import SeedRefused, run, seed, table_counts
+from scripts.seed import SeedRefused, ensure_local, run, seed, table_counts
 
 spec = pytest.mark.spec
 TODAY = date(2027, 3, 1)
@@ -81,3 +81,18 @@ async def test_remote_database_is_refused_before_connecting(url):
     # If run() tried to connect, this would fail with a connection error instead.
     with pytest.raises(SeedRefused, match="non-local"):
         await run(url, TODAY)
+
+
+@spec("seed-data", "Seeding refuses non-development databases")
+async def test_a_different_remote_host_is_still_refused():
+    url = "postgresql://pawdesk:secret@db.prod.example.com:5432/pawdesk"
+    with pytest.raises(SeedRefused, match="non-local"):
+        await run(url, TODAY, allowed_host="ep-demo.us-east-1.aws.neon.tech")
+
+
+@spec("seed-data", "Seeding refuses non-development databases")
+def test_the_named_remote_host_passes_the_check():
+    host = "ep-demo.us-east-1.aws.neon.tech"
+    ensure_local(f"postgresql://pawdesk:secret@{host}/pawdesk?sslmode=require", host)
+    with pytest.raises(SeedRefused):
+        ensure_local(f"postgresql://pawdesk:secret@{host}/pawdesk", "")
