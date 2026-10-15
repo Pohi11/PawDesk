@@ -23,11 +23,11 @@ The same seed SHALL always give the same request and certificate, including afte
 - **THEN** they include many pet names, both species, more than one service, and every scenario
 
 ### Requirement: The certificate matches its request
-The certificate SHALL name the request's pet, its species and breed, and its owner, and list the vaccines the facility requires for that service and species, dated by its scenario:
-- `current`: every vaccine was given before the stay and expires after it;
-- `expired`: one required vaccine expired before the stay;
-- `expires_during_stay`: one required vaccine expires on a day of the stay before checkout;
-- `missing`: one required vaccine is left off the card.
+The certificate SHALL name the pet, its species and breed, and its owner, and list the vaccines required for the service and species, dated by its scenario:
+- `current`: all given before the stay and expiring after it;
+- `expired`: one expired before the stay;
+- `expires_during_stay`: one expires on a day of the stay before checkout;
+- `missing`: one is left off the card.
 
 The scenario SHALL be described in plain words with the request.
 

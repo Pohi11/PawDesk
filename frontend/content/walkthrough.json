@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-15T03:04:09+00:00",
+ "generated_at": "2026-10-15T03:04:33+00:00",
  "reports": {
   "backend": "2026-10-14T21:59:15.906426-05:00",
-  "frontend": "2026-10-15T03:01:20.417Z",
+  "frontend": "2026-10-15T03:04:14.266Z",
   "e2e": "2026-10-15T03:01:54.896Z"
  },
  "totals": {
@@ -2140,7 +2140,7 @@
    "slug": "demo-new-pets",
    "title": "Demo new pets",
    "date": "2026-10-14",
-   "archived_at": null,
+   "archived_at": "2026-10-14T22:04:14-05:00",
    "why": "The Try page's generated requests draw their pet from the eight seeded pets, so the same names keep coming back: generate a few requests and Biscuit or Moose shows up again, often a name that already has a request in the list. A demo that is meant to show the desk handling requests it was never tuned on keeps showing it the same few pets.",
    "what_changes": "- **A generated request brings a new pet:**\n  - a seeded owner, as before;\n  - a pet invented for that owner: a name from a pool of over 100 dog names and 50 cat names, a breed, and a weight that fits the breed.\n- **Sending adds the pet to its owner** before the request is stored, so intake matches it like any pet on file. Sending the same seed again reuses that pet.\n- **Fresh names.** When the server picks the seed, it skips any draw whose pet name is already on file (which covers every earlier request's pet) or was generated recently in this browser.\n- **The Try page remembers recent names.** It sends the last 10 names it generated in this browser session with each new generation.\n- **Still reproducible:** a seed alone still fixes the request, so the preview, the card, and the send stay the same.\n- **Simpler scenarios.** A new pet has no vaccine records on file, so the card is the only evidence and every scenario holds as described.",
    "tasks": [
@@ -2391,13 +2391,13 @@
        "suite": "frontend",
        "id": "lib/comparison.test.ts::the dashboard marks the better side of each metric the same way for both",
        "status": "passed",
-       "seconds": 0.0034833
+       "seconds": 0.0040449
       },
       {
        "suite": "frontend",
        "id": "lib/comparison.test.ts::fractions compare by value",
        "status": "passed",
-       "seconds": 0.0005901
+       "seconds": 0.0005713
       }
      ],
      "status": "verified"
@@ -7560,19 +7560,19 @@
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::anchors are stable and distinct",
        "status": "passed",
-       "seconds": 0.0029929
+       "seconds": 0.0029066
       },
       {
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::a change's requirements lead to their tests and results",
        "status": "passed",
-       "seconds": 0.0009045
+       "seconds": 0.0013815
       },
       {
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::a change's decisions lead to the decision records",
        "status": "passed",
-       "seconds": 0.0010709
+       "seconds": 0.0010832
       }
      ],
      "status": "verified"
@@ -8040,7 +8040,7 @@
     },
     {
      "name": "The certificate matches its request",
-     "text": "The certificate SHALL name the request's pet, its species and breed, and its owner, and list the vaccines the facility requires for that service and species, dated by its scenario:\n- `current`: every vaccine was given before the stay and expires after it;\n- `expired`: one required vaccine expired before the stay;\n- `expires_during_stay`: one required vaccine expires on a day of the stay before checkout;\n- `missing`: one required vaccine is left off the card.\n\nThe scenario SHALL be described in plain words with the request.",
+     "text": "The certificate SHALL name the pet, its species and breed, and its owner, and list the vaccines required for the service and species, dated by its scenario:\n- `current`: all given before the stay and expiring after it;\n- `expired`: one expired before the stay;\n- `expires_during_stay`: one expires on a day of the stay before checkout;\n- `missing`: one is left off the card.\n\nThe scenario SHALL be described in plain words with the request.",
      "scenarios": [
       {
        "name": "Matching pet and owner",
@@ -8297,25 +8297,25 @@
        "suite": "frontend",
        "id": "tests/copy.test.ts::a banned word in rendered text is reported with its file and line",
        "status": "passed",
-       "seconds": 0.0085577
+       "seconds": 0.0099067
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::string values and phrases are checked, with curly apostrophes too",
        "status": "passed",
-       "seconds": 0.0016505
+       "seconds": 0.0022717
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::class names, imports, comments, types, and object keys are not text",
        "status": "passed",
-       "seconds": 0.0032215
+       "seconds": 0.0044806
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::the current dashboard has no banned words",
        "status": "passed",
-       "seconds": 0.098025
+       "seconds": 0.1330764
       }
      ],
      "status": "verified"
@@ -8344,19 +8344,19 @@
        "suite": "frontend",
        "id": "tests/copy.test.ts::an em dash inside a sentence is reported",
        "status": "passed",
-       "seconds": 0.0004413
+       "seconds": 0.0010724
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::a lone em dash marking a missing value is allowed",
        "status": "passed",
-       "seconds": 0.0012229
+       "seconds": 0.0017916
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::the current dashboard has no em dash inside a sentence",
        "status": "passed",
-       "seconds": 0.0591276
+       "seconds": 0.082983
       }
      ],
      "status": "verified"
@@ -8427,13 +8427,13 @@
        "suite": "frontend",
        "id": "lib/story.test.ts::a request sent with no approval says the checks passed it",
        "status": "passed",
-       "seconds": 0.0022996
+       "seconds": 0.002996
       },
       {
        "suite": "frontend",
        "id": "lib/story.test.ts::a staff decision starts with the staff member's name",
        "status": "passed",
-       "seconds": 0.0004777
+       "seconds": 0.0004504
       }
      ],
      "status": "verified"
@@ -8462,7 +8462,7 @@
        "suite": "frontend",
        "id": "lib/story.test.ts::a failure names its step in words, never as a state",
        "status": "passed",
-       "seconds": 0.0007887
+       "seconds": 0.0007481
       }
      ],
      "status": "verified"
@@ -9473,19 +9473,19 @@
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a Beagle gets the Beagle photo",
        "status": "passed",
-       "seconds": 0.003257
+       "seconds": 0.0030484
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::breed matching ignores case and surrounding spaces",
        "status": "passed",
-       "seconds": 0.0004972
+       "seconds": 0.0004664
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a cat never gets a dog's breed photo",
        "status": "passed",
-       "seconds": 0.0004469
+       "seconds": 0.0005527
       }
      ],
      "status": "verified"
@@ -9514,31 +9514,31 @@
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a breed without a photo gets a general photo of the species",
        "status": "passed",
-       "seconds": 0.000321
+       "seconds": 0.0003501
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a pet with no breed gets a general photo",
        "status": "passed",
-       "seconds": 0.0006825
+       "seconds": 0.0005752
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::the same pet gets the same photo every time",
        "status": "passed",
-       "seconds": 0.0005857
+       "seconds": 0.0005165
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::different pets spread across the general photos",
        "status": "passed",
-       "seconds": 0.0004866
+       "seconds": 0.0007384
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::the hash is the published FNV-1a",
        "status": "passed",
-       "seconds": 0.0004018
+       "seconds": 0.000423
       }
      ],
      "status": "verified"
@@ -9560,7 +9560,7 @@
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::no matched pet means no photo",
        "status": "passed",
-       "seconds": 0.000237
+       "seconds": 0.0003103
       },
       {
        "suite": "e2e",
@@ -9667,19 +9667,19 @@
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::every file has one manifest entry and every entry its file",
        "status": "passed",
-       "seconds": 0.0047205
+       "seconds": 0.0056578
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::every photo is CC0 or public domain, from Commons",
        "status": "passed",
-       "seconds": 0.0039485
+       "seconds": 0.0042479
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::every species has a general photo",
        "status": "passed",
-       "seconds": 0.0002889
+       "seconds": 0.0005135
       }
      ],
      "status": "verified"
@@ -9719,13 +9719,13 @@
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::no committed photo carries EXIF or XMP",
        "status": "passed",
-       "seconds": 0.0208597
+       "seconds": 0.0153837
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::the scan does find metadata when it is there",
        "status": "passed",
-       "seconds": 0.0005229
+       "seconds": 0.0004736
       }
      ],
      "status": "verified"
@@ -9767,37 +9767,37 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::parallel steps both show running",
        "status": "passed",
-       "seconds": 0.0041552
+       "seconds": 0.0057172
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a request routed straight to drafting skips the resolver",
        "status": "passed",
-       "seconds": 0.0006579
+       "seconds": 0.0005117
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a request waiting for review",
        "status": "passed",
-       "seconds": 0.0008227
+       "seconds": 0.000494
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::steps without a span are skipped once their parent step ends",
        "status": "passed",
-       "seconds": 0.0004994
+       "seconds": 0.0004424
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::failures show as errors, and a failed send as a send error",
        "status": "passed",
-       "seconds": 0.0005094
+       "seconds": 0.000365
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::every node has a kind for its color",
        "status": "passed",
-       "seconds": 0.000561
+       "seconds": 0.0003535
       }
      ],
      "status": "verified"
@@ -9826,19 +9826,19 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::concurrent spans overlap",
        "status": "passed",
-       "seconds": 0.0028776
+       "seconds": 0.0231629
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a child is drawn one level deeper",
        "status": "passed",
-       "seconds": 0.0004236
+       "seconds": 0.0004887
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a running span extends to now",
        "status": "passed",
-       "seconds": 0.00031
+       "seconds": 0.0003267
       }
      ],
      "status": "verified"
@@ -9881,43 +9881,43 @@
        "suite": "frontend",
        "id": "lib/proxy.test.ts::reads and staff actions are allowed",
        "status": "passed",
-       "seconds": 0.0039945
+       "seconds": 0.0030817
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::everything else is refused",
        "status": "passed",
-       "seconds": 0.001143
+       "seconds": 0.0009651
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::an allowed path streams the backend response through",
        "status": "passed",
-       "seconds": 0.0122453
+       "seconds": 0.0091107
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::a refused path never contacts the backend",
        "status": "passed",
-       "seconds": 0.0042183
+       "seconds": 0.0037397
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::demo previews and certificate images are allowed",
        "status": "passed",
-       "seconds": 0.0006229
+       "seconds": 0.0004464
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::certificate images pass through unchanged",
        "status": "passed",
-       "seconds": 0.0030145
+       "seconds": 0.0020639
       },
       {
        "suite": "frontend",
        "id": "tests/no-backend-in-client.test.ts::no client component reads the backend address",
        "status": "passed",
-       "seconds": 0.0278294
+       "seconds": 0.0343572
       }
      ],
      "status": "verified"
@@ -9946,13 +9946,13 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::the span inspector shows tokens, dollars, and seconds",
        "status": "passed",
-       "seconds": 0.0009411
+       "seconds": 0.0013433
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::submitting a demo sample opens its live run view",
        "status": "passed",
-       "seconds": 0.0335215
+       "seconds": 0.0385032
       }
      ],
      "status": "verified"
@@ -9988,31 +9988,31 @@
        "suite": "frontend",
        "id": "lib/demo.test.ts::generating fetches a request and points at its seed's certificate",
        "status": "passed",
-       "seconds": 0.0454307
+       "seconds": 0.0510347
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::a generated request is sent by its seed and opens its run",
        "status": "passed",
-       "seconds": 0.0020076
+       "seconds": 0.0021743
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::a failed generation says so",
        "status": "passed",
-       "seconds": 0.0027233
+       "seconds": 0.002806
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::recent names go with each generation",
        "status": "passed",
-       "seconds": 0.0011534
+       "seconds": 0.0006052
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::the page remembers the latest names, newest first, without repeats",
        "status": "passed",
-       "seconds": 0.0021836
+       "seconds": 0.001097
       }
      ],
      "status": "verified"
@@ -10048,37 +10048,37 @@
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::every step says what it does, whatever its status",
        "status": "passed",
-       "seconds": 0.0062461
+       "seconds": 0.0070427
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::a clean run says what each step found",
        "status": "passed",
-       "seconds": 0.0007561
+       "seconds": 0.000604
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::a failing vaccine and a full kennel are named",
        "status": "passed",
-       "seconds": 0.0005764
+       "seconds": 0.0004017
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::the resolver, the reply, and staff review report this run",
        "status": "passed",
-       "seconds": 0.000715
+       "seconds": 0.0005821
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::skipped and unchecked steps say why",
        "status": "passed",
-       "seconds": 0.0005916
+       "seconds": 0.0004092
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::missing or odd fields fall back to plain text, never the message",
        "status": "passed",
-       "seconds": 0.0018584
+       "seconds": 0.0018453
       },
       {
        "suite": "e2e",
