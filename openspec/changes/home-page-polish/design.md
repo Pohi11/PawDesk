@@ -35,3 +35,4 @@
 ## Risks / Trade-offs
 
 - [The worked example is hand-written and could drift from the sample] → It quotes the clean sample's message and the facts the end-to-end test asserts for that sample (Biscuit, March 24 to 27, sent with no review).
+- [Next keeps the home page mounted, hidden, after a client-side navigation to a run page] → The example's outcome sentence is worded differently from the run page's, so tests that look that sentence up by its text find one element.

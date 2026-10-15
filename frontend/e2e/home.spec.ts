@@ -8,10 +8,13 @@ test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ 
   await page.goto("/");
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("PawDesk reads booking requests and drafts the replies.");
+  const example = page.getByRole("figure", { name: "One request from start to finish" });
+  await expect(example.getByRole("blockquote")).toContainText("Could Biscuit board with you from March 24 to March 27?");
+  await expect(example).toContainText("Every check passed, so PawDesk sent the reply");
   await expect(page.getByRole("heading", { name: "Try a request" })).toBeVisible();
   await expect(page.getByText("Clean boarding request", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Make one up/ })).toBeVisible();
-  for (const section of ["How a request moves", "Pages in the dashboard", "About this project", "Built with"]) {
+  for (const section of ["How a request moves", "What the tests hold it to", "Why I built PawDesk", "Working with an AI assistant"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }
 });
