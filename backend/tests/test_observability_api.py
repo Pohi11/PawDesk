@@ -517,6 +517,23 @@ async def test_samples_carry_their_pets_photo_fields(api, committed, full_seed):
     assert (unknown["pet_id"], unknown["pet_species"], unknown["pet_breed"]) == (None, None, None)
 
 
+@spec("observability-api", "Each sample is about a different pet")
+async def test_no_two_samples_share_a_pet(api, committed, full_seed):
+    samples = (await api.get("/demo/samples")).json()
+
+    pet_ids = [s["pet_id"] for s in samples if s["pet_id"] is not None]
+    assert len(pet_ids) == len(set(pet_ids)) >= 3
+
+
+@spec("observability-api", "Each sample is about a different pet")
+async def test_the_injection_samples_card_is_drawn_the_same_each_time(api):
+    first = await api.get("/demo/samples/injection/certificate.png")
+    second = await api.get("/demo/samples/injection/certificate.png")
+
+    assert first.status_code == 200 and first.content.startswith(b"\x89PNG")
+    assert first.content == second.content
+
+
 @spec("demo-generator", "Previews carry their pet's photo fields")
 async def test_the_seed_fixes_the_pet_id(api, committed, full_seed, scripted_background):
     first = (await api.get("/demo/generate", params={"seed": 42})).json()

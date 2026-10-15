@@ -50,6 +50,8 @@ test(`${TRY_PAGE} samples and a generated pet show their photos before sending`,
 
   const clean = page.locator("label").filter({ hasText: "Clean boarding request" });
   await expect(clean.getByRole("img", { name: "Photo for Biscuit" })).toHaveAttribute("src", "/pets/beagle.jpg");
+  const injection = page.locator("label").filter({ hasText: "Prompt injection attempt" });
+  await expect(injection.getByRole("img", { name: "Photo for Pepper" })).toHaveAttribute("src", "/pets/chihuahua.jpg");
   const unknown = page.locator("label").filter({ hasText: "Pet not on file" });
   await expect(unknown.getByRole("img", { name: "No pet matched yet" })).toBeVisible();
 
