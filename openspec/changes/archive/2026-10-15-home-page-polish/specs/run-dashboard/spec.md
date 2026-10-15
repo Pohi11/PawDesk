@@ -3,7 +3,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: The home page introduces PawDesk and holds the Try panel
-The home page (`/`) SHALL open with a plain-language description of what PawDesk does, why it was built, and its main features, beside a worked example of one request, followed by the Try panel. Below the panel it SHALL describe how a request moves through the steps, the guarantees the tests check, how the code is written, and which technologies serve each skill in the job posting, linking to the dashboard's other pages where it mentions them. `/demo` SHALL redirect to the home page, and the requests list SHALL be at `/requests`.
+The home page (`/`) SHALL open with what PawDesk does, why it was built, its main features, and a worked request, then the Try panel. Below the panel it SHALL explain the steps, the guarantees the tests check, how the code is written, and which technologies serve each skill in the job posting. `/demo` SHALL redirect to `/`, and the requests list SHALL be at `/requests`.
 
 #### Scenario: Opening the home page
 - **WHEN** a visitor opens `/`

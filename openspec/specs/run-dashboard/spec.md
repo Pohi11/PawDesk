@@ -104,11 +104,11 @@ Hovering or focusing a step in the run view's path SHALL show a tooltip with wha
 - **THEN** the same tooltip is shown and announced as the step's description, Escape hides it, and Enter opens the step in the inspector
 
 ### Requirement: The home page introduces PawDesk and holds the Try panel
-The home page (`/`) SHALL open with a plain-language description of what PawDesk does, followed by the Try panel. Below the panel it SHALL describe how a request moves through the steps, the dashboard's other pages, why the project was built, and the technologies it uses. `/demo` SHALL redirect to the home page, and the requests list SHALL be at `/requests`.
+The home page (`/`) SHALL open with what PawDesk does, why it was built, its main features, and a worked request, then the Try panel. Below the panel it SHALL explain the steps, the guarantees the tests check, how the code is written, and which technologies serve each skill in the job posting. `/demo` SHALL redirect to `/`, and the requests list SHALL be at `/requests`.
 
 #### Scenario: Opening the home page
 - **WHEN** a visitor opens `/`
-- **THEN** the page says what PawDesk does and shows the Try panel's samples and its "Make one up" choice
+- **THEN** the page says what PawDesk does and why it was built, shows the worked example, and shows the Try panel's samples and its "Make one up" choice
 
 #### Scenario: The old Try page address
 - **WHEN** a visitor opens `/demo`

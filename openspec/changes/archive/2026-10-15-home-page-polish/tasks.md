@@ -8,4 +8,4 @@
 
 ## 2. Integration
 
-- [ ] 2.1 Run every suite and the coverage check, then regenerate the walkthrough.
+- [x] 2.1 Run every suite and the coverage check, then regenerate the walkthrough.

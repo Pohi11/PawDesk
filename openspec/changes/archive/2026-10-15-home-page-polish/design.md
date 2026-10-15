@@ -4,7 +4,7 @@
 
 - **The home page** (change `home-page-intro`) has an introduction, the Try panel, and six sections: steps, rules, page cards, about with a skills list, method, and technology tags.
 - **The dashboard's tokens** give color a meaning: violet for model steps, blue for code, amber for tools, orange where a person acts, green for done.
-- **Interface copy** follows `docs/style/interface-copy.md` (decision record [0018](../../../docs/decisions/0018-plain-voice-for-interface-copy.md)).
+- **Interface copy** follows `docs/style/interface-copy.md` (decision record [0018](../../../../docs/decisions/0018-plain-voice-for-interface-copy.md)).
 
 ## Goals / Non-Goals
 
