@@ -21,7 +21,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.approvals import NotWaiting, decide, review_queue
 from app.certificate_card import render as render_certificate
 from app.db import get_sessionmaker
-from app.demo import DEMO_TODAY, SAMPLES, sample_certificate, store_request, submit_sample
+from app.demo import (
+    DEMO_TODAY,
+    SAMPLES,
+    sample_certificate,
+    sample_pets,
+    store_request,
+    submit_sample,
+)
 from app.demo_generator import MAX_SEED, fresh_seed, generate
 from app.enums import ApprovalAction
 from app.observability import (
@@ -176,8 +183,20 @@ async def evals(results_dir: ResultsDir) -> list[dict[str, Any]]:
 
 
 @router.get("/demo/samples")
-async def demo_samples() -> list[dict[str, Any]]:
-    return [sample.to_json() for sample in SAMPLES.values()]
+async def demo_samples(sessions: Sessions) -> list[dict[str, Any]]:
+    """The fixed samples, each with its pet's photo fields (null when not on file)."""
+    async with sessions() as session:
+        pets = await sample_pets(session)
+    return [
+        sample.to_json()
+        | {
+            "pet": pet.name if (pet := pets[sample.id]) else sample.pet,
+            "pet_id": str(pet.id) if pet else None,
+            "pet_species": str(pet.species) if pet else None,
+            "pet_breed": pet.breed if pet else None,
+        }
+        for sample in SAMPLES.values()
+    ]
 
 
 @router.get("/demo/samples/{sample_id}/certificate.png")

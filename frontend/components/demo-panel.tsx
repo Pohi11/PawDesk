@@ -8,11 +8,14 @@ import {
   type GeneratedRequest,
   certificateSrc,
   generateRequest,
+  generatedPet,
   rememberName,
   submitDemo,
 } from "@/lib/demo";
 import { formatService, formatStay } from "@/lib/format";
 import type { DemoSample } from "@/lib/types";
+
+import { PetAvatar } from "./pet-avatar";
 
 const GENERATED = "generated";
 const RECENT_KEY = "pawdesk.recent-demo-names";
@@ -93,9 +96,14 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
           onClick={makeOne}
           className={`block w-full rounded-2xl p-4 text-left ring-1 ${chosen === GENERATED ? "bg-surface ring-2 ring-ink" : "ring-rule hover:bg-surface"}`}
         >
-          <span className="block font-display text-lg font-semibold">Make one up</span>
-          <span className="mt-1 block text-sm text-muted">
-            A new pet for one of the pet parents, a stay, and a vaccine card to match. No name repeats one already on file.
+          <span className="flex items-start gap-3">
+            {generated && <PetAvatar pet={generatedPet(generated)} />}
+            <span>
+              <span className="block font-display text-lg font-semibold">Make one up</span>
+              <span className="mt-1 block text-sm text-muted">
+                A new pet for one of the pet parents, a stay, and a vaccine card to match. No name repeats one already on file.
+              </span>
+            </span>
           </span>
         </button>
         {samples.map((s) => (
@@ -104,8 +112,13 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
             className={`block cursor-pointer rounded-2xl p-4 ring-1 ${chosen === s.id ? "bg-surface ring-2 ring-ink" : "ring-rule hover:bg-surface"}`}
           >
             <input type="radio" name="sample" value={s.id} checked={chosen === s.id} onChange={() => setChosen(s.id)} className="sr-only" />
-            <span className="block font-display text-lg font-semibold">{s.title}</span>
-            <span className="mt-1 block text-sm text-muted">{s.expect}</span>
+            <span className="flex items-start gap-3">
+              <PetAvatar pet={s} />
+              <span>
+                <span className="block font-display text-lg font-semibold">{s.title}</span>
+                <span className="mt-1 block text-sm text-muted">{s.expect}</span>
+              </span>
+            </span>
           </label>
         ))}
       </fieldset>
@@ -116,13 +129,16 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
         ) : (
           <>
             {chosen === GENERATED && generated && (
-              <div className="mb-5">
-                <p className="font-display text-xl font-semibold">
-                  {generated.pet}, {formatService(generated.service).toLowerCase()}, {formatStay(generated.start_date, generated.end_date)}
-                </p>
-                <p className="text-muted">
-                  From {generated.owner}. {generated.breed}, {generated.weight_lb} lb. {generated.scenario_text}
-                </p>
+              <div className="mb-5 flex items-start gap-4">
+                <PetAvatar pet={generatedPet(generated)} size="lg" />
+                <div>
+                  <p className="font-display text-xl font-semibold">
+                    {generated.pet}, {formatService(generated.service).toLowerCase()}, {formatStay(generated.start_date, generated.end_date)}
+                  </p>
+                  <p className="text-muted">
+                    From {generated.owner}. {generated.breed}, {generated.weight_lb} lb. {generated.scenario_text}
+                  </p>
+                </div>
               </div>
             )}
             <label className="block">

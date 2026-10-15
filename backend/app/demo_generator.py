@@ -10,6 +10,7 @@ would otherwise depend on what has been sent (change demo-new-pets, design D2).
 
 import random
 import secrets
+import uuid
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
@@ -29,6 +30,9 @@ SERVICE_WEIGHTS = {Service.BOARDING: 3, Service.DAYCARE: 1, Service.GROOMING: 1}
 MAX_SEED = 2**31 - 1
 FRESH_DRAWS = 200  # seeds tried for an unused name before the last one is kept
 DOG_SHARE = 0.75
+# Generated pets' ids come from their seed, so the preview can show the photo the run page
+# will show once the pet is added (change try-page-pet-photos, design D2).
+PET_ID_NAMESPACE = uuid.UUID("6f4d1f2e-8a1b-5c3d-9e7f-0a1b2c3d4e5f")
 
 # Names for invented pets. None is a seeded pet's name or appears in a sample's message
 # (tests/test_demo_generator.py checks both).
@@ -330,11 +334,14 @@ class GeneratedRequest:
             for r in data["records"]
         ]
         data.pop("owner_email")
+        data["pet_id"] = str(demo_pet_id(self.seed))
         return data
 
     def new_pet(self) -> NewPet:
         """The pet to add to its owner when the request is sent."""
-        return NewPet(self.pet, Species(self.species), self.breed, self.weight_lb)
+        return NewPet(
+            self.pet, Species(self.species), self.breed, self.weight_lb, demo_pet_id(self.seed)
+        )
 
 
 def spoken(day: date) -> str:
@@ -353,6 +360,11 @@ def invent_pet(rng: random.Random) -> NewPet:
     name = rng.choice(NAMES[species])
     breed, lightest, heaviest = rng.choice(BREEDS[species])
     return NewPet(name, species, breed, round(rng.uniform(lightest, heaviest), 1))
+
+
+def demo_pet_id(seed: int) -> uuid.UUID:
+    """The id a generated pet gets when its request is sent."""
+    return uuid.uuid5(PET_ID_NAMESPACE, f"pawdesk-demo-pet:{seed}")
 
 
 def pet_name(seed: int) -> str:

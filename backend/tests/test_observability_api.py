@@ -493,6 +493,36 @@ async def test_generated_names_avoid_pets_on_file_and_recent_names(api, committe
     assert kept.json()["pet"] == sent  # a given seed is used as is
 
 
+@spec("demo-generator", "Previews carry their pet's photo fields")
+async def test_samples_carry_their_pets_photo_fields(api, committed, full_seed):
+    samples = {s["id"]: s for s in (await api.get("/demo/samples")).json()}
+
+    async with committed() as s:
+        biscuit = await s.scalar(select(Pet).where(Pet.name == "Biscuit"))
+    clean, unknown = samples["clean"], samples["unknown-pet"]
+    assert (clean["pet"], clean["pet_id"], clean["pet_species"], clean["pet_breed"]) == (
+        "Biscuit",
+        str(biscuit.id),
+        "dog",
+        "Beagle",
+    )
+    assert (unknown["pet_id"], unknown["pet_species"], unknown["pet_breed"]) == (None, None, None)
+
+
+@spec("demo-generator", "Previews carry their pet's photo fields")
+async def test_the_seed_fixes_the_pet_id(api, committed, full_seed, scripted_background):
+    first = (await api.get("/demo/generate", params={"seed": 42})).json()
+    second = (await api.get("/demo/generate", params={"seed": 42})).json()
+
+    request_id = uuid.UUID((await api.post("/demo/requests", json={"seed": 42})).json()["id"])
+
+    await wait_for(committed, request_id, {"needs_review", "sent", "failed", "drafting"})
+    async with committed() as s:
+        pet = await s.get(Pet, uuid.UUID(first["pet_id"]))
+    assert first["pet_id"] == second["pet_id"]
+    assert pet is not None and pet.name == first["pet"]
+
+
 async def test_too_many_recent_names_are_refused(api):
     response = await api.get("/demo/generate", params={"avoid": [f"n{i}" for i in range(21)]})
 

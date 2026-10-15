@@ -113,7 +113,7 @@ export interface EvalReport {
   headline: Record<string, unknown>;
 }
 
-export interface DemoSample {
+export interface DemoSample extends PetFields {
   id: string;
   title: string;
   expect: string;

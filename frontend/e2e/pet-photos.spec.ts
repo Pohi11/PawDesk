@@ -42,3 +42,20 @@ test(`${PLACEHOLDER} a pet not on file gets the paw placeholder`, async ({ page 
   await expect(row.getByRole("img", { name: "No pet matched yet" })).toBeVisible();
   await expect(row.getByRole("img", { name: /^Photo for/ })).toHaveCount(0);
 });
+
+const TRY_PAGE = specTag("pet-photos", "The Try page shows each request's pet photo");
+
+test(`${TRY_PAGE} samples and a generated pet show their photos before sending`, async ({ page }) => {
+  await page.goto("/demo");
+
+  const clean = page.locator("label").filter({ hasText: "Clean boarding request" });
+  await expect(clean.getByRole("img", { name: "Photo for Biscuit" })).toHaveAttribute("src", "/pets/beagle.jpg");
+  const unknown = page.locator("label").filter({ hasText: "Pet not on file" });
+  await expect(unknown.getByRole("img", { name: "No pet matched yet" })).toBeVisible();
+
+  await page.getByRole("button", { name: /Make one up/ }).click();
+  const heading = page.locator("p.font-display.text-xl");
+  await expect(heading).toBeVisible();
+  const pet = (await heading.textContent())!.split(",")[0];
+  await expect(page.getByRole("img", { name: `Photo for ${pet}` })).toHaveCount(2); // choice + preview
+});
