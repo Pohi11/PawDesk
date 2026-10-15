@@ -21,7 +21,7 @@ const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
   {
     title: "Read",
     who: ["llm"],
-    text: "A model pulls the pet, the service, and the dates out of the message. A second call reads the photo of the vaccine card.",
+    text: "The intake and records agents read the message and the vaccine card at the same time.",
   },
   {
     title: "Check",
@@ -31,12 +31,12 @@ const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
   {
     title: "Find options",
     who: ["llm", "tool"],
-    text: "When a check fails, an agent with read-only tools suggests a fix: other dates, a larger kennel, or an updated vaccine record. Code runs the checks again on each suggestion.",
+    text: "If a check fails, the resolver suggests a fix and code checks it again. If every check passes, this step is skipped.",
   },
   {
     title: "Write the reply",
     who: ["llm"],
-    text: "A model writes to the pet parent from the checked facts. It never sees their original message, so instructions hidden in that message can't reach it.",
+    text: "The reply agent drafts the answer to the pet parent from the facts code checked.",
   },
   {
     title: "Send or hold",
@@ -49,6 +49,37 @@ const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
         edits, or declines it.
       </>
     ),
+  },
+];
+
+const AGENTS: { name: string; calls: string; reads: string; returns: string; checks: string }[] = [
+  {
+    name: "Intake",
+    calls: "One model call",
+    reads: "The pet parent's message. Code scans it for instruction-like text, such as “ignore your rules”, before the model sees it.",
+    returns: "The pet's name, the service, the dates, any special notes, a confidence score, and anything it found unclear.",
+    checks: "Matches the pet to one on file and checks the dates. Instruction-like text, a confidence under 0.7, or anything unclear sends the request to a person.",
+  },
+  {
+    name: "Records",
+    calls: "One model call",
+    reads: "The photo of the vaccine card.",
+    returns: "Each vaccine with the date given and the expiry date, the pet's name as printed, whether the photo was readable, and a confidence score.",
+    checks: "Rejects impossible dates and unknown vaccines, and compares the printed name with the booked pet. An unreadable card or a confidence under 0.7 sends the request to a person.",
+  },
+  {
+    name: "Resolver",
+    calls: "A loop of up to 6 model calls",
+    reads: "Only values code built, such as which vaccine expired. It never sees the pet parent's message, and code starts it only for problems it can work on.",
+    returns: "One offer: other dates, a larger kennel, or a request for an updated vaccine record. It finds them with 3 read-only tools, at most 12 calls.",
+    checks: "Runs the checks again on every option. The resolver can't book anything, and a person reviews its offer.",
+  },
+  {
+    name: "Reply",
+    calls: "One model call",
+    reads: "The checked facts and the options code verified. Like the resolver, it never sees the original message.",
+    returns: "A subject line and the body of the reply.",
+    checks: "Flags any date the checks didn't confirm, any money amount, and words like “booked” or “confirmed” the facts don't support. A flagged draft goes to a person.",
   },
 ];
 
@@ -118,6 +149,7 @@ export default function Home() {
         </Suspense>
       </section>
 
+      <Agents />
       <HowItWorks />
       <Method />
       <Skills />
@@ -150,7 +182,7 @@ function Intro() {
           PawDesk handles pet care bookings and asks a person when it isn&apos;t sure.
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
-          It&apos;s a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
+          PawDesk is a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
           request and the photo of the vaccine card, plain code checks the vaccines and finds a free
           kennel, and another agent writes the reply.
         </p>
@@ -247,6 +279,56 @@ function Section({ id, title, children }: { id: string; title: string; children:
       </h2>
       {children}
     </section>
+  );
+}
+
+function Agents() {
+  const cell = "block align-top leading-relaxed text-muted lg:table-cell lg:py-5 lg:pr-6";
+  const label = "block text-xs font-medium text-faint lg:hidden";
+  return (
+    <Section id="agents" title="The agents">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        Four parts of PawDesk use a model. Each one reads something, returns a fixed set of fields,
+        and hands them to code that checks them before they count. None of them can approve a
+        booking.
+      </p>
+
+      <table className="mt-10 w-full max-w-3xl border-t border-ink text-left text-sm lg:max-w-none">
+        <thead className="hidden lg:table-header-group">
+          <tr className="text-xs text-faint">
+            <th scope="col" className="w-44 py-3 pr-6 font-medium">Agent</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Reads</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Returns</th>
+            <th scope="col" className="py-3 font-medium">What code checks</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-rule border-t border-rule">
+          {AGENTS.map((a) => (
+            <tr key={a.name} className="flex flex-col gap-3 py-5 lg:table-row">
+              <th scope="row" className="align-top font-normal lg:py-5 lg:pr-6">
+                <span className="flex items-center gap-2 font-display text-lg font-semibold">
+                  <KindDot kind="llm" />
+                  {a.name}
+                </span>
+                <span className="mt-0.5 block text-xs text-muted">{a.calls}</span>
+              </th>
+              <td className={cell}>
+                <span className={label}>Reads</span>
+                {a.reads}
+              </td>
+              <td className={cell}>
+                <span className={label}>Returns</span>
+                {a.returns}
+              </td>
+              <td className={`${cell} lg:pr-0`}>
+                <span className={label}>What code checks</span>
+                {a.checks}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Section>
   );
 }
 

@@ -14,7 +14,11 @@ test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ 
   await expect(page.getByRole("heading", { name: "Try a request" })).toBeVisible();
   await expect(page.getByText("Clean boarding request", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Make one up/ })).toBeVisible();
-  for (const section of ["How a request moves", "What the tests hold it to", "Working with an AI assistant", "Skills from the posting"]) {
+  const agents = page.locator("#agents");
+  for (const agent of ["Intake", "Records", "Resolver", "Reply"]) {
+    await expect(agents.getByRole("rowheader", { name: new RegExp(`^${agent}`) })).toBeVisible();
+  }
+  for (const section of ["The agents", "How a request moves", "What the tests hold it to", "Working with an AI assistant", "Skills from the posting"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }
 });

@@ -18,7 +18,7 @@
 
 ### D1. A table, one row per agent
 - **The content is a grid by nature:** four agents by three questions (reads, returns, what code checks). A table shows that, where four cards would hide it.
-- **On phones** each row stacks, and each cell carries its column's name.
+- **Below 1024 px** each row stacks, and each cell carries its column's name: four columns of prose are too narrow to read at tablet width.
 - **Each agent's name says how much of it is a model:** "one model call" or "a loop of up to 6 model calls". Calling all four "agents" is the project's own vocabulary; the table states which one loops.
 
 ### D2. The steps section shrinks
