@@ -94,6 +94,18 @@ def test_settings_choose_the_transport(tmp_path):
         cassette_transport(fake_settings(llm_cassette_mode="replay"))
 
 
+@spec("llm-client", "Model text keeps its characters")
+async def test_en_dash_survives_record_and_replay(tracer, tmp_path):
+    upstream = Script(ok(text="M1 is free Mar 6–10."))  # raw UTF-8, no charset declared
+
+    recorded = await call(
+        tracer, CassetteTransport(tmp_path, "record", httpx.MockTransport(upstream))
+    )
+    replayed = await call(tracer, CassetteTransport(tmp_path, "replay"))
+
+    assert recorded.text == replayed.text == "M1 is free Mar 6–10."
+
+
 @spec("llm-client", REQ)
 async def test_recording_a_compressed_response(tracer, tmp_path):
     """Real providers gzip their responses; the recorder hands on decoded content."""

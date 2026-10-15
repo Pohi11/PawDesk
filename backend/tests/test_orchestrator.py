@@ -628,6 +628,37 @@ async def test_resolution_saved_with_the_move(committed, desk, submit, process):
     assert by_name["find_alternative_dates"].parent_span_id == by_name["resolve"].id
 
 
+# An en dash, sent the way the provider sends it: raw UTF-8 inside the arguments string
+# (ensure_ascii=False) and in a body declared `application/json` with no charset.
+EN_DASH_SUMMARY = "No medium kennel is free Mar 10–14, but M1 is free four days earlier."
+EN_DASH_PROPOSAL = [
+    lambda: tool_calls(("find_alternative_dates", {"max_shift_days": 7})),
+    lambda: tool_calls(
+        (
+            "propose_offer",
+            json.dumps({"options": [EARLIER], "summary": EN_DASH_SUMMARY}, ensure_ascii=False),
+        )
+    ),
+]
+
+
+@spec("llm-client", "Model text keeps its characters")
+async def test_en_dash_in_a_tool_call_reaches_the_saved_step(committed, desk, submit, process):
+    await fill_kennel(committed, desk)
+    request_id = await submit()
+    wire = EN_DASH_PROPOSAL[1]()
+    assert "–".encode() in wire.content and "charset" not in wire.headers["content-type"]
+
+    await process(request_id, FakeModel(resolver=EN_DASH_PROPOSAL))
+
+    resolution = (await saved(committed, request_id))[Step.RESOLUTION]
+    assert resolution["proposal"]["summary"] == EN_DASH_SUMMARY
+    [call] = [c for c in resolution["tool_calls"] if c["name"] == "propose_offer"]
+    assert json.loads(call["arguments"])["summary"] == EN_DASH_SUMMARY
+    by_name = {s.name: s for s in await spans_of(committed, request_id)}
+    assert json.loads(by_name["propose_offer"].input["arguments"])["summary"] == EN_DASH_SUMMARY
+
+
 @spec("booking-orchestration", "Resolving runs the resolver, then moves to drafting")
 async def test_not_attempted_still_moves_on(committed, submit, process):
     request_id = await submit()
