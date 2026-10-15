@@ -10,7 +10,7 @@
 
 ## 3. Dashboard
 
-- [ ] 3.1 Keep the last 10 generated names in session storage and send them with each generation. Verify with a frontend test of the request URL, then lint, type check, build, and the end-to-end demo.
+- [x] 3.1 Keep the last 10 generated names in session storage and send them with each generation. Verify with a frontend test of the request URL, then lint, type check, build, and the end-to-end demo.
 - [ ] 3.2 Try it in a browser: generate several requests, check the names don't repeat and the cards match, and send one. Verify with a screenshot and the run's outcome.
 
 ## 4. Integration

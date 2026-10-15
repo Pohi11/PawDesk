@@ -3,11 +3,38 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { type DemoSource, type GeneratedRequest, certificateSrc, generateRequest, submitDemo } from "@/lib/demo";
+import {
+  type DemoSource,
+  type GeneratedRequest,
+  certificateSrc,
+  generateRequest,
+  rememberName,
+  submitDemo,
+} from "@/lib/demo";
 import { formatService, formatStay } from "@/lib/format";
 import type { DemoSample } from "@/lib/types";
 
 const GENERATED = "generated";
+const RECENT_KEY = "pawdesk.recent-demo-names";
+
+// Recent names live in session storage, so they survive opening a run and coming back. The
+// page works the same without storage (private windows, blocked site data).
+function loadRecent(): string[] {
+  try {
+    const parsed: unknown = JSON.parse(sessionStorage.getItem(RECENT_KEY) ?? "[]");
+    return Array.isArray(parsed) ? parsed.filter((n): n is string => typeof n === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecent(names: string[]) {
+  try {
+    sessionStorage.setItem(RECENT_KEY, JSON.stringify(names));
+  } catch {
+    // Not kept; the server still skips every name on file.
+  }
+}
 
 export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   const router = useRouter();
@@ -18,6 +45,8 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Not rendered, so reading storage while rendering can't cause a hydration mismatch.
+  const [recent, setRecent] = useState<string[]>(loadRecent);
 
   const sample = samples.find((s) => s.id === chosen);
   const source: DemoSource | null =
@@ -32,7 +61,11 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
     setError(null);
     setBusy(true);
     try {
-      setGenerated(await generateRequest());
+      const request = await generateRequest(recent);
+      const names = rememberName(recent, request.pet);
+      setRecent(names);
+      saveRecent(names);
+      setGenerated(request);
     } catch (e) {
       setError(e instanceof Error ? `${e.message}. Is the API running?` : String(e));
     }
@@ -62,7 +95,7 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
         >
           <span className="block font-display text-lg font-semibold">Make one up</span>
           <span className="mt-1 block text-sm text-muted">
-            A random pet parent, pet, stay, and a vaccine card to match. Every one is different.
+            A new pet for one of the pet parents, a stay, and a vaccine card to match. No name repeats one already on file.
           </span>
         </button>
         {samples.map((s) => (
@@ -88,7 +121,7 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
                   {generated.pet}, {formatService(generated.service).toLowerCase()}, {formatStay(generated.start_date, generated.end_date)}
                 </p>
                 <p className="text-muted">
-                  From {generated.owner}. {generated.scenario_text}
+                  From {generated.owner}. {generated.breed}, {generated.weight_lb} lb. {generated.scenario_text}
                 </p>
               </div>
             )}

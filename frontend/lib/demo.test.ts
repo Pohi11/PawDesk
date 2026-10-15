@@ -1,7 +1,7 @@
 import { expect, vi } from "vitest";
 
 import { specTest } from "../tests/spec";
-import { certificateSrc, generateRequest, submitDemo } from "./demo";
+import { RECENT_NAMES, certificateSrc, generateRequest, rememberName, submitDemo } from "./demo";
 
 const TRY = "The Try page previews a request and its certificate";
 
@@ -9,7 +9,7 @@ specTest("run-dashboard", TRY, "generating fetches a request and points at its s
   const generated = { seed: 42, pet: "Biscuit", message: "Hi", certificate_url: "/demo/generated/42/certificate.png" };
   const fetchMock = vi.fn(async () => Response.json(generated));
 
-  const request = await generateRequest(fetchMock as unknown as typeof fetch);
+  const request = await generateRequest([], fetchMock as unknown as typeof fetch);
 
   expect(fetchMock.mock.calls[0]).toEqual(["/api/demo/generate"]);
   expect(request).toEqual(generated);
@@ -34,5 +34,24 @@ specTest("run-dashboard", TRY, "a generated request is sent by its seed and open
 specTest("run-dashboard", TRY, "a failed generation says so", async () => {
   const fetchMock = vi.fn(async () => new Response("", { status: 502 }));
 
-  await expect(generateRequest(fetchMock as unknown as typeof fetch)).rejects.toThrow("(502)");
+  await expect(generateRequest([], fetchMock as unknown as typeof fetch)).rejects.toThrow("(502)");
+});
+
+specTest("run-dashboard", TRY, "recent names go with each generation", async () => {
+  const fetchMock = vi.fn(async () => Response.json({ seed: 7, pet: "Nacho" }));
+
+  await generateRequest(["Juno", "Pickle"], fetchMock as unknown as typeof fetch);
+
+  const [url] = fetchMock.mock.calls[0] as unknown as [string];
+  expect(url).toBe("/api/demo/generate?avoid=Juno&avoid=Pickle");
+});
+
+specTest("run-dashboard", TRY, "the page remembers the latest names, newest first, without repeats", () => {
+  let recent: string[] = [];
+  for (const name of ["Juno", "Pickle", "juno"]) recent = rememberName(recent, name);
+  expect(recent).toEqual(["juno", "Pickle"]);
+
+  for (let i = 0; i < 20; i++) recent = rememberName(recent, `Pet ${i}`);
+  expect(recent).toHaveLength(RECENT_NAMES);
+  expect(recent[0]).toBe("Pet 19");
 });
