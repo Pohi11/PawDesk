@@ -8,6 +8,8 @@ A booking intake desk for pet care businesses (boarding, daycare, grooming). A p
 
 Anything risky waits for a staff member. Every step is traced, and visible live in a dashboard.
 
+**Try it:** [huggingface.co/spaces/pohi111/pawdesk](https://huggingface.co/spaces/pohi111/pawdesk). See [Hosted demo](#hosted-demo).
+
 ![Demo: a clean request runs to sent; a prompt-injection attempt waits for review and is approved by staff](docs/demo.gif)
 
 *The end-to-end test run, captured frame by frame:*
@@ -140,6 +142,18 @@ uv run python -m scripts.compare_architectures
 
 No model key is used in CI.
 
+## Hosted demo
+
+The public demo runs on a Hugging Face Docker Space with its database at Neon ([decision record 0019](docs/decisions/0019-host-demo-on-hugging-face-and-neon.md)):
+- **One container** ([`deploy/huggingface/`](deploy/huggingface/)): on start it migrates, reseeds the synthetic data, and runs the backend on the loopback address behind the dashboard on the public port.
+- **Model use is capped** per hour and per day (`DEMO_MODEL_CALLS_PER_HOUR`, `DEMO_MODEL_CALLS_PER_DAY`), counted from recorded model calls. Past a limit, sending answers 429 and the Try page says why.
+- **Everyone is staff** in the demo. Replies are never sent anywhere, and the data resets on every restart.
+- **Deploying** uploads only the files committed at `HEAD`. Secrets (`DATABASE_URL`, `OPENROUTER_API_KEY`, `PAWDESK_SEED_ALLOWED_HOST`) are set on the Space.
+
+```bash
+cd backend && uv run python -m scripts.deploy_space <owner>/<space>
+```
+
 ## Layout
 
 ```
@@ -147,4 +161,5 @@ backend/    FastAPI, SQLAlchemy, Alembic; app/ (workflow, agents, checks, tracin
 frontend/   Next.js dashboard; app/ (pages), components/, lib/ (pure view logic), e2e/
 openspec/   specs/ (current requirements) and changes/archive/ (every change, in order)
 docs/       decisions/ (decision records) and the demo GIF
+deploy/     the hosted demo's container (Hugging Face Space)
 ```
