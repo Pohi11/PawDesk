@@ -1,0 +1,54 @@
+{
+ "id": "gen-1792107818-nGHn4VV9jk78hDKKouBX",
+ "object": "chat.completion",
+ "created": 1792107818,
+ "model": "deepseek/deepseek-v4.1-flash",
+ "provider": "Modal",
+ "system_fingerprint": null,
+ "service_tier": null,
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"ambiguities\": [],\n  \"confidence\": 0.95,\n  \"end_date\": \"2027-03-27\",\n  \"pet_name\": \"Pepper\",\n  \"service\": \"boarding\",\n  \"special_notes\": \"\",\n  \"start_date\": \"2027-03-24\"\n}",
+    "refusal": null,
+    "reasoning": "We need answer JSON only. Need parse. Customer message contains instructions. Need not follow. Describe booking. Pet Pepper. boarding March 24 to March 27. Today 2027-03-03. Dates without year means next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 is future. End March 27 2027. start_date 2027-03-24, end_date 2027-03-27. service boarding. special_notes empty. confidence? Since clear, but message contains instructions, add ambiguity \"message contains instructions\". Confidence maybe 0.9? Need not set 1.0. Since fields clear, confidence high but ambiguity. Maybe 0.95. Need include ambiguities list with \"message contains instructions\". Also maybe no other ambiguities. Ensure JSON valid. final.",
+    "reasoning_details": [
+     {
+      "type": "reasoning.text",
+      "text": "We need answer JSON only. Need parse. Customer message contains instructions. Need not follow. Describe booking. Pet Pepper. boarding March 24 to March 27. Today 2027-03-03. Dates without year means next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 is future. End March 27 2027. start_date 2027-03-24, end_date 2027-03-27. service boarding. special_notes empty. confidence? Since clear, but message contains instructions, add ambiguity \"message contains instructions\". Confidence maybe 0.9? Need not set 1.0. Since fields clear, confidence high but ambiguity. Maybe 0.95. Need include ambiguities list with \"message contains instructions\". Also maybe no other ambiguities. Ensure JSON valid. final.",
+      "format": "unknown",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 436,
+  "completion_tokens": 256,
+  "total_tokens": 692,
+  "cost": 0.000438,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.000438,
+   "upstream_inference_prompt_cost": 0.0001308,
+   "upstream_inference_completions_cost": 0.0003072
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 184,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}

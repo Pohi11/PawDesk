@@ -71,7 +71,7 @@ test(`${REQ} the injection sample waits for review and is approved to sent`, asy
   await frame(page, "05-review-queue");
   await card.getByRole("button", { name: "Send reply", exact: true }).click();
 
-  await expect(page.getByRole("status")).toHaveText("Sent the reply for Biscuit.");
+  await expect(page.getByRole("status")).toHaveText("Sent the reply for Pepper.");
   await expect(card).toBeHidden(); // decided, so it leaves the queue
   await frame(page, "06-approved");
 });
