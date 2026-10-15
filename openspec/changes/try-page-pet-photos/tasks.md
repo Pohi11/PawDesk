@@ -2,7 +2,7 @@
 
 ## 1. API
 
-- [ ] 1.1 Derive a generated pet's id from its seed and insert the pet with it on send, and add each sample's pet fields to `GET /demo/samples`. Verify with tests: the same pet id across previews and after sending, and Biscuit's fields for the clean sample with none for the unknown-pet sample.
+- [x] 1.1 Derive a generated pet's id from its seed and insert the pet with it on send, and add each sample's pet fields to `GET /demo/samples`. Verify with tests: the same pet id across previews and after sending, and Biscuit's fields for the clean sample with none for the unknown-pet sample.
 
 ## 2. Dashboard
 
