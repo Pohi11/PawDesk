@@ -77,7 +77,7 @@ export function RunView({ initial }: { initial: RequestDetail }) {
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/" className="text-sm text-muted hover:text-ink">
+        <Link href="/requests" className="text-sm text-muted hover:text-ink">
           All requests
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

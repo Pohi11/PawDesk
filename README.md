@@ -94,7 +94,7 @@ uv run uvicorn app.main:app --reload
 ```
 
 ```bash
-cd frontend && pnpm dev          # dashboard at http://localhost:3000; try the Demo page
+cd frontend && pnpm dev          # dashboard at http://localhost:3000 (the home page holds the Try panel)
 ```
 
 ## Test
