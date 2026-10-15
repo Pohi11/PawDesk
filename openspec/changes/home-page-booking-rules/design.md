@@ -17,7 +17,7 @@
 ## Decisions
 
 ### D1. A comparison table for the services
-- **Three services by four questions** (visit, kennel, dogs need, cats need) is a grid, so it's a table with the services as columns. On phones each service stacks with its four answers.
+- **Three services by four questions** (visit, kennel, dogs need, cats need) is a grid, so it's a table with one row per service, like the agents table. Below 1024 px each service stacks with its four answers, each labeled.
 
 ### D2. One date strip for coverage
 - **"Covers the stay" is the rule visitors misread most**: the shot has to last through pickup day, not only drop-off. A strip of the days March 23 to 28, with the stay marked and two vaccine bars under it (one lasting past pickup, one ending on the 26th), shows it faster than a sentence.
