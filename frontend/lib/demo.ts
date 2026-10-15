@@ -5,6 +5,8 @@ export interface GeneratedRequest {
   owner: string;
   pet: string;
   species: string;
+  breed: string;
+  weight_lb: number;
   service: string;
   start_date: string;
   end_date: string;
@@ -26,8 +28,22 @@ export function certificateSrc(source: DemoSource): string {
     : `/api/demo/samples/${source.sample}/certificate.png`;
 }
 
-export async function generateRequest(fetchImpl: typeof fetch = fetch): Promise<GeneratedRequest> {
-  const response = await fetchImpl("/api/demo/generate");
+/** How many generated names the Try page remembers and asks the server to avoid. */
+export const RECENT_NAMES = 10;
+
+/** The recent names with `name` first, without repeats, at most RECENT_NAMES long. */
+export function rememberName(recent: string[], name: string): string[] {
+  const others = recent.filter((n) => n.toLowerCase() !== name.toLowerCase());
+  return [name, ...others].slice(0, RECENT_NAMES);
+}
+
+/** A new request whose pet is named none of `avoid` and no pet on file (spec: demo-generator). */
+export async function generateRequest(
+  avoid: string[] = [],
+  fetchImpl: typeof fetch = fetch,
+): Promise<GeneratedRequest> {
+  const query = new URLSearchParams(avoid.map((name) => ["avoid", name])).toString();
+  const response = await fetchImpl(query ? `/api/demo/generate?${query}` : "/api/demo/generate");
   if (!response.ok) throw new Error(`could not make up a request (${response.status})`);
   return (await response.json()) as GeneratedRequest;
 }
