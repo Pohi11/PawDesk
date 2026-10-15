@@ -51,12 +51,14 @@ async function Desk() {
           and watch it run.
         </p>
       ) : (
-        <ol className="divide-y divide-rule overflow-hidden rounded-2xl bg-surface ring-1 ring-rule">
+        // The list owns the column tracks and every row is a subgrid of them, so the
+        // auto status column sizes to the widest tag in the list rather than per row.
+        <ol className="grid grid-cols-[1fr_auto] gap-x-6 divide-y divide-rule overflow-hidden rounded-2xl bg-surface ring-1 ring-rule sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto_5rem]">
           {rows.map((row) => (
-            <li key={row.id}>
+            <li key={row.id} className="col-span-full grid grid-cols-subgrid">
               <Link
                 href={`/requests/${row.id}`}
-                className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-5 py-4 hover:bg-wash sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto_5rem]"
+                className="col-span-full grid grid-cols-subgrid items-center gap-y-1 px-5 py-4 hover:bg-wash"
               >
                 <div className="flex min-w-0 items-center gap-4">
                   <PetAvatar pet={row} />
