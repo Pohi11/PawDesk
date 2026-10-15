@@ -10,6 +10,7 @@ import {
   generateRequest,
   generatedPet,
   rememberName,
+  DemoRefused,
   submitDemo,
 } from "@/lib/demo";
 import { formatService, formatStay } from "@/lib/format";
@@ -82,7 +83,8 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
     try {
       router.push(await submitDemo(source, message !== original ? message : undefined));
     } catch (e) {
-      setError(e instanceof Error ? `Not sent: ${e.message}. Is the API running?` : String(e));
+      if (e instanceof DemoRefused) setError(`Not sent: ${e.message}`);
+      else setError(e instanceof Error ? `Not sent: ${e.message}. Is the API running?` : String(e));
       setBusy(false);
     }
   }

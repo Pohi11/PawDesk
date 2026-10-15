@@ -3,6 +3,7 @@ import { expect, vi } from "vitest";
 import { specTest } from "../tests/spec";
 import { petPhoto } from "./pet-photo";
 import {
+  DemoRefused,
   RECENT_NAMES,
   type GeneratedRequest,
   certificateSrc,
@@ -87,3 +88,13 @@ specTest(
     expect(petPhoto(generatedPet({ ...preview, breed: "Beagle" }))?.breed).toBe("Beagle");
   },
 );
+
+specTest("demo-hosting", "The Try page explains a reached limit", "a refused request carries the server's explanation", async () => {
+  const detail = "The demo reached its hourly limit on model calls. Try again later.";
+  const fetchMock = vi.fn(async () => Response.json({ detail }, { status: 429 }));
+
+  const sending = submitDemo({ sample: "clean" }, undefined, fetchMock as unknown as typeof fetch);
+
+  await expect(sending).rejects.toBeInstanceOf(DemoRefused);
+  await expect(sending).rejects.toThrow(detail);
+});

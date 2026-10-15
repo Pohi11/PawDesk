@@ -57,6 +57,9 @@ export async function generateRequest(
   return (await response.json()) as GeneratedRequest;
 }
 
+/** The demo refused a request on purpose (a model-use limit), with the server's explanation. */
+export class DemoRefused extends Error {}
+
 /** Sends a sample or a generated request and returns the live run view's path for it. */
 export async function submitDemo(
   source: DemoSource,
@@ -68,6 +71,10 @@ export async function submitDemo(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(message ? { ...source, message } : source),
   });
+  if (response.status === 429) {
+    const { detail } = (await response.json()) as { detail: string };
+    throw new DemoRefused(detail);
+  }
   if (!response.ok) {
     throw new Error(`demo submission failed (${response.status})`);
   }
