@@ -9,6 +9,7 @@ attaches are consistent with the stay. Processing for demo requests uses that da
 import uuid
 from dataclasses import dataclass
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -16,7 +17,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.documents import attach_certificate
-from app.models import BookingRequest, Facility, Owner
+from app.enums import Species
+from app.models import BookingRequest, Facility, Owner, Pet
 
 DEMO_TODAY = date(2027, 3, 3)
 CERTIFICATES = Path(__file__).resolve().parents[1] / "evals" / "certificates" / "v2" / "images"
@@ -112,18 +114,35 @@ async def submit_sample(
     )
 
 
+@dataclass(frozen=True)
+class NewPet:
+    """A pet invented for a generated request, added to its owner when the request is sent."""
+
+    name: str
+    species: Species
+    breed: str
+    weight_lb: float
+
+
 async def store_request(
     sessions: async_sessionmaker[AsyncSession],
     owner_email: str,
     message: str,
     certificate: bytes | None,
+    new_pet: NewPet | None = None,
 ) -> uuid.UUID:
-    """Store a demo request for a seeded owner, with its certificate attached if any."""
+    """Store a demo request for a seeded owner, with its certificate attached if any.
+
+    A generated request's pet is added to the owner first, or reused when the owner already
+    has a pet of that name, so sending a seed twice gives one pet (change demo-new-pets, D3).
+    """
     async with sessions() as session:
         owner = await session.scalar(select(Owner).where(Owner.email == owner_email))
         facility_id = await session.scalar(select(Facility.id).order_by(Facility.id).limit(1))
         if owner is None or facility_id is None:
             raise LookupError("demo data is missing: run the seed script first")
+        if new_pet is not None:
+            await _add_pet(session, owner.id, new_pet)
         request = BookingRequest(facility_id=facility_id, owner_id=owner.id, raw_message=message)
         session.add(request)
         await session.flush()
@@ -131,3 +150,19 @@ async def store_request(
             await attach_certificate(session, request.id, certificate)
         await session.commit()
         return request.id
+
+
+async def _add_pet(session: AsyncSession, owner_id: uuid.UUID, pet: NewPet) -> None:
+    names = await session.scalars(select(Pet.name).where(Pet.owner_id == owner_id))
+    if any(name.strip().casefold() == pet.name.casefold() for name in names):
+        return
+    session.add(
+        Pet(
+            owner_id=owner_id,
+            name=pet.name,
+            species=pet.species,
+            breed=pet.breed,
+            weight_lb=Decimal(str(pet.weight_lb)),
+        )
+    )
+    await session.flush()

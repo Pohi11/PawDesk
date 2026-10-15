@@ -2,11 +2,11 @@
 
 ## 1. Generator
 
-- [ ] 1.1 Invent the pet from the seed (species, pool name, breed, weight), show the breed on the card, and add choosing a fresh seed. Verify with tests: pool sizes and clearance, same request before and after sending, names vary, fresh seeds skip names on file and recent names, a given seed is kept, and the scenario checks still pass.
+- [x] 1.1 Invent the pet from the seed (species, pool name, breed, weight), show the breed on the card, and add choosing a fresh seed. Verify with tests: pool sizes and clearance, same request before and after sending, names vary, fresh seeds skip names on file and recent names, a given seed is kept, and the scenario checks still pass.
 
 ## 2. API
 
-- [ ] 2.1 Accept `avoid` on `GET /demo/generate` and add the pet on send. Verify with API tests: a name on file and recent names are skipped, sending adds one pet with the generated details, and sending twice reuses it.
+- [x] 2.1 Accept `avoid` on `GET /demo/generate` and add the pet on send. Verify with API tests: a name on file and recent names are skipped, sending adds one pet with the generated details, and sending twice reuses it.
 
 ## 3. Dashboard
 

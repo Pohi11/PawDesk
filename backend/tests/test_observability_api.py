@@ -13,6 +13,8 @@ from app.api import StreamTiming, get_llm_kwargs, get_results_dir, get_stream_ti
 from app.db import get_sessionmaker
 from app.demo import DEMO_TODAY, SAMPLES
 from app.documents import attach_certificate, load_certificate
+from app.enums import Species
+from app.intake import match_pet
 from app.llm import RetryPolicy, make_client
 from app.main import app
 from app.models import BookingRequest, Owner, Pet
@@ -446,6 +448,55 @@ async def test_send_a_generated_request(api, committed, full_seed, scripted_back
     assert request.raw_message == preview["message"]
     assert owner.full_name == preview["owner"]
     assert stored.content == image  # the same card that was previewed
+
+
+@spec("demo-generator", "Generated pets are new")
+async def test_sending_adds_the_pet_once(api, committed, full_seed, scripted_background):
+    preview = (await api.get("/demo/generate", params={"seed": 42})).json()
+
+    ids = [
+        uuid.UUID((await api.post("/demo/requests", json={"seed": 42})).json()["id"])
+        for _ in range(2)
+    ]
+
+    for request_id in ids:
+        await wait_for(committed, request_id, {"needs_review", "sent", "failed", "drafting"})
+    async with committed() as s:
+        owner_ids = {(await s.get(BookingRequest, i)).owner_id for i in ids}
+        pets = list(await s.scalars(select(Pet).where(Pet.name == preview["pet"])))
+        owners_pets = list(await s.scalars(select(Pet).where(Pet.owner_id.in_(owner_ids))))
+    assert len(owner_ids) == 1 and len(pets) == 1
+    (pet,) = pets
+    assert (str(pet.species), pet.breed, pet.weight_lb) == (
+        preview["species"],
+        preview["breed"],
+        Decimal(str(preview["weight_lb"])),
+    )
+    assert match_pet(preview["pet"], owners_pets) == (pet.id, None)  # intake finds one pet
+
+
+@spec("demo-generator", "New names avoid names in use")
+async def test_generated_names_avoid_pets_on_file_and_recent_names(api, committed, full_seed):
+    sent = (await api.get("/demo/generate", params={"seed": 42})).json()["pet"]
+    async with committed() as s:
+        owner_id = await s.scalar(select(Owner.id).limit(1))
+        s.add(Pet(owner_id=owner_id, name=sent, species=Species.DOG, weight_lb=Decimal(30)))
+        await s.commit()
+    recent = ["Pickle", "Maple", "Miso", "Cleo", "Luna"]
+
+    names = [
+        (await api.get("/demo/generate", params={"avoid": recent})).json()["pet"] for _ in range(25)
+    ]
+
+    assert not {n.casefold() for n in names} & {n.casefold() for n in [sent, *recent]}
+    kept = await api.get("/demo/generate", params={"seed": 42, "avoid": [sent]})
+    assert kept.json()["pet"] == sent  # a given seed is used as is
+
+
+async def test_too_many_recent_names_are_refused(api):
+    response = await api.get("/demo/generate", params={"avoid": [f"n{i}" for i in range(21)]})
+
+    assert response.status_code == 422
 
 
 async def test_sample_and_seed_together_are_refused(api):

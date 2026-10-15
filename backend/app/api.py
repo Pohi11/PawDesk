@@ -7,7 +7,6 @@ belongs to the deployment work, before this API is reachable by anyone else.
 
 import asyncio
 import json
-import secrets
 import uuid
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -23,7 +22,7 @@ from app.approvals import NotWaiting, decide, review_queue
 from app.certificate_card import render as render_certificate
 from app.db import get_sessionmaker
 from app.demo import DEMO_TODAY, SAMPLES, sample_certificate, store_request, submit_sample
-from app.demo_generator import generate
+from app.demo_generator import MAX_SEED, fresh_seed, generate
 from app.enums import ApprovalAction
 from app.observability import (
     RESULTS_DIR,
@@ -38,7 +37,6 @@ from app.orchestrator import process_request
 from app.transitions import TransitionConflict
 
 router = APIRouter()
-MAX_SEED = 2**31 - 1
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
 Reason = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
@@ -75,6 +73,7 @@ LLMKwargs = Annotated[dict[str, Any], Depends(get_llm_kwargs)]
 MessageText = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)
 ]
+PetName = Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)]
 
 
 class _Body(BaseModel):
@@ -191,12 +190,17 @@ async def demo_sample_certificate(sample_id: str) -> Response:
 
 @router.get("/demo/generate")
 async def demo_generate(
-    sessions: Sessions, seed: Annotated[int | None, Query(ge=0, le=MAX_SEED)] = None
+    sessions: Sessions,
+    seed: Annotated[int | None, Query(ge=0, le=MAX_SEED)] = None,
+    avoid: Annotated[list[PetName], Query(max_length=20)] = [],  # noqa: B006 (FastAPI copies it)
 ) -> dict[str, Any]:
     """A random request with a matching certificate. Nothing is stored: the seed alone
-    reproduces it for the preview image and for sending."""
+    reproduces it for the preview image and for sending. Without a seed, the server picks
+    one whose pet name is on no pet on file and none of `avoid` (recent names)."""
     async with sessions() as session:
-        request = await generate(session, secrets.randbelow(MAX_SEED + 1) if seed is None else seed)
+        if seed is None:
+            seed = await fresh_seed(session, avoid)
+        request = await generate(session, seed)
     return request.to_json() | {
         "certificate_url": f"/demo/generated/{request.seed}/certificate.png"
     }
@@ -225,6 +229,7 @@ async def demo_request(
                 generated.owner_email,
                 body.message or generated.message,
                 render_certificate(generated),
+                generated.new_pet(),
             )
         else:
             request_id = await submit_sample(sessions, body.sample, body.message)

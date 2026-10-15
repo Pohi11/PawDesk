@@ -1,13 +1,16 @@
 """Random demo requests with a matching vaccine certificate (spec: demo-generator).
 
-Everything is decided by `random.Random(seed)` and the seeded database, so a seed always
-gives the same request and the same card. Nothing is stored until the request is sent.
+Everything is decided by `random.Random(seed)` and the seeded data (owners, rules), so a seed
+always gives the same request and the same card, before and after it is sent. The pet is
+invented from the seed and added to its owner only when the request is sent.
 
-The desk checks a card together with the pet's records on file, so a scenario is only used
-where the real compliance check, given both, agrees with it (design D3).
+A fresh name comes from choosing the seed (`fresh_seed`), not from the generator, which
+would otherwise depend on what has been sent (change demo-new-pets, design D2).
 """
 
 import random
+import secrets
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
 from typing import Any
@@ -15,26 +18,232 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.compliance import (
-    VaccineEvidence,
-    VaccineStatus,
-    load_evidence,
-    load_requirements,
-    vaccine_status,
-)
-from app.demo import DEMO_TODAY
+from app.compliance import load_requirements
+from app.demo import DEMO_TODAY, NewPet
 from app.enums import Service, Species, Vaccine
 from app.models import Facility, Owner, Pet, VaccineRule
 
 SCENARIOS = ("current", "expired", "expires_during_stay", "missing")
 SCENARIO_WEIGHTS = (40, 20, 20, 20)
 SERVICE_WEIGHTS = {Service.BOARDING: 3, Service.DAYCARE: 1, Service.GROOMING: 1}
-EXPECTED = {
-    "expired": VaccineStatus.EXPIRED,
-    "expires_during_stay": VaccineStatus.EXPIRES_DURING_STAY,
-    "missing": VaccineStatus.MISSING,
+MAX_SEED = 2**31 - 1
+FRESH_DRAWS = 200  # seeds tried for an unused name before the last one is kept
+DOG_SHARE = 0.75
+
+# Names for invented pets. None is a seeded pet's name or appears in a sample's message
+# (tests/test_demo_generator.py checks both).
+NAMES = {
+    Species.DOG: [
+        "Juno",
+        "Pickle",
+        "Maple",
+        "Ziggy",
+        "Clover",
+        "Bodhi",
+        "Nacho",
+        "Hazel",
+        "Ollie",
+        "Pretzel",
+        "Mabel",
+        "Rocket",
+        "Poppy",
+        "Bruno",
+        "Daisy",
+        "Finn",
+        "Ginger",
+        "Hank",
+        "Ivy",
+        "Jasper",
+        "Koda",
+        "Lulu",
+        "Milo",
+        "Nala",
+        "Oreo",
+        "Peanut",
+        "Quinn",
+        "Rufus",
+        "Sadie",
+        "Theo",
+        "Uma",
+        "Violet",
+        "Winnie",
+        "Yogi",
+        "Zeus",
+        "Archie",
+        "Bella",
+        "Cooper",
+        "Dexter",
+        "Ellie",
+        "Fudge",
+        "Gus",
+        "Harley",
+        "Indie",
+        "Jack",
+        "Kona",
+        "Louie",
+        "Marley",
+        "Nova",
+        "Otis",
+        "Penny",
+        "Remy",
+        "Scout",
+        "Toby",
+        "Ruby",
+        "Waylon",
+        "Bailey",
+        "Chester",
+        "Dolly",
+        "Ember",
+        "Frankie",
+        "Goose",
+        "Honey",
+        "Iggy",
+        "Jolene",
+        "Kip",
+        "Luna",
+        "Murphy",
+        "Nugget",
+        "Ozzy",
+        "Pippin",
+        "Rosco",
+        "Sprout",
+        "Tucker",
+        "Ripley",
+        "Benji",
+        "Cosmo",
+        "Duke",
+        "Echo",
+        "Fitz",
+        "Gizmo",
+        "Hobbes",
+        "Izzy",
+        "Jet",
+        "Kai",
+        "Leo",
+        "Ned",
+        "Opal",
+        "Pax",
+        "Rory",
+        "Sage",
+        "Tank",
+        "Vinny",
+        "Wally",
+        "Xena",
+        "Yuki",
+        "Bear",
+        "Barnaby",
+        "Captain",
+        "Dash",
+        "Elvis",
+        "Flash",
+        "Gatsby",
+        "Huckleberry",
+        "Jiffy",
+        "Kobe",
+        "Lucky",
+        "Nemo",
+        "Noble",
+        "Oakley",
+        "Pumba",
+        "Rascal",
+        "Sherlock",
+        "Tater",
+        "Willis",
+        "Banjo",
+        "Chewie",
+        "Domino",
+        "Frodo",
+        "Gunner",
+    ],
+    Species.CAT: [
+        "Miso",
+        "Cleo",
+        "Pumpkin",
+        "Smokey",
+        "Whiskers",
+        "Salem",
+        "Mittens",
+        "Noodle",
+        "Pixel",
+        "Sushi",
+        "Biscotti",
+        "Marmalade",
+        "Felix",
+        "Simba",
+        "Tigger",
+        "Shadow",
+        "Jinx",
+        "Willow",
+        "Basil",
+        "Chai",
+        "Dumpling",
+        "Figaro",
+        "Gnocchi",
+        "Hamlet",
+        "Inky",
+        "Kiki",
+        "Lychee",
+        "Mango",
+        "Nutmeg",
+        "Onyx",
+        "Paprika",
+        "Quill",
+        "Raisin",
+        "Saffron",
+        "Truffle",
+        "Udon",
+        "Velvet",
+        "Wasabi",
+        "Yoshi",
+        "Zuzu",
+        "Ash",
+        "Bean",
+        "Cinder",
+        "Dot",
+        "Fig",
+        "Gigi",
+        "Jellybean",
+        "Kit",
+        "Lola",
+        "Moxie",
+        "Nori",
+        "Pistachio",
+        "Ramen",
+        "Sesame",
+        "Tinsel",
+        "Vesper",
+        "Wren",
+        "Yarrow",
+        "Zinnia",
+        "Clementine",
+    ],
 }
-ATTEMPTS = 30  # draws of pet, service, and stay before a failing scenario gives way
+# (breed, lightest, heaviest) in pounds. Breeds in the dashboard's photo set come first.
+BREEDS = {
+    Species.DOG: [
+        ("Beagle", 20, 30),
+        ("Border Collie", 30, 45),
+        ("Labrador Retriever", 55, 80),
+        ("Bernese Mountain Dog", 80, 110),
+        ("Chihuahua", 4, 6),
+        ("Pembroke Welsh Corgi", 24, 30),
+        ("Golden Retriever", 55, 75),
+        ("Dachshund", 16, 32),
+        ("Boxer", 50, 70),
+        ("Shih Tzu", 9, 16),
+        ("Standard Poodle", 40, 70),
+        ("Australian Shepherd", 40, 65),
+        ("Great Dane", 110, 160),
+        ("Mixed Breed", 15, 70),
+    ],
+    Species.CAT: [
+        ("Domestic Shorthair", 8, 14),
+        ("Ragdoll", 10, 20),
+        ("Maine Coon", 10, 25),
+        ("Siamese", 6, 12),
+        ("Domestic Longhair", 8, 15),
+    ],
+}
 
 VACCINE_LABEL = {
     Vaccine.RABIES: "Rabies",
@@ -96,6 +305,8 @@ class GeneratedRequest:
     owner: str
     pet: str
     species: str
+    breed: str
+    weight_lb: float
     service: str
     start_date: date
     end_date: date
@@ -121,6 +332,10 @@ class GeneratedRequest:
         data.pop("owner_email")
         return data
 
+    def new_pet(self) -> NewPet:
+        """The pet to add to its owner when the request is sent."""
+        return NewPet(self.pet, Species(self.species), self.breed, self.weight_lb)
+
 
 def spoken(day: date) -> str:
     """How a pet parent writes a date: "March 12"."""
@@ -132,41 +347,61 @@ def printed(day: date) -> str:
     return f"{day.strftime('%b')} {day.day}, {day.year}"
 
 
+def invent_pet(rng: random.Random) -> NewPet:
+    """The pet, from the first draws of the seed's random sequence."""
+    species = Species.DOG if rng.random() < DOG_SHARE else Species.CAT
+    name = rng.choice(NAMES[species])
+    breed, lightest, heaviest = rng.choice(BREEDS[species])
+    return NewPet(name, species, breed, round(rng.uniform(lightest, heaviest), 1))
+
+
+def pet_name(seed: int) -> str:
+    """The name `generate` gives seed's pet, without touching the database."""
+    return invent_pet(random.Random(seed)).name
+
+
+async def fresh_seed(
+    session: AsyncSession,
+    avoid: Iterable[str] = (),
+    draw: Callable[[], int] = lambda: secrets.randbelow(MAX_SEED + 1),
+) -> int:
+    """A random seed whose pet name is on no pet on file and none of `avoid`, ignoring case.
+    After FRESH_DRAWS tries the last draw is kept, so a used-up pool still gives a request."""
+    taken = {name.strip().casefold() for name in await session.scalars(select(Pet.name))}
+    taken |= {name.strip().casefold() for name in avoid}
+    seed = draw()
+    for _ in range(FRESH_DRAWS - 1):
+        if pet_name(seed).casefold() not in taken:
+            break
+        seed = draw()
+    return seed
+
+
 async def generate(session: AsyncSession, seed: int) -> GeneratedRequest:
     rng = random.Random(seed)
-    rows = (
-        await session.execute(
-            select(Pet, Owner).join(Owner, Owner.id == Pet.owner_id).order_by(Pet.name, Pet.id)
-        )
-    ).all()
-    if not rows:
-        raise LookupError("demo data is missing: run the seed script first")
+    pet = invent_pet(rng)
+    owners = list(await session.scalars(select(Owner).order_by(Owner.email)))
     facility_id = await session.scalar(select(Facility.id).order_by(Facility.id).limit(1))
-    scenario = rng.choices(SCENARIOS, weights=SCENARIO_WEIGHTS)[0]
+    if not owners or facility_id is None:
+        raise LookupError("demo data is missing: run the seed script first")
+    owner = rng.choice(owners)
 
-    for attempt in range(ATTEMPTS + 1):
-        if attempt == ATTEMPTS:
-            scenario = "current"  # holds for any pet: the card covers every vaccine
-        pet, owner = rng.choice(rows)
-        offered = sorted(
-            set(
-                await session.scalars(
-                    select(VaccineRule.service).where(VaccineRule.species == pet.species)
-                )
+    offered = sorted(
+        set(
+            await session.scalars(
+                select(VaccineRule.service).where(VaccineRule.species == pet.species)
             )
         )
-        service = rng.choices(offered, weights=[SERVICE_WEIGHTS[s] for s in offered])[0]
-        start = DEMO_TODAY + timedelta(days=rng.randint(5, 40))
-        nights = rng.randint(2, 6) if service == Service.BOARDING else 0
-        end = start + timedelta(days=nights)
-        if scenario == "expires_during_stay" and nights < 2:
-            continue
-        required = sorted(await load_requirements(session, facility_id, service, pet.species))
-        on_file = await load_evidence(session, pet.id)
-        drawn = _records(rng, pet.species, required, on_file, start, end, scenario)
-        if drawn is not None:
-            break
-    records, scenario_text = drawn
+    )
+    service = rng.choices(offered, weights=[SERVICE_WEIGHTS[s] for s in offered])[0]
+    start = DEMO_TODAY + timedelta(days=rng.randint(5, 40))
+    nights = rng.randint(2, 6) if service == Service.BOARDING else 0
+    end = start + timedelta(days=nights)
+    scenario = rng.choices(SCENARIOS, weights=SCENARIO_WEIGHTS)[0]
+    if scenario == "expires_during_stay" and nights < 2:
+        scenario = "expired"  # a one-day visit has no day before checkout
+    required = sorted(await load_requirements(session, facility_id, service, pet.species))
+    records, scenario_text = _records(rng, pet.species, required, start, end, scenario)
 
     template = rng.choice(MESSAGES[service])
     message = template.format(pet=pet.name, start=spoken(start), end=spoken(end)) + rng.choice(
@@ -179,6 +414,8 @@ async def generate(session: AsyncSession, seed: int) -> GeneratedRequest:
         owner=owner.full_name,
         pet=pet.name,
         species=str(pet.species),
+        breed=pet.breed,
+        weight_lb=pet.weight_lb,
         service=str(service),
         start_date=start,
         end_date=end,
@@ -195,13 +432,12 @@ def _records(
     rng: random.Random,
     species: Species,
     required: list[Vaccine],
-    on_file: list[VaccineEvidence],
     start: date,
     end: date,
     scenario: str,
-) -> tuple[list[CardRecord], str] | None:
-    """The card's records and the scenario in words, or None when no required vaccine can
-    show the scenario because the records on file already decide it."""
+) -> tuple[list[CardRecord], str]:
+    """The card's records and the scenario in words. The pet is new, with no records on file,
+    so the card alone decides each vaccine's status."""
 
     def current(vaccine: Vaccine) -> CardRecord:
         given = start - timedelta(days=rng.randint(60, 330))
@@ -223,30 +459,18 @@ def _records(
     if scenario == "current":
         text = "Every vaccine on the card is current for the whole stay."
     else:
-        expires = None
-        if scenario == "expired":
-            expires = start - timedelta(days=rng.randint(5, 60))
-        elif scenario == "expires_during_stay":
-            expires = start + timedelta(days=rng.randint(0, (end - start).days - 1))
-
-        def shows_scenario(vaccine: Vaccine) -> bool:
-            evidence = [r for r in on_file if r.vaccine == vaccine]
-            if expires is not None:
-                evidence.append(VaccineEvidence(vaccine, expires - timedelta(days=365), expires))
-            return vaccine_status(evidence, start, end) == EXPECTED[scenario]
-
-        candidates = [v for v in required if shows_scenario(v)]
-        if not candidates:
-            return None
-        target = rng.choice(candidates)
+        target = rng.choice(required)
         label = VACCINE_LABEL[target]
-        if expires is None:
+        if scenario == "missing":
             del records[target]
-            text = f"{label} is not on the card or on file."
+            text = f"{label} is not on the card."
         else:
+            if scenario == "expired":
+                expires = start - timedelta(days=rng.randint(5, 60))
+                text = f"{label} expired on {printed(expires)}, before the stay."
+            else:
+                expires = start + timedelta(days=rng.randint(0, (end - start).days - 1))
+                text = f"{label} expires on {printed(expires)}, during the stay."
             records[target] = CardRecord(str(target), label, expires - timedelta(days=365), expires)
-            when = "before the stay" if scenario == "expired" else "during the stay"
-            verb = "expired" if scenario == "expired" else "expires"
-            text = f"{label} {verb} on {printed(expires)}, {when}."
     ordered = sorted(records.values(), key=lambda r: list(VACCINE_LABEL).index(Vaccine(r.vaccine)))
     return ordered, text

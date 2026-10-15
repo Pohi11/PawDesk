@@ -39,14 +39,16 @@ def render(request: GeneratedRequest) -> bytes:
 
     # Patient and owner.
     y = 172
-    for column, (name, text) in enumerate(
+    # Species and breed get the widest column; Owner lines up with the Expires column.
+    for x, (name, text) in zip(
+        (40, 300, 680),
         [
             ("Patient", request.pet),
-            ("Species", request.species.capitalize()),
+            ("Species", f"{request.species.capitalize()}, {request.breed}"),
             ("Owner", request.owner),
-        ]
+        ],
+        strict=True,
     ):
-        x = 40 + column * 300
         draw.text((x, y), name, font=label, fill=FAINT)
         draw.text((x, y + 24), text, font=value, fill=INK)
 
