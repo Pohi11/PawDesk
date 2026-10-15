@@ -23,7 +23,7 @@
     { "state": "resolving", "step": "_resolve", "does": "Runs the resolver when code allows it" },
     { "state": "drafting", "step": "_draft", "does": "Writes the reply and decides whether a person sees it" },
     { "state": "ready", "step": "_auto_approve", "does": "Approves a request that passed every check" },
-    { "state": "approved", "step": "_send", "does": "Saves the reply and reserves the kennel" },
+    { "state": "approved", "step": "_send", "does": "Saves the reply, and reserves the kennel for a confirmed stay" },
     { "state": "rejected", "step": "_send", "does": "Saves the decline message" }
   ]
 }
