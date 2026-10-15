@@ -6,7 +6,7 @@ const SHOWN = specTag("pet-photos", "Photos appear on the requests list and the 
 const PLACEHOLDER = specTag("pet-photos", "A request without a matched pet shows a placeholder");
 
 async function sendSample(page: Page, title: string): Promise<string> {
-  await page.goto("/demo");
+  await page.goto("/");
   await page.getByText(title, { exact: true }).click();
   await page.getByRole("button", { name: "Send and watch it run" }).click();
   await page.waitForURL(/\/requests\/[0-9a-f-]{36}$/);
@@ -22,7 +22,7 @@ test(`${SHOWN} Biscuit's Beagle photo shows on the live run and the list`, async
   await expect(photo).toHaveAttribute("src", "/pets/beagle.jpg");
   await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
 
-  await page.goto("/");
+  await page.goto("/requests");
   const row = page.locator(`a[href="${path}"]`);
   await expect(row.getByRole("img", { name: "Photo for Biscuit" })).toHaveAttribute("src", "/pets/beagle.jpg");
 });
@@ -37,7 +37,7 @@ test(`${PLACEHOLDER} a pet not on file gets the paw placeholder`, async ({ page 
   await expect(page.getByRole("img", { name: "No pet matched yet" })).toBeVisible();
   await expect(page.getByRole("img", { name: /^Photo for/ })).toHaveCount(0);
 
-  await page.goto("/");
+  await page.goto("/requests");
   const row = page.locator(`a[href="${path}"]`);
   await expect(row.getByRole("img", { name: "No pet matched yet" })).toBeVisible();
   await expect(row.getByRole("img", { name: /^Photo for/ })).toHaveCount(0);
@@ -46,7 +46,7 @@ test(`${PLACEHOLDER} a pet not on file gets the paw placeholder`, async ({ page 
 const TRY_PAGE = specTag("pet-photos", "The Try page shows each request's pet photo");
 
 test(`${TRY_PAGE} samples and a generated pet show their photos before sending`, async ({ page }) => {
-  await page.goto("/demo");
+  await page.goto("/");
 
   const clean = page.locator("label").filter({ hasText: "Clean boarding request" });
   await expect(clean.getByRole("img", { name: "Photo for Biscuit" })).toHaveAttribute("src", "/pets/beagle.jpg");

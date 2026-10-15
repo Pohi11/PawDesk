@@ -9,14 +9,14 @@ const frame = (page: Page, name: string) =>
   page.screenshot({ path: `test-results/demo-frames/${name}.png` });
 
 async function sendSample(page: Page, title: string) {
-  await page.goto("/demo");
+  await page.goto("/");
   await page.getByText(title, { exact: true }).click();
   await page.getByRole("button", { name: "Send and watch it run" }).click();
   await page.waitForURL(/\/requests\/[0-9a-f-]{36}$/);
 }
 
 test(`${REQ} the clean sample runs live to sent`, async ({ page }) => {
-  await page.goto("/demo");
+  await page.goto("/");
   await frame(page, "01-demo");
 
   await sendSample(page, "Clean boarding request");
