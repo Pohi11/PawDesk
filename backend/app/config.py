@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # Recorded responses (decision record 0016): "off", "record", or "replay".
     llm_cassette_mode: Literal["off", "record", "replay"] = "off"
     llm_cassette_dir: Path | None = None
+    # Ceilings on model calls for the public demo (spec: demo-hosting). Unset: no limit.
+    demo_model_calls_per_hour: int | None = None
+    demo_model_calls_per_day: int | None = None
 
 
 @lru_cache

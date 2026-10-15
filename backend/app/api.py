@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.approvals import NotWaiting, decide, review_queue
 from app.certificate_card import render as render_certificate
+from app.config import get_settings
 from app.db import get_sessionmaker
 from app.demo import (
     DEMO_TODAY,
@@ -31,6 +32,7 @@ from app.demo import (
 )
 from app.demo_generator import MAX_SEED, fresh_seed, generate
 from app.enums import ApprovalAction
+from app.limits import DemoLimits, limit_reached
 from app.observability import (
     RESULTS_DIR,
     eval_reports,
@@ -77,6 +79,14 @@ def get_llm_kwargs() -> dict[str, Any]:
 
 
 LLMKwargs = Annotated[dict[str, Any], Depends(get_llm_kwargs)]
+
+
+def get_demo_limits() -> DemoLimits:
+    settings = get_settings()
+    return DemoLimits(settings.demo_model_calls_per_hour, settings.demo_model_calls_per_day)
+
+
+Limits = Annotated[DemoLimits, Depends(get_demo_limits)]
 MessageText = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)
 ]
@@ -236,9 +246,19 @@ async def demo_generated_certificate(seed: int, sessions: Sessions) -> Response:
 
 @router.post("/demo/requests", status_code=202)
 async def demo_request(
-    body: DemoBody, sessions: Sessions, background: BackgroundTasks, llm_kwargs: LLMKwargs
+    body: DemoBody,
+    sessions: Sessions,
+    background: BackgroundTasks,
+    llm_kwargs: LLMKwargs,
+    limits: Limits,
 ) -> dict[str, str]:
-    """Store the sample as a new request and answer at once; processing runs afterward."""
+    """Store the sample as a new request and answer at once; processing runs afterward.
+
+    Refused with 429 before anything is stored once a model-call limit is reached."""
+    async with sessions() as session:
+        refusal = await limit_reached(session, limits)
+    if refusal is not None:
+        raise HTTPException(status_code=429, detail=refusal)
     try:
         if body.seed is not None:
             async with sessions() as session:

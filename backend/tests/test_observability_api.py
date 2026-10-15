@@ -3,21 +3,29 @@
 import asyncio
 import json
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 
 import httpx
 import pytest
 from sqlalchemy import func, select
 
-from app.api import StreamTiming, get_llm_kwargs, get_results_dir, get_stream_timing
+from app.api import (
+    StreamTiming,
+    get_demo_limits,
+    get_llm_kwargs,
+    get_results_dir,
+    get_stream_timing,
+)
 from app.db import get_sessionmaker
 from app.demo import DEMO_TODAY, SAMPLES
 from app.documents import attach_certificate, load_certificate
-from app.enums import Species
+from app.enums import SpanKind, Species
 from app.intake import match_pet
+from app.limits import DemoLimits
 from app.llm import RetryPolicy, make_client
 from app.main import app
-from app.models import BookingRequest, Owner, Pet
+from app.models import BookingRequest, Owner, Pet, Span, Trace
 from app.orchestrator import process_request
 from scripts.seed import seed
 from tests.test_llm import fake_settings
@@ -533,3 +541,87 @@ async def test_sample_and_seed_together_are_refused(api):
     response = await api.post("/demo/requests", json={"sample": "clean", "seed": 1})
 
     assert response.status_code == 422
+
+
+# --- Model-use limits for the public demo (spec: demo-hosting) --------------------------
+
+LIMITS = "Model use is capped per hour and per day"
+
+
+@pytest.fixture
+def limits():
+    def set_limits(per_hour=None, per_day=None):
+        app.dependency_overrides[get_demo_limits] = lambda: DemoLimits(per_hour, per_day)
+
+    return set_limits
+
+
+async def record_spans(committed, kind, count, hours_ago):
+    """Record `count` spans of `kind` that started `hours_ago` hours before now."""
+    async with committed() as s:
+        trace = Trace(name="earlier run")
+        s.add(trace)
+        await s.flush()
+        started = (await s.scalar(select(func.now()))) - timedelta(hours=hours_ago)
+        s.add_all(
+            Span(trace_id=trace.id, kind=kind, name=f"{kind} call", started_at=started)
+            for _ in range(count)
+        )
+        await s.commit()
+
+
+async def stored_requests(committed):
+    async with committed() as s:
+        return await s.scalar(select(func.count()).select_from(BookingRequest))
+
+
+@spec("demo-hosting", LIMITS)
+async def test_hourly_limit_reached(api, committed, demo_owner, limits):
+    limits(per_hour=3)
+    await record_spans(committed, SpanKind.LLM, 3, hours_ago=0.5)
+
+    response = await api.post("/demo/requests", json={"sample": "injection"})
+
+    assert response.status_code == 429
+    assert response.json()["detail"] == (
+        "The demo reached its hourly limit on model calls. Try again later."
+    )
+    assert await stored_requests(committed) == 0
+
+
+@spec("demo-hosting", LIMITS)
+async def test_daily_limit_reached(api, committed, demo_owner, limits):
+    limits(per_hour=3, per_day=5)
+    await record_spans(committed, SpanKind.LLM, 5, hours_ago=2)
+
+    response = await api.post("/demo/requests", json={"seed": 42})
+
+    assert response.status_code == 429
+    assert "daily limit" in response.json()["detail"]
+    assert await stored_requests(committed) == 0
+
+
+@spec("demo-hosting", LIMITS)
+async def test_only_recent_model_calls_count(
+    api, committed, demo_owner, limits, scripted_background
+):
+    limits(per_hour=3)
+    await record_spans(committed, SpanKind.LLM, 3, hours_ago=1.5)
+    await record_spans(committed, SpanKind.TOOL, 3, hours_ago=0.1)
+    await record_spans(committed, SpanKind.CODE, 3, hours_ago=0.1)
+
+    response = await api.post("/demo/requests", json={"sample": "injection"})
+
+    assert response.status_code == 202
+    await wait_for(committed, uuid.UUID(response.json()["id"]), {"needs_review", "sent", "failed"})
+
+
+@spec("demo-hosting", LIMITS)
+async def test_no_limit_configured(api, committed, demo_owner, limits, scripted_background):
+    limits()
+    await record_spans(committed, SpanKind.LLM, 50, hours_ago=0.1)
+
+    response = await api.post("/demo/requests", json={"sample": "injection"})
+
+    assert response.status_code == 202
+    await wait_for(committed, uuid.UUID(response.json()["id"]), {"needs_review", "sent", "failed"})
