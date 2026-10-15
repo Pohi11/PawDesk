@@ -517,7 +517,7 @@ async def test_samples_carry_their_pets_photo_fields(api, committed, full_seed):
     assert (unknown["pet_id"], unknown["pet_species"], unknown["pet_breed"]) == (None, None, None)
 
 
-@spec("observability-api", "Distinct pets")
+@spec("observability-api", "Each sample is about a different pet")
 async def test_no_two_samples_share_a_pet(api, committed, full_seed):
     samples = (await api.get("/demo/samples")).json()
 
@@ -525,7 +525,7 @@ async def test_no_two_samples_share_a_pet(api, committed, full_seed):
     assert len(pet_ids) == len(set(pet_ids)) >= 3
 
 
-@spec("observability-api", "The injection sample's card matches its pet")
+@spec("observability-api", "Each sample is about a different pet")
 async def test_the_injection_samples_card_is_drawn_the_same_each_time(api):
     first = await api.get("/demo/samples/injection/certificate.png")
     second = await api.get("/demo/samples/injection/certificate.png")
