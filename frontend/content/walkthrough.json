@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-10-15T14:51:59+00:00",
+ "generated_at": "2026-10-15T14:52:09+00:00",
  "reports": {
   "backend": "2026-10-15T09:48:12.671774-05:00",
   "frontend": "2026-10-15T14:51:57.637Z",
   "e2e": "2026-10-15T14:50:20.416Z"
  },
  "totals": {
-  "changes": 20,
-  "requirements": 142,
-  "verified": 142,
+  "changes": 21,
+  "requirements": 144,
+  "verified": 144,
   "tests": {
    "backend": 886,
    "frontend": 66,
@@ -2220,6 +2220,65 @@
      "capability": "run-dashboard",
      "kind": "modified",
      "name": "The Try page previews a request and its certificate"
+    }
+   ],
+   "decisions": []
+  },
+  {
+   "id": "2026-10-15-try-page-pet-photos",
+   "slug": "try-page-pet-photos",
+   "title": "Try page pet photos",
+   "date": "2026-10-15",
+   "archived_at": null,
+   "why": "The requests list and the run page show each pet's photo, but the Try page, where a visitor picks a request to send, shows none. The visitor chooses between requests about pets without seeing the pets, and a freshly made-up pet stays a name until it is sent.",
+   "what_changes": "- **Each sample in the Try page's list shows its pet's photo,** or the paw placeholder when the sample's pet is not on file (the unknown-pet sample).\n- **A generated request shows its pet's photo** on the \"Make one up\" choice and beside the preview's heading.\n- **The preview's photo is the one the run page will show.** A breed in the photo set always gets its breed's photo. Other pets get a general photo chosen from the pet's id, so a generated pet's id now comes from its seed, and sending gives the new pet that id.\n- **The samples list from the API includes each sample pet's id, species, and breed** when the pet is on file.",
+   "tasks": [
+    {
+     "title": "1. API",
+     "items": [
+      {
+       "id": "1.1",
+       "done": true,
+       "text": "Derive a generated pet's id from its seed and insert the pet with it on send, and add each sample's pet fields to `GET /demo/samples`. Verify with tests: the same pet id across previews and after sending, and Biscuit's fields for the clean sample with none for the unknown-pet sample."
+      }
+     ]
+    },
+    {
+     "title": "2. Dashboard",
+     "items": [
+      {
+       "id": "2.1",
+       "done": true,
+       "text": "Show `PetAvatar` on each choice in the Try page's list and beside the preview's heading. Verify with a frontend test that a generated preview and its sent pet get the same photo, an end-to-end check of the Beagle photo on the clean sample, then lint, type check, and build."
+      },
+      {
+       "id": "2.2",
+       "done": true,
+       "text": "Try it in a browser: check the samples' photos, generate a pet whose breed is outside the set, send it, and compare the photos. Verify with screenshots."
+      }
+     ]
+    },
+    {
+     "title": "3. Integration",
+     "items": [
+      {
+       "id": "3.1",
+       "done": true,
+       "text": "Run every suite and the coverage check, then regenerate the walkthrough."
+      }
+     ]
+    }
+   ],
+   "requirements": [
+    {
+     "capability": "demo-generator",
+     "kind": "added",
+     "name": "Previews carry their pet's photo fields"
+    },
+    {
+     "capability": "pet-photos",
+     "kind": "added",
+     "name": "The Try page shows each request's pet photo"
     }
    ],
    "decisions": []
@@ -8259,6 +8318,41 @@
       }
      ],
      "status": "verified"
+    },
+    {
+     "name": "Previews carry their pet's photo fields",
+     "text": "A generated request SHALL carry a pet id derived from its seed, and sending SHALL give the new pet that id. The demo samples list SHALL give each sample's pet id, species, and breed when the pet is on file, and none of them otherwise.",
+     "scenarios": [
+      {
+       "name": "The seed fixes the pet id",
+       "steps": [
+        "**WHEN** seed 42 is previewed twice and then sent",
+        "**THEN** both previews carry the same pet id, and the pet added on send has that id"
+       ]
+      },
+      {
+       "name": "Sample pet fields",
+       "steps": [
+        "**WHEN** the demo samples are listed",
+        "**THEN** the clean boarding sample carries Biscuit's id, species, and breed, and the unknown-pet sample carries none"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_samples_carry_their_pets_photo_fields",
+       "status": "passed",
+       "seconds": 0.178
+      },
+      {
+       "suite": "backend",
+       "id": "tests.test_observability_api::test_the_seed_fixes_the_pet_id",
+       "status": "passed",
+       "seconds": 0.594
+      }
+     ],
+     "status": "verified"
     }
    ]
   },
@@ -9726,6 +9820,48 @@
        "id": "tests/pet-photos-manifest.test.ts::the scan does find metadata when it is there",
        "status": "passed",
        "seconds": 0.0008699
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "The Try page shows each request's pet photo",
+     "text": "Each sample in the Try page's list SHALL show its pet's photo, or the placeholder when the sample's pet is not on file. A generated request SHALL show its pet's photo on the \"Make one up\" choice and beside the preview's heading, chosen by the same rules as everywhere else, so it is the photo the run page shows once the request is sent.",
+     "scenarios": [
+      {
+       "name": "A sample's pet",
+       "steps": [
+        "**WHEN** the Try page lists the clean boarding sample, whose pet is Biscuit, a Beagle",
+        "**THEN** the sample shows the Beagle photo with alternative text naming Biscuit"
+       ]
+      },
+      {
+       "name": "A sample without a pet on file",
+       "steps": [
+        "**WHEN** the Try page lists the unknown-pet sample",
+        "**THEN** the sample shows the placeholder"
+       ]
+      },
+      {
+       "name": "A generated pet keeps its photo",
+       "steps": [
+        "**WHEN** a generated pet whose breed has no photo in the set is previewed and then sent",
+        "**THEN** the preview and the run page show the same general photo"
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "frontend",
+       "id": "lib/demo.test.ts::a generated pet keeps its photo once sent",
+       "status": "passed",
+       "seconds": 0.0004966
+      },
+      {
+       "suite": "e2e",
+       "id": "pet-photos.spec.ts::samples and a generated pet show their photos before sending",
+       "status": "passed",
+       "seconds": 0.328
       }
      ],
      "status": "verified"
