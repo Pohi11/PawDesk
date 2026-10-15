@@ -3,6 +3,7 @@ import { type ReactNode, Suspense } from "react";
 
 import { DemoPanel } from "@/components/demo-panel";
 import { KindDot, Loading, StateTag } from "@/components/ui";
+import rules from "@/content/booking-rules.json";
 import data from "@/content/walkthrough.json";
 import { backendJson } from "@/lib/backend";
 import type { DemoSample, SpanKind } from "@/lib/types";
@@ -21,7 +22,7 @@ const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
   {
     title: "Read",
     who: ["llm"],
-    text: "A model pulls the pet, the service, and the dates out of the message. A second call reads the photo of the vaccine card.",
+    text: "The intake and records agents read the message and the vaccine card at the same time.",
   },
   {
     title: "Check",
@@ -31,12 +32,12 @@ const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
   {
     title: "Find options",
     who: ["llm", "tool"],
-    text: "When a check fails, an agent with read-only tools suggests a fix: other dates, a larger kennel, or an updated vaccine record. Code runs the checks again on each suggestion.",
+    text: "If a check fails, the resolver suggests a fix and code checks it again. If every check passes, this step is skipped.",
   },
   {
     title: "Write the reply",
     who: ["llm"],
-    text: "A model writes to the pet parent from the checked facts. It never sees their original message, so instructions hidden in that message can't reach it.",
+    text: "The reply agent drafts the answer to the pet parent from the facts code checked.",
   },
   {
     title: "Send or hold",
@@ -49,6 +50,37 @@ const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
         edits, or declines it.
       </>
     ),
+  },
+];
+
+const AGENTS: { name: string; calls: string; reads: string; returns: string; checks: string }[] = [
+  {
+    name: "Intake",
+    calls: "One model call",
+    reads: "The pet parent's message. Code scans it for instruction-like text, such as “ignore your rules”, before the model sees it.",
+    returns: "The pet's name, the service, the dates, any special notes, a confidence score, and anything it found unclear.",
+    checks: "Matches the pet to one on file and checks the dates. Instruction-like text, a confidence under 0.7, or anything unclear sends the request to a person.",
+  },
+  {
+    name: "Records",
+    calls: "One model call",
+    reads: "The photo of the vaccine card.",
+    returns: "Each vaccine with the date given and the expiry date, the pet's name as printed, whether the photo was readable, and a confidence score.",
+    checks: "Rejects impossible dates and unknown vaccines, and compares the printed name with the booked pet. An unreadable card or a confidence under 0.7 sends the request to a person.",
+  },
+  {
+    name: "Resolver",
+    calls: "A loop of up to 6 model calls",
+    reads: "Only values code built, such as which vaccine expired. It never sees the pet parent's message, and code starts it only for problems it can work on.",
+    returns: "One offer: other dates, a larger kennel, or a request for an updated vaccine record. It finds them with 3 read-only tools, at most 12 calls.",
+    checks: "Runs the checks again on every option. The resolver can't book anything, and a person reviews its offer.",
+  },
+  {
+    name: "Reply",
+    calls: "One model call",
+    reads: "The checked facts and the options code verified. Like the resolver, it never sees the original message.",
+    returns: "A subject line and the body of the reply.",
+    checks: "Flags any date the checks didn't confirm, any money amount, and words like “booked” or “confirmed” the facts don't support. A flagged draft goes to a person.",
   },
 ];
 
@@ -118,6 +150,8 @@ export default function Home() {
         </Suspense>
       </section>
 
+      <BookingRules />
+      <Agents />
       <HowItWorks />
       <Method />
       <Skills />
@@ -150,7 +184,7 @@ function Intro() {
           PawDesk handles pet care bookings and asks a person when it isn&apos;t sure.
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
-          It&apos;s a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
+          PawDesk is a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
           request and the photo of the vaccine card, plain code checks the vaccines and finds a free
           kennel, and another agent writes the reply.
         </p>
@@ -247,6 +281,233 @@ function Section({ id, title, children }: { id: string; title: string; children:
       </h2>
       {children}
     </section>
+  );
+}
+
+type VaccineId = keyof typeof rules.vaccine_names;
+const vaccineList = (ids: string[]) => ids.map((id) => rules.vaccine_names[id as VaccineId]).join(", ");
+
+function BookingRules() {
+  const cell = "block align-top leading-relaxed lg:table-cell lg:py-5 lg:pr-6";
+  const label = "block text-xs font-medium text-faint lg:hidden";
+  return (
+    <Section id="rules" title="Booking rules">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        Code checks each rule below; no model decides any of them. They&apos;re the demo
+        facility&apos;s rules, and each facility sets its own vaccine lists per service and species.
+      </p>
+
+      <h3 className="mt-10 text-xl font-semibold">Services</h3>
+      <table className="mt-4 w-full max-w-3xl border-t border-ink text-left text-sm lg:max-w-none">
+        <thead className="hidden lg:table-header-group">
+          <tr className="text-xs text-faint">
+            <th scope="col" className="w-36 py-3 pr-6 font-medium">Service</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Visit</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Kennel</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Dogs need</th>
+            <th scope="col" className="py-3 font-medium">Cats need</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-rule border-t border-rule">
+          {rules.services.map((s) => (
+            <tr key={s.service} className="flex flex-col gap-3 py-5 lg:table-row">
+              <th scope="row" className="align-top font-display text-lg font-semibold lg:py-5 lg:pr-6">
+                {s.label}
+              </th>
+              <td className={`${cell} text-muted`}>
+                <span className={label}>Visit</span>
+                {s.visit}
+              </td>
+              <td className={`${cell} text-muted`}>
+                <span className={label}>Kennel</span>
+                {s.kennel ? "A free kennel of the pet's size, reserved when the reply goes out" : "None"}
+              </td>
+              <td className={cell}>
+                <span className={label}>Dogs need</span>
+                {vaccineList(s.vaccines.dog)}
+              </td>
+              <td className={`${cell} lg:pr-0`}>
+                <span className={label}>Cats need</span>
+                {vaccineList(s.vaccines.cat)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="mt-14 grid gap-x-14 gap-y-12 lg:grid-cols-2">
+        <div>
+          <h3 className="text-xl font-semibold">When a vaccine counts</h3>
+          <p className="mt-3 leading-relaxed text-muted">
+            The pet is on site every day from drop-off through pickup. A shot counts if the pet got
+            it on or before drop-off and it expires on or after pickup day. Code looks at the records
+            on file and the ones the records agent read from the card, and one covering record is
+            enough.
+          </p>
+          <CoverageStrip />
+          <p className="mt-6 leading-relaxed text-muted">
+            When no record covers the stay, code names the reason: no record, expired before
+            drop-off, expires during the stay, or given after drop-off. A card with no expiry date for
+            a required shot goes to a person.
+          </p>
+        </div>
+
+        <div className="space-y-10">
+          <div>
+            <h3 className="text-xl font-semibold">Kennel sizes</h3>
+            <p className="mt-3 leading-relaxed text-muted">
+              Code sets a pet&apos;s size from its species and weight and searches only kennels of
+              that size. Cats get cat kennels at any weight. Dogs:
+            </p>
+            <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-rule ring-1 ring-rule sm:grid-cols-4">
+              {rules.dog_sizes.map((band, i) => (
+                <div key={band.size} className="bg-surface px-4 py-3">
+                  <dt className="font-display font-semibold">{band.label}</dt>
+                  <dd className="mt-0.5 text-sm text-muted">{bandRange(i)}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-4 leading-relaxed text-muted">
+              A kennel is free when none of the stay&apos;s nights is booked. The nights run from
+              drop-off to the night before pickup, so a stay that ends March 27 doesn&apos;t block one
+              that starts March 27.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold">Dates</h3>
+            <p className="mt-3 leading-relaxed text-muted">
+              A request can start today or up to {rules.booking_horizon_days} days ahead. Boarding
+              has to end at least one day after it starts. Daycare and grooming start and end on the
+              same date.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3 className="mt-14 text-xl font-semibold">When a rule isn&apos;t met</h3>
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        A failed rule, or anything the intake or records agent flags, takes the request off the
+        automatic path. If the resolver can work on the problem, it suggests other dates, a larger
+        kennel, or an updated vaccine record. Either way, someone on staff decides before a reply
+        goes out.
+      </p>
+    </Section>
+  );
+}
+
+/** A dog weight band in words, from the band before it: "20 to under 50 lb". */
+function bandRange(i: number): string {
+  const band = rules.dog_sizes[i];
+  const from = i === 0 ? null : rules.dog_sizes[i - 1].under_lb;
+  if (from === null) return `Under ${band.under_lb} lb`;
+  if (band.under_lb === null) return `${from} lb and up`;
+  return `${from} to under ${band.under_lb} lb`;
+}
+
+/** Biscuit's stay from the worked example, with one shot that covers it and one that doesn't. */
+function CoverageStrip() {
+  const days = [23, 24, 25, 26, 27, 28];
+  const onSite = (d: number) => d >= 24 && d <= 27;
+  const shots = [
+    { name: "Bordetella, expires April 2", verdict: "Covers the stay", ok: true, until: 28 },
+    { name: "DHPP, expires March 26", verdict: "Expires during the stay", ok: false, until: 26 },
+  ];
+  const lane = (children: ReactNode) => (
+    <div className="relative grid grid-cols-6">
+      {days.map((d) => (
+        <span key={d} aria-hidden className={`h-7 ${onSite(d) ? "bg-kennel-soft" : ""}`} />
+      ))}
+      {children}
+    </div>
+  );
+  return (
+    <figure
+      aria-label="Two vaccines against Biscuit's stay from March 24 to 27"
+      className="mt-6 rounded-2xl bg-surface p-5 ring-1 ring-rule"
+    >
+      <div className="grid grid-cols-6 text-center text-xs text-muted">
+        {days.map((d) => (
+          <span key={d} className={`py-1 ${onSite(d) ? "font-medium text-kennel" : ""}`}>
+            Mar {d}
+          </span>
+        ))}
+      </div>
+      {lane(
+        <span className="absolute inset-y-0 right-[16.67%] left-[16.67%] flex items-center justify-center text-xs font-medium text-kennel">
+          Biscuit on site
+        </span>,
+      )}
+      {shots.map((shot) => (
+        <div key={shot.name} className="mt-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
+            <span>{shot.name}</span>
+            <span className={`text-xs font-medium ${shot.ok ? "text-kennel" : "text-error"}`}>{shot.verdict}</span>
+          </div>
+          {lane(
+            <span
+              aria-hidden
+              className={`absolute inset-y-2.5 left-0 ${shot.ok ? "rounded-l-full bg-kennel" : "rounded-full bg-error"}`}
+              style={{ width: `${((days.indexOf(shot.until) + 1) * 100) / days.length}%` }}
+            />,
+          )}
+        </div>
+      ))}
+      <figcaption className="mt-4 text-xs leading-relaxed text-muted">
+        Drop-off March 24, pickup March 27. The DHPP shot runs out before pickup, so it fails even
+        though it was valid at drop-off.
+      </figcaption>
+    </figure>
+  );
+}
+
+function Agents() {
+  const cell = "block align-top leading-relaxed text-muted lg:table-cell lg:py-5 lg:pr-6";
+  const label = "block text-xs font-medium text-faint lg:hidden";
+  return (
+    <Section id="agents" title="The agents">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        Four parts of PawDesk use a model. Each one reads something, returns a fixed set of fields,
+        and hands them to code that checks them before they count. None of them can approve a
+        booking.
+      </p>
+
+      <table className="mt-10 w-full max-w-3xl border-t border-ink text-left text-sm lg:max-w-none">
+        <thead className="hidden lg:table-header-group">
+          <tr className="text-xs text-faint">
+            <th scope="col" className="w-44 py-3 pr-6 font-medium">Agent</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Reads</th>
+            <th scope="col" className="py-3 pr-6 font-medium">Returns</th>
+            <th scope="col" className="py-3 font-medium">What code checks</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-rule border-t border-rule">
+          {AGENTS.map((a) => (
+            <tr key={a.name} className="flex flex-col gap-3 py-5 lg:table-row">
+              <th scope="row" className="align-top font-normal lg:py-5 lg:pr-6">
+                <span className="flex items-center gap-2 font-display text-lg font-semibold">
+                  <KindDot kind="llm" />
+                  {a.name}
+                </span>
+                <span className="mt-0.5 block text-xs text-muted">{a.calls}</span>
+              </th>
+              <td className={cell}>
+                <span className={label}>Reads</span>
+                {a.reads}
+              </td>
+              <td className={cell}>
+                <span className={label}>Returns</span>
+                {a.returns}
+              </td>
+              <td className={`${cell} lg:pr-0`}>
+                <span className={label}>What code checks</span>
+                {a.checks}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Section>
   );
 }
 
