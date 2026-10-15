@@ -3,7 +3,7 @@
 ## Context
 
 - **Locally,** the stack is three containers (decision record 0002): Postgres, the FastAPI backend, and the Next.js dashboard. The browser reaches the backend only through the dashboard's allowlisted proxy (`app/api/[...path]/route.ts`).
-- **The chosen hosts** (decision record 0019): a Hugging Face Docker Space runs one container with one public port, and its disk is wiped on every restart. Neon provides the Postgres database outside the container.
+- **The chosen hosts** ([decision record 0019](../../../../docs/decisions/0019-host-demo-on-hugging-face-and-neon.md)): a Hugging Face Docker Space runs one container with one public port, and its disk is wiped on every restart. Neon provides the Postgres database outside the container.
 - **The only route that calls the model** is `POST /demo/requests`. Staff actions resume a run from a decision and make no model call. Every model call is already recorded as a span of kind `llm` (decision record 0006).
 
 ## Goals / Non-Goals

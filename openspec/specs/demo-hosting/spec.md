@@ -1,7 +1,9 @@
-# Spec Delta
+# demo-hosting Specification
 
-## ADDED Requirements
+## Purpose
+Keeps the public hosted demo safe and cheap to run: model use has a hard ceiling, the hosted database is reachable as its provider gives it, and a deploy can only publish committed files.
 
+## Requirements
 ### Requirement: Model use is capped per hour and per day
 When an hourly or daily limit on model calls is configured, sending a demo request SHALL be refused with status 429 and a plain explanation once the model calls recorded in the last hour or the last 24 hours reach that limit. A refused request SHALL store nothing. With no limit configured, submissions SHALL never be refused for volume.
 
