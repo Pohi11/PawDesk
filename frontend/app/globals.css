@@ -28,7 +28,7 @@
   --color-error: #c42b3e;
   --color-error-soft: #f9dfe3;
 
-  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, monospace;
 }
@@ -37,7 +37,7 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-feature-settings: "tnum" 1;
+  font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
 h1,

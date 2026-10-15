@@ -2,7 +2,7 @@ import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
 
 import { DemoPanel } from "@/components/demo-panel";
-import { Figure, KindDot, Loading, StateTag } from "@/components/ui";
+import { KindDot, Loading, StateTag } from "@/components/ui";
 import data from "@/content/walkthrough.json";
 import { backendJson } from "@/lib/backend";
 import type { DemoSample, SpanKind } from "@/lib/types";
@@ -10,130 +10,94 @@ import type { Walkthrough } from "@/lib/walkthrough";
 
 const walkthrough = data as unknown as Walkthrough;
 
-// The home page (spec: run-dashboard): a short introduction, the Try panel, then the
-// explanation a visitor reads after trying a request. Counts that change with every change
-// come from the walkthrough; everything else is hand-written and has to match the code.
+// The home page (spec: run-dashboard): an introduction with one worked request, the Try
+// panel, then what a visitor reads after trying it. Counts come from the walkthrough; the
+// rest is hand-written and has to match the code. The worked example quotes the clean
+// sample and the outcome the end-to-end test asserts for it.
 
-const STEPS: { title: string; kinds: SpanKind[]; text: string }[] = [
+const link = "text-code underline decoration-code/30 underline-offset-2 hover:decoration-code";
+
+const STEPS: { title: string; who: SpanKind[]; text: ReactNode }[] = [
   {
     title: "Read",
-    kinds: ["llm"],
-    text: "A model turns the message into fields: the pet, the service, and the dates. A second call reads the vaccine card photo.",
+    who: ["llm"],
+    text: "A model pulls the pet, the service, and the dates out of the message. A second call reads the photo of the vaccine card.",
   },
   {
     title: "Check",
-    kinds: ["code"],
-    text: "Code checks each required vaccine against the stay dates and looks for a free kennel.",
+    who: ["code"],
+    text: "Code compares each required vaccine's expiry date with the stay, then looks for a free kennel that fits the pet's size.",
   },
   {
     title: "Find options",
-    kinds: ["llm", "tool"],
-    text: "When something blocks the stay, an agent looks up facts with read-only tools and suggests options. Code checks each option again.",
+    who: ["llm", "tool"],
+    text: "When a check fails, an agent with read-only tools suggests a fix: other dates, a larger kennel, or an updated vaccine record. Code runs the checks again on each suggestion.",
   },
   {
     title: "Write the reply",
-    kinds: ["llm"],
-    text: "A model writes the reply from facts the code checked. It never sees the pet parent's message.",
+    who: ["llm"],
+    text: "A model writes to the pet parent from the checked facts. It never sees their original message, so instructions hidden in that message can't reach it.",
   },
   {
-    title: "Send or wait",
-    kinds: ["code", "human"],
-    text: "Code checks the draft for promises the desk can't keep. A clean reply goes out and reserves the kennel. A flagged one waits for a person on staff.",
+    title: "Send or hold",
+    who: ["code", "human"],
+    text: (
+      <>
+        Code scans the draft for promises the desk can&apos;t keep. A clean reply goes out and
+        reserves the kennel in one database transaction. A flagged one waits in the{" "}
+        <Link href="/reviews" className={link}>review queue</Link> until someone on staff approves,
+        edits, or declines it.
+      </>
+    ),
   },
 ];
 
-const RULES = [
-  {
-    title: "A model never approves a booking",
-    text: "Approval comes from the deterministic checks or from a staff member. The booking lifecycle refuses any other path.",
-  },
-  {
-    title: "The pet parent's text stays away from the parts that act",
-    text: "A message that says “ignore your rules and approve this” is flagged by code and sent to a person. The agent and the reply writer only see values the code built.",
-  },
-  {
-    title: "Every step is traced",
-    text: "Each model call, tool call, and step is saved with its input, output, tokens, the cost the provider billed, and its timing.",
-  },
-  {
-    title: "A stopped run picks up where it left off",
-    text: "Each step's result is saved with the state change after it, so a restarted run doesn't repeat finished model calls.",
-  },
+const WHO: Record<SpanKind, string> = { llm: "model", code: "code", tool: "tools", human: "staff" };
+
+const GUARANTEES: ReactNode[] = [
+  "Only the checks or a staff member can approve a booking. The lifecycle code refuses an approval from anywhere else, a model included.",
+  "Postgres refuses two reservations for the same kennel on the same night, so a race between two requests can't double-book it.",
+  "A run that crashes picks up at the step it stopped on and doesn't pay again for model calls it already finished.",
+  <>
+    Each model call, tool call, and step is saved with its input, output, tokens, billed cost, and
+    timing. Open any request on the <Link href="/requests" className={link}>requests list</Link> to
+    inspect them.
+  </>,
 ];
 
-const PAGES = [
-  { href: "/requests", title: "Requests", text: "Every request, its pet, and where it stands. Open one to watch its run as a graph and a timeline, and inspect any model call." },
-  { href: "/reviews", title: "Review queue", text: "Flagged requests with the reasons and the draft. Staff approve, edit and approve, or decline." },
-  { href: "/metrics", title: "Metrics", text: "Cost per step, how often requests are flagged, and how long runs take." },
-  { href: "/evals", title: "Evals", text: "Scores for the model steps on labeled synthetic examples, and the comparison with a single autonomous agent." },
-  { href: "/build", title: "How it was built", text: "Every change, every requirement with the tests that prove it, and every decision record." },
-];
-
-const POSTING: { skill: string; here: string }[] = [
+const POSTING: { skill: string; here: ReactNode }[] = [
   {
-    skill: "Python and FastAPI",
-    here: "The backend: a REST API, the workflow, and the checks, with Pydantic models validating every model output.",
+    skill: "Python, FastAPI",
+    here: "The API, the workflow, and the checks. Pydantic validates each model response before the code uses it.",
   },
   {
-    skill: "TypeScript and React",
-    here: "This dashboard, in Next.js and React, with a live run graph, a timeline, and charts.",
+    skill: "TypeScript, React",
+    here: "This dashboard, in Next.js 16 and React 19 with Tailwind CSS. React Flow draws the run graph and Recharts draws the metrics.",
   },
   {
-    skill: "REST APIs and service integrations",
-    here: "Live run updates over server-sent events, model calls through OpenRouter, and a proxy that forwards only an allowlist of API paths.",
+    skill: "REST APIs and integrations",
+    here: "FastAPI endpoints with live run updates over server-sent events. Model calls go to DeepSeek V4.1 Flash through OpenRouter. The browser reaches the API only through a proxy with an allowlist.",
   },
   {
-    skill: "Relational databases and data modeling",
-    here: "PostgreSQL with SQLAlchemy and Alembic migrations. Sending a reply and reserving the kennel happen in one transaction.",
+    skill: "PostgreSQL and data modeling",
+    here: "Postgres 18 with SQLAlchemy and Alembic migrations. The schema models owners, pets, vaccine records, kennels, reservations, and the steps of each run.",
   },
   {
-    skill: "Docker, Git, and CI/CD",
-    here: "Docker Compose for the full stack, a GitHub Actions pipeline, and a history of small commits that each leave the tests passing.",
+    skill: "Docker and CI/CD",
+    here: "Docker Compose runs the full stack. A GitHub Actions workflow runs lint, type checks, the tests, the build, and a gitleaks secret scan.",
   },
   {
-    skill: "Secure coding and automated testing",
-    here: "Prompt injections caught in code, secrets kept on the server, a secret scan, and tests in pytest, Vitest, and Playwright.",
+    skill: "Automated testing",
+    here: "pytest against a real Postgres, Vitest for the dashboard's logic, and Playwright end-to-end runs that replay recorded model responses so they cost nothing.",
   },
   {
-    skill: "Responsive design and accessibility",
-    here: "Layouts that hold at phone width, and run steps you can reach by keyboard, with descriptions screen readers announce.",
+    skill: "Secure coding",
+    here: "Pet parents' messages and photos count as untrusted input. Code flags prompt injections, and the API key stays on the server.",
   },
   {
-    skill: "AI-assisted development, applied responsibly",
-    here: "An AI coding assistant working inside the process below, with its output checked against the spec and the tests.",
+    skill: "Accessibility",
+    here: "You can reach each step of a run by keyboard, and screen readers announce its summary. Layouts hold at phone width.",
   },
-];
-
-const METHOD = [
-  {
-    title: "Spec first",
-    text: "Each change starts as an OpenSpec proposal: requirements with when-then scenarios, a design that weighs the options, and tasks. I review it before any code is written.",
-  },
-  {
-    title: "Small, tested steps",
-    text: "Code lands in small commits. Lint, type checks, and tests pass before each one.",
-  },
-  {
-    title: "Tests name their requirement",
-    text: "Every test says which requirement it proves, and the build fails when a requirement has no passing test.",
-  },
-  {
-    title: "Decisions on record",
-    text: "A choice that outlasts one change gets a numbered decision record with the options considered.",
-  },
-  {
-    title: "Numbers from real runs",
-    text: "Model steps are scored on labeled examples, and the numbers on these pages come from measured runs.",
-  },
-];
-
-const STACK: { group: string; items: string[] }[] = [
-  { group: "Backend", items: ["Python 3.12", "FastAPI", "Pydantic", "SQLAlchemy", "Alembic", "PostgreSQL 18"] },
-  { group: "Models", items: ["OpenRouter", "DeepSeek V4.1 Flash", "OpenAI Python SDK"] },
-  { group: "Frontend", items: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "React Flow", "Recharts"] },
-  { group: "Testing", items: ["pytest", "Vitest", "Playwright", "Recorded model responses"] },
-  { group: "Delivery", items: ["Docker", "Docker Compose", "GitHub Actions", "gitleaks"] },
-  { group: "Process", items: ["OpenSpec", "Decision records", "Conventional Commits"] },
 ];
 
 export default function Home() {
@@ -146,9 +110,8 @@ export default function Home() {
           Try a request
         </h2>
         <p className="mt-2 mb-8 max-w-2xl leading-relaxed text-muted">
-          Make up a request for one of the synthetic pet parents or pick a sample, then watch each
-          step run with real model calls. The desk treats today as March 3, 2027, so the vaccine
-          cards&apos; dates line up with the stays.
+          Pick a sample or make one up, then watch each step run with real model calls. The desk
+          treats today as March 3, 2027, so the vaccine cards&apos; dates line up with the stays.
         </p>
         <Suspense fallback={<Loading label="Loading samples" />}>
           <Samples />
@@ -156,13 +119,11 @@ export default function Home() {
       </section>
 
       <HowItWorks />
-      <Rules />
-      <Pages />
-      <About />
-      <Stack />
+      <Method />
+      <Skills />
 
-      <p className="mt-20 border-t border-rule pt-6 text-sm text-faint">
-        All pet parents, pets, facilities, and vaccine cards are made up.
+      <p className="mt-24 border-t border-rule pt-6 text-sm text-faint">
+        The pet parents, pets, and vaccine cards on this site are made up.
       </p>
     </>
   );
@@ -173,220 +134,237 @@ async function Samples() {
   return <DemoPanel samples={samples} />;
 }
 
+const FEATURES: { skill: string; what: string }[] = [
+  { skill: "Python and FastAPI", what: "the API and the workflow that runs each request" },
+  { skill: "React and TypeScript", what: "this dashboard, which shows each run live" },
+  { skill: "PostgreSQL and Docker", what: "migrations, and the full stack in Docker Compose" },
+  { skill: "Testing and CI", what: "pytest, Vitest, and Playwright, run by GitHub Actions" },
+  { skill: "AI-assisted development", what: "each change specified, reviewed, and tested before it ships" },
+];
+
 function Intro() {
   return (
-    <section className="mb-16 grid items-center gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-      <div>
-        <p className="text-sm font-medium tracking-wide text-kennel uppercase">
-          Booking intake for pet boarding, daycare, and grooming
-        </p>
-        <h1 className="mt-3 text-4xl leading-[1.05] font-extrabold sm:text-5xl">
-          PawDesk reads booking requests and drafts the replies.
+    <section className="mb-20 grid items-start gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12">
+      <div className="max-w-2xl lg:pt-4">
+        <h1 className="text-4xl leading-[1.05] font-semibold sm:text-5xl">
+          PawDesk handles pet care bookings and asks a person when it isn&apos;t sure.
         </h1>
-        <p className="mt-4 text-lg leading-relaxed text-muted">
-          A pet parent asks for a stay and attaches a photo of their pet&apos;s vaccine card.
-          PawDesk reads both, checks the vaccines, finds a free kennel, and writes the reply. Plain
-          code makes every decision, and anything risky waits for a person on staff.
+        <p className="mt-5 text-lg leading-relaxed text-muted">
+          It&apos;s a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
+          request and the photo of the vaccine card, plain code checks the vaccines and finds a free
+          kennel, and another agent writes the reply.
         </p>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <p className="mt-4 text-lg leading-relaxed text-muted">
+          When every check passes, PawDesk books the stay and sends the reply. When something is
+          unclear or breaks a rule, the request waits in a review queue for someone on staff.
+        </p>
+        <p className="mt-4 text-lg leading-relaxed">
+          I built it to show full stack work and AI-driven
+          development, with the skills the posting lists:
+        </p>
+        <ul className="mt-4 space-y-2">
+          {FEATURES.map((f) => (
+            <li key={f.skill} className="flex gap-3 leading-relaxed">
+              <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-kennel" />
+              <span>
+                <span className="font-medium">{f.skill}:</span> <span className="text-muted">{f.what}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
           <a href="#try" className="rounded-full bg-ink px-5 py-2.5 font-medium text-white hover:brightness-125">
             Try a request
           </a>
-          <a href="#how" className="rounded-full px-5 py-2.5 font-medium ring-1 ring-rule hover:bg-surface">
+          <a href="#how" className={link}>
             How it works
           </a>
-          <a href="#about" className="px-2 py-2.5 text-sm text-muted underline-offset-4 hover:text-ink hover:underline">
-            Why I built it
+          <a href="#skills" className={link}>
+            Skills in detail
           </a>
         </div>
       </div>
-      <Example />
+      <WorkedExample />
     </section>
   );
 }
 
-/** One request, start to finish, as a glance at what the desk does. */
-function Example() {
-  const rows: { kind: SpanKind; text: string }[] = [
-    { kind: "llm", text: "Read the message and the vaccine card" },
-    { kind: "code", text: "Rabies, DHPP, and Bordetella cover the stay" },
-    { kind: "code", text: "Kennel free for all three nights" },
-    { kind: "llm", text: "Reply written from the checked facts" },
+function Read({ children }: { children: ReactNode }) {
+  return <mark className="rounded bg-model-soft px-1 text-model">{children}</mark>;
+}
+
+/**
+ * The clean sample, start to finish: violet marks what a model read, blue what code
+ * checked, the same colors the run graph uses.
+ */
+function WorkedExample() {
+  const facts: { kind: SpanKind; label: string; value: string }[] = [
+    { kind: "llm", label: "Pet", value: "Biscuit, a Beagle on file" },
+    { kind: "llm", label: "Stay", value: "Boarding, March 24 to 27" },
+    { kind: "code", label: "Vaccines", value: "Rabies, DHPP, and Bordetella cover all three nights" },
+    { kind: "code", label: "Kennel", value: "One free for his size" },
   ];
   return (
-    <figure aria-label="An example request" className="hidden rounded-2xl bg-surface p-5 ring-1 ring-rule lg:block">
-      <div className="rounded-xl rounded-bl-sm bg-wash p-3 text-sm leading-relaxed ring-1 ring-rule">
-        Hi! Could Biscuit board with you from March 24 to March 27? His vaccine card is attached.
-        <span className="mt-1 block text-xs text-faint">From a pet parent, with a photo</span>
-      </div>
-      <ol className="mt-4 space-y-2.5 border-l border-rule pl-4 text-sm">
-        {rows.map((r) => (
-          <li key={r.text} className="flex items-center gap-2.5">
-            <KindDot kind={r.kind} />
-            {r.text}
-          </li>
+    <figure aria-label="One request from start to finish" className="rounded-2xl bg-surface p-5 ring-1 ring-rule sm:p-7">
+      <p className="text-sm text-faint">Avery Lindqvist wrote, with a photo attached:</p>
+      <blockquote className="mt-2 font-display text-xl leading-snug font-medium sm:text-2xl lg:text-xl">
+        Hi! Could <Read>Biscuit</Read> <Read>board</Read> with you from <Read>March 24 to March 27</Read>?
+        He eats grain-free food twice a day. His <Read>vaccine card</Read> is attached.
+      </blockquote>
+
+      <dl className="mt-6 space-y-2.5 border-t border-rule pt-5 text-sm">
+        {facts.map((f) => (
+          <div key={f.label} className="grid grid-cols-[1rem_5rem_minmax(0,1fr)] items-baseline">
+            <KindDot kind={f.kind} />
+            <dt className="text-muted">{f.label}</dt>
+            <dd>{f.value}</dd>
+          </div>
         ))}
-      </ol>
-      <figcaption className="mt-4 flex items-center justify-between gap-3 border-t border-rule pt-4 text-sm text-muted">
-        Every check passed, so it went out.
+      </dl>
+
+      <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-rule pt-5 text-sm">
         <StateTag status="sent" />
+        <span>Every check passed, so PawDesk sent the reply with no one on staff involved.</span>
+      </div>
+
+      <figcaption className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">
+        <span className="inline-flex items-center gap-1.5">
+          <KindDot kind="llm" /> A model read it
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <KindDot kind="code" /> Code checked it
+        </span>
       </figcaption>
     </figure>
   );
 }
 
-function Section({ id, title, lead, children }: { id: string; title: string; lead?: string; children: ReactNode }) {
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-heading`} className="mt-24 scroll-mt-6">
+    <section id={id} aria-labelledby={`${id}-heading`} className="mt-28 scroll-mt-6">
       <h2 id={`${id}-heading`} className="text-3xl font-bold">
         {title}
       </h2>
-      {lead && <p className="mt-2 max-w-2xl leading-relaxed text-muted">{lead}</p>}
-      <div className="mt-8">{children}</div>
+      {children}
     </section>
   );
 }
 
-const KIND_NAME: Record<SpanKind, string> = { llm: "Model", code: "Code", tool: "Tools", human: "Person" };
-
 function HowItWorks() {
   return (
-    <Section
-      id="how"
-      title="How a request moves"
-      lead="Code fixes the order of the steps and makes every decision. Models only read messy input and write text for people."
-    >
-      <ol className="grid gap-px overflow-hidden rounded-2xl bg-rule ring-1 ring-rule sm:grid-cols-2 lg:grid-cols-5">
+    <Section id="how" title="How a request moves">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        Code sets the order of the steps and makes each decision. The models read messy input and
+        write text for people.
+      </p>
+
+      <ol className="mt-10 max-w-3xl">
         {STEPS.map((step, i) => (
-          <li key={step.title} className="bg-surface p-5 sm:last:col-span-2 lg:last:col-span-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-display text-sm font-semibold text-faint">{i + 1}</span>
-              <span className="flex flex-wrap justify-end gap-x-2.5 text-xs text-muted">
-                {step.kinds.map((k) => (
-                  <span key={k} className="inline-flex items-center gap-1.5">
-                    <KindDot kind={k} />
-                    {KIND_NAME[k]}
-                  </span>
-                ))}
-              </span>
+          <li key={step.title} className="relative grid grid-cols-[2.5rem_minmax(0,1fr)] pb-9 last:pb-0">
+            {i < STEPS.length - 1 && <span aria-hidden className="absolute top-8 bottom-1 left-[0.9rem] w-px bg-rule" />}
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface font-display text-sm font-semibold ring-1 ring-rule">
+              {i + 1}
+            </span>
+            <div>
+              <h3 className="flex flex-wrap items-baseline gap-x-3 text-xl font-semibold">
+                {step.title}
+                <span className="inline-flex items-center gap-2 font-sans text-sm font-normal text-muted">
+                  {step.who.map((k) => (
+                    <span key={k} className="inline-flex items-center gap-1.5">
+                      <KindDot kind={k} />
+                      {WHO[k]}
+                    </span>
+                  ))}
+                </span>
+              </h3>
+              <p className="mt-1.5 leading-relaxed text-muted">{step.text}</p>
             </div>
-            <h3 className="mt-3 text-lg font-semibold">{step.title}</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">{step.text}</p>
           </li>
         ))}
       </ol>
-    </Section>
-  );
-}
 
-function Rules() {
-  return (
-    <Section id="rules" title="Rules the desk follows" lead="Pet parents' messages and photos are untrusted input. These rules hold for every request, and tests prove each one.">
-      <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
-        {RULES.map((r) => (
-          <div key={r.title} className="border-l-2 border-kennel pl-5">
-            <h3 className="text-lg font-semibold">{r.title}</h3>
-            <p className="mt-1.5 leading-relaxed text-muted">{r.text}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-function Pages() {
-  return (
-    <Section id="pages" title="Pages in the dashboard">
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {PAGES.map((p) => (
-          <li key={p.href}>
-            <Link href={p.href} className="block h-full rounded-2xl bg-surface p-5 ring-1 ring-rule hover:ring-ink">
-              <span className="font-display text-lg font-semibold">{p.title}</span>
-              <span className="mt-1.5 block text-sm leading-relaxed text-muted">{p.text}</span>
-            </Link>
+      <h3 className="mt-16 text-xl font-semibold">What the tests hold it to</h3>
+      <ul className="mt-5 grid max-w-4xl gap-x-10 gap-y-5 leading-relaxed text-muted md:grid-cols-2">
+        {GUARANTEES.map((g, i) => (
+          <li key={i} className="flex gap-3">
+            <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-kennel" />
+            <span>{g}</span>
           </li>
         ))}
       </ul>
+      <p className="mt-8 max-w-2xl leading-relaxed text-muted">
+        On 16 labeled messages, three of them prompt-injection attempts, intake got all 16 right and
+        sent all three attempts to a person. The <Link href="/evals" className={link}>evals page</Link>{" "}
+        has that report and the others.
+      </p>
     </Section>
   );
 }
 
-function About() {
+function Skills() {
+  return (
+    <Section id="skills" title="Skills from the posting">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        The posting asks for someone who works across the stack and uses AI tools every day while
+        checking what they produce. Each row pairs one of its skills with the parts of PawDesk that
+        use it.
+      </p>
+
+      <table className="mt-10 w-full max-w-4xl border-t border-ink text-left">
+        <thead className="sr-only">
+          <tr>
+            <th scope="col">Skill from the posting</th>
+            <th scope="col">Where PawDesk uses it</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-rule">
+          {POSTING.map((row) => (
+            <tr key={row.skill} className="flex flex-col gap-1 py-4 sm:table-row">
+              <th scope="row" className="pr-8 align-top font-display font-semibold sm:w-60 sm:py-4">
+                {row.skill}
+              </th>
+              <td className="align-top leading-relaxed text-muted sm:py-4">{row.here}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Section>
+  );
+}
+
+function Method() {
   const { totals } = walkthrough;
   const tests = totals.tests.backend + totals.tests.frontend + (totals.tests.e2e ?? 0);
+  const changeSteps: ReactNode[] = [
+    "An AI assistant drafts the change as an OpenSpec proposal: requirements with when/then scenarios, a design that weighs the options, and a task list.",
+    "I read the proposal, push back where I disagree, and approve it before any code exists.",
+    "The code goes in as small commits. Lint, type checks, and the tests pass before each one.",
+    <>
+      Each test names the requirement it proves, and the build fails when a requirement has no
+      passing test. In the latest test run, {totals.verified} of {totals.requirements} requirements
+      pass, across{" "}
+      {tests} tests.
+    </>,
+  ];
   return (
-    <Section id="about" title="About this project">
-      <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <div className="space-y-4 text-lg leading-relaxed">
-          <p>
-            I built PawDesk to show full stack work and AI-driven
-            development.
-          </p>
-          <p className="text-muted">
-            The posting asks for an engineer who works across the stack and uses AI tools every day
-            while checking what they produce. PawDesk is my way of showing both in one working
-            product, small enough that I can explain every design decision in it.
-          </p>
-          <p className="text-muted">
-            Each skill from the posting is paired with the place PawDesk uses it.
-          </p>
-        </div>
-
-        <dl className="divide-y divide-rule overflow-hidden rounded-2xl bg-surface ring-1 ring-rule">
-          {POSTING.map((row) => (
-            <div key={row.skill} className="grid gap-1 px-5 py-4 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6">
-              <dt className="font-medium">{row.skill}</dt>
-              <dd className="text-sm leading-relaxed text-muted">{row.here}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      <h3 className="mt-16 text-2xl font-bold">How I work with an AI assistant</h3>
-      <p className="mt-2 max-w-2xl leading-relaxed text-muted">
-        The assistant writes code inside a fixed process, and nothing counts as done until a test or
-        a real run shows it working.
+    <Section id="method" title="Working with an AI assistant">
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+        I build PawDesk one change at a time, and each change goes through the same four steps.
+        Choices that outlast one change get a numbered decision record; there are{" "}
+        {walkthrough.decisions.length} so far.
       </p>
-      <ol className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
-        {METHOD.map((m, i) => (
-          <li key={m.title}>
-            <span className="font-display text-sm font-semibold text-kennel">{String(i + 1).padStart(2, "0")}</span>
-            <h4 className="mt-1 font-display font-semibold">{m.title}</h4>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">{m.text}</p>
+      <ol className="mt-8 max-w-2xl list-decimal space-y-3 pl-6 leading-relaxed marker:font-display marker:font-semibold marker:text-kennel">
+        {changeSteps.map((s, i) => (
+          <li key={i} className="pl-2">
+            {s}
           </li>
         ))}
       </ol>
-
-      <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-6 rounded-2xl bg-surface p-6 ring-1 ring-rule md:grid-cols-4">
-        <Figure label="Requirements proven" value={`${totals.verified} of ${totals.requirements}`} />
-        <Figure label="Tests" value={tests} />
-        <Figure label="Changes" value={totals.changes} />
-        <Figure label="Decision records" value={walkthrough.decisions.length} />
-      </div>
-      <p className="mt-3 text-sm text-faint">
-        From the latest test run. <Link href="/build" className="text-code underline">See every change, requirement, and test</Link>.
+      <p className="mt-8 max-w-2xl leading-relaxed text-muted">
+        <Link href="/build" className={link}>How it was built</Link> lists each of the{" "}
+        {totals.changes} changes with its requirements, the tests behind them, and their latest
+        results.
       </p>
-    </Section>
-  );
-}
-
-function Stack() {
-  return (
-    <Section id="stack" title="Built with">
-      <dl className="grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
-        {STACK.map((s) => (
-          <div key={s.group}>
-            <dt className="text-sm font-medium text-muted">{s.group}</dt>
-            <dd className="mt-2 flex flex-wrap gap-1.5">
-              {s.items.map((item) => (
-                <span key={item} className="rounded-full bg-surface px-3 py-1 text-sm ring-1 ring-rule">
-                  {item}
-                </span>
-              ))}
-            </dd>
-          </div>
-        ))}
-      </dl>
     </Section>
   );
 }

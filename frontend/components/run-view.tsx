@@ -82,7 +82,7 @@ export function RunView({ initial }: { initial: RequestDetail }) {
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
           <PetAvatar pet={detail} size="lg" />
-          <h1 className="text-4xl font-extrabold sm:text-5xl">{detail.pet ?? "Pet not on file"}</h1>
+          <h1 className="text-4xl font-semibold sm:text-5xl">{detail.pet ?? "Pet not on file"}</h1>
           <StateTag status={detail.status} />
           {live && (
             <span className="inline-flex items-center gap-2 text-sm text-code">

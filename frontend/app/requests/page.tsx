@@ -23,7 +23,7 @@ async function Desk() {
     <>
       <section className="mb-12 flex flex-wrap items-end justify-between gap-6">
         <div className="max-w-2xl">
-          <h1 className="text-4xl leading-[1.05] font-extrabold sm:text-5xl">
+          <h1 className="text-4xl leading-[1.05] font-semibold sm:text-5xl">
             {waiting === 0
               ? "Nothing is waiting for you."
               : `${waiting} ${waiting === 1 ? "request is" : "requests are"} waiting for you.`}
