@@ -64,3 +64,14 @@ The API SHALL list sample requests, including at least one injection attempt. It
 #### Scenario: Unknown sample
 - **WHEN** a sample id that doesn't exist is submitted
 - **THEN** the API answers 404 and stores nothing
+
+### Requirement: JSON responses declare UTF-8
+Every JSON response from the API SHALL be encoded as UTF-8 and declared as `application/json; charset=utf-8`, so clients that guess an encoding when none is given read non-ASCII text correctly.
+
+#### Scenario: Non-ASCII text in a response
+- **WHEN** a request whose resolver summary contains an en dash is inspected
+- **THEN** the response is declared `application/json; charset=utf-8`, and the summary reads back with the en dash unchanged
+
+#### Scenario: Error responses too
+- **WHEN** an unknown request id is inspected, or a demo submission fails validation
+- **THEN** the error response is declared `application/json; charset=utf-8`
