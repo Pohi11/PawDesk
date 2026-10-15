@@ -33,6 +33,11 @@
   --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, monospace;
 }
 
+/* No blue flash over a tapped link or button on phones; pressed styles give the feedback. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background: var(--color-paper);
   color: var(--color-ink);
@@ -50,6 +55,18 @@ h3 {
 :focus-visible {
   outline: 2px solid var(--color-code);
   outline-offset: 2px;
+}
+
+/*
+ * A tapped field counts as focus-visible, but on a finger-first device the caret, keyboard,
+ * or picker already shows focus. Buttons and links never match after a tap, so they keep it.
+ */
+@media (hover: none) and (pointer: coarse) {
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
