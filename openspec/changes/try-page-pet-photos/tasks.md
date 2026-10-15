@@ -7,8 +7,8 @@
 ## 2. Dashboard
 
 - [x] 2.1 Show `PetAvatar` on each choice in the Try page's list and beside the preview's heading. Verify with a frontend test that a generated preview and its sent pet get the same photo, an end-to-end check of the Beagle photo on the clean sample, then lint, type check, and build.
-- [ ] 2.2 Try it in a browser: check the samples' photos, generate a pet whose breed is outside the set, send it, and compare the photos. Verify with screenshots.
+- [x] 2.2 Try it in a browser: check the samples' photos, generate a pet whose breed is outside the set, send it, and compare the photos. Verify with screenshots.
 
 ## 3. Integration
 
-- [ ] 3.1 Run every suite and the coverage check, then regenerate the walkthrough.
+- [x] 3.1 Run every suite and the coverage check, then regenerate the walkthrough.
