@@ -1,0 +1,40 @@
+{
+  "about": "The demo facility's booking rules, as the home page shows them (spec: run-dashboard). backend/tests/test_home_page_rules.py checks these values against the seed's vaccine rules, SIZE_CLASS_SQL, and BOOKING_HORIZON_DAYS.",
+  "services": [
+    {
+      "service": "boarding",
+      "label": "Boarding",
+      "visit": "Overnight, at least one night",
+      "kennel": true,
+      "vaccines": { "dog": ["rabies", "dhpp", "bordetella"], "cat": ["rabies", "fvrcp"] }
+    },
+    {
+      "service": "daycare",
+      "label": "Daycare",
+      "visit": "One day, drop-off and pickup on the same date",
+      "kennel": false,
+      "vaccines": { "dog": ["rabies", "dhpp", "bordetella", "canine_influenza"], "cat": ["rabies", "fvrcp"] }
+    },
+    {
+      "service": "grooming",
+      "label": "Grooming",
+      "visit": "One appointment on a single date",
+      "kennel": false,
+      "vaccines": { "dog": ["rabies"], "cat": ["rabies"] }
+    }
+  ],
+  "vaccine_names": {
+    "rabies": "Rabies",
+    "dhpp": "DHPP",
+    "bordetella": "Bordetella",
+    "canine_influenza": "Canine influenza",
+    "fvrcp": "FVRCP"
+  },
+  "dog_sizes": [
+    { "size": "small", "label": "Small", "under_lb": 20 },
+    { "size": "medium", "label": "Medium", "under_lb": 50 },
+    { "size": "large", "label": "Large", "under_lb": 90 },
+    { "size": "xlarge", "label": "Extra large", "under_lb": null }
+  ],
+  "booking_horizon_days": 365
+}
