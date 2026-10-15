@@ -73,7 +73,7 @@ export function stepSummary(id: NodeId, status: NodeStatus, detail: RequestDetai
 function result(id: NodeId, status: NodeStatus, detail: RequestDetail): string {
   if (status === "waiting") return "Not run yet.";
   if (status === "running") return id === "review" ? "Waiting for a person." : "Working on it now.";
-  if (status === "error") return "Failed here. It can be retried.";
+  if (status === "error") return "Failed here. Processing the request again resumes from this step.";
   const steps = detail.steps;
   switch (id) {
     case "intake":
@@ -194,17 +194,18 @@ function reply(step: Json | undefined): string {
   return `${drafted}. A person reviews it before it goes out.`;
 }
 
+// The staff member leads the sentence, as in the outcome sentence (spec: interface-copy).
 const DECIDED: Record<string, string> = {
-  approve: "Approved",
-  edit_and_approve: "Edited and approved",
-  reject: "Declined",
+  approve: "approved the reply",
+  edit_and_approve: "edited the reply and approved it",
+  reject: "declined the request",
 };
 
 function review(status: NodeStatus, detail: RequestDetail): string {
   if (status === "skipped") return "Not needed: nothing was flagged.";
   const approval = detail.approvals.at(-1);
   if (!approval) return "Done.";
-  return `${DECIDED[approval.action] ?? "Decided"} by ${approval.staff_name}.`;
+  return `${approval.staff_name} ${DECIDED[approval.action] ?? "decided"}.`;
 }
 
 function send(detail: RequestDetail): string {

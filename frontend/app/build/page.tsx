@@ -10,20 +10,20 @@ const walkthrough = data as unknown as Walkthrough;
 
 const METHOD = [
   {
-    title: "Every change starts as a spec",
-    text: "Each phase is a change with a reason, requirements written as when-then scenarios, a design that weighs options, and tasks that each name the test proving them. Finished changes are archived and their requirements join the living specs.",
+    title: "Each change starts as a spec",
+    text: "Each piece of work is an OpenSpec change. It holds a proposal, requirements written as when-then scenarios, a design that weighs the options, and tasks that each name the test proving them. A finished change is archived, and its requirements join the current specs.",
   },
   {
-    title: "Decisions are written down once",
-    text: "Choices that outlive one change get a numbered record: context, options, decision, consequences. A record is never rewritten; a changed mind is a new record.",
+    title: "Decisions get a numbered record",
+    text: "A choice that outlives one change gets a record with its context, the options, the decision, and the consequences. A committed record stays as written. A new record replaces it when the decision changes.",
   },
   {
-    title: "Every test names what it proves",
-    text: "Backend, frontend, and browser tests each name the requirement they verify, so every requirement below links to its tests and their latest result, and a check fails on any gap.",
+    title: "Tests name the requirement they prove",
+    text: "Backend, frontend, and browser tests each name the requirement they verify. Each requirement below links to its tests and their latest result, and the build fails when a requirement has no passing test.",
   },
   {
-    title: "Models are measured, not trusted",
-    text: "Rules with a right answer stay in code. Model steps are scored on labeled synthetic examples, with the dangerous errors counted on their own, and every model call is traced with its exact cost.",
+    title: "Model steps are scored and traced",
+    text: "Rules with a right answer stay in code. Model steps are scored on labeled synthetic examples, with the dangerous errors counted separately, and each model call is traced with the cost the provider reported.",
   },
 ];
 
@@ -33,8 +33,8 @@ export default function BuildPage() {
   return (
     <>
       <PageTitle title="How PawDesk was built">
-        Generated from the repository itself: every change, every requirement with the tests that prove
-        it, and every decision. Nothing on these pages is written by hand.
+        The changes, requirements, tests, and decision records on these pages come from the repository
+        and the latest test run. The method section below is written by hand.
       </PageTitle>
       <BuildNav />
 
@@ -57,7 +57,7 @@ export default function BuildPage() {
         ))}
       </section>
 
-      <h2 className="mt-16 mb-6 text-3xl font-bold">Every change, in order</h2>
+      <h2 className="mt-16 mb-6 text-3xl font-bold">Changes, in order</h2>
       <ol className="space-y-4 border-l-2 border-rule pl-8">
         {changes.map((change) => {
           const items = change.tasks.flatMap((g) => g.items);

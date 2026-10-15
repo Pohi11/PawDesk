@@ -3,8 +3,9 @@ import { defineConfig, devices } from "@playwright/test";
 // End-to-end tests (spec: delivery-pipeline): the real API on a fresh seeded database with
 // recorded model responses (scripts/e2e_server.py), and the dashboard in front of it.
 // Record new responses with PAWDESK_E2E_RECORD=1 (real model calls); CI always replays.
-const API_PORT = 8011;
-const WEB_PORT = 3011;
+// Two checkouts can run at once with their own ports (and PAWDESK_E2E_DB for the database).
+const API_PORT = Number(process.env.PAWDESK_E2E_API_PORT ?? 8011);
+const WEB_PORT = Number(process.env.PAWDESK_E2E_WEB_PORT ?? 3011);
 
 export default defineConfig({
   testDir: "./e2e",

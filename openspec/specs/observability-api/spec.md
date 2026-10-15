@@ -65,6 +65,17 @@ The API SHALL list sample requests, including at least one injection attempt. It
 - **WHEN** a sample id that doesn't exist is submitted
 - **THEN** the API answers 404 and stores nothing
 
+### Requirement: Requests identify the matched pet
+The request list and the request detail SHALL report the matched pet's id, species, and breed alongside its name. When no pet is matched, all four SHALL be null.
+
+#### Scenario: Matched pet
+- **WHEN** a request matched to Biscuit, a dog whose breed is "Beagle", is listed and inspected
+- **THEN** both responses include Biscuit's pet id, species `dog`, and breed `Beagle`
+
+#### Scenario: No matched pet
+- **WHEN** a request with no matched pet is listed and inspected
+- **THEN** both responses report the pet's name, id, species, and breed as null
+
 ### Requirement: JSON responses declare UTF-8
 Every JSON response from the API SHALL be encoded as UTF-8 and declared as `application/json; charset=utf-8`, so clients that guess an encoding when none is given read non-ASCII text correctly.
 

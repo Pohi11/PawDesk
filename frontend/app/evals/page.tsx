@@ -10,8 +10,8 @@ export default function EvalsPage() {
   return (
     <>
       <PageTitle title="Evals">
-        How well the model steps do on labeled, synthetic examples. Each result comes from one dated run
-        with real model calls.
+        Scores for the model steps on labeled synthetic examples. Each card is one dated run with real
+        model calls.
       </PageTitle>
       <Suspense fallback={<Loading label="Loading results" />}>
         <Reports />
@@ -26,10 +26,10 @@ const KIND: Record<string, string> = {
 };
 
 const MEASURE: Record<string, string> = {
-  cases_fully_matched: "Messages read completely right",
+  cases_fully_matched: "Messages with every field right",
   injections_sent_to_review: "Injection attempts sent to a person",
-  decision_agreement: "Decisions that match the truth",
-  silent_disagreements: "Wrong decisions nobody would notice",
+  decision_agreement: "Decisions that match the label",
+  silent_disagreements: "Wrong decisions not sent to a person",
   vaccine_recall: "Vaccines found",
   expiry_accuracy: "Expiry dates read right",
   invented_expiries: "Expiry dates made up",

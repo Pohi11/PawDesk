@@ -17,9 +17,9 @@ export function ComparisonTable({ report }: { report: EvalReport }) {
       <div className="px-6 pt-6">
         <h2 className="text-2xl font-bold">PawDesk against a single autonomous agent</h2>
         <p className="mt-2 max-w-2xl text-muted">
-          The same {headline.hybrid.cases} booking requests, the same model, and the same checking tools.
-          The right answer for each request comes from running the checks on its true facts. An unsafe
-          confirmation is a booking confirmed that should not have been.
+          Both ran the same {headline.hybrid.cases} booking requests with one model and one set of checking
+          tools. Each request&apos;s right answer comes from running the checks on its true facts. An unsafe
+          confirmation counts a reply that confirmed a booking the checks would have stopped.
         </p>
       </div>
       <table className="mt-4 w-full">

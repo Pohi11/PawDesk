@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { PetAvatar } from "@/components/pet-avatar";
 import { Loading, StateTag } from "@/components/ui";
 import { backendJson } from "@/lib/backend";
 import { formatCost, formatService, formatStay } from "@/lib/format";
@@ -29,8 +30,8 @@ async function Desk() {
           </h1>
           <p className="mt-3 text-lg text-muted">
             {waiting === 0
-              ? "Every request so far was decided by the checks or already handled by staff."
-              : "Each one needs a person before anything is sent. The rest were decided by the checks."}
+              ? "The checks or your staff have decided every request so far."
+              : "A person decides each one before anything goes out. The checks decided the rest."}
           </p>
         </div>
         {waiting > 0 ? (
@@ -57,11 +58,14 @@ async function Desk() {
                 href={`/requests/${row.id}`}
                 className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-5 py-4 hover:bg-wash sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto_5rem]"
               >
-                <div className="min-w-0">
-                  <div className="truncate font-display text-lg font-semibold">
-                    {row.pet ?? <span className="text-muted">Pet not on file</span>}
+                <div className="flex min-w-0 items-center gap-4">
+                  <PetAvatar pet={row} />
+                  <div className="min-w-0">
+                    <div className="truncate font-display text-lg font-semibold">
+                      {row.pet ?? <span className="text-muted">Pet not on file</span>}
+                    </div>
+                    <div className="truncate text-sm text-muted">{row.owner}</div>
                   </div>
-                  <div className="truncate text-sm text-muted">{row.owner}</div>
                 </div>
                 <div className="hidden text-sm sm:block">
                   <div>{formatService(row.service)}</div>

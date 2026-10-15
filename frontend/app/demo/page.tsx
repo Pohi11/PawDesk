@@ -9,9 +9,9 @@ export default function DemoPage() {
   return (
     <>
       <PageTitle title="Try a request">
-        Make up a request from one of the synthetic pet parents, or pick a sample, then watch the desk
-        handle it live with real model calls. Requests are handled as of March 3, 2027, the day their
-        vaccine cards were made for.
+        Make up a request for one of the synthetic pet parents or pick a sample, then watch each
+        step run with real model calls. The desk treats today as March 3, 2027, so the vaccine
+        cards&apos; dates line up with the stays.
       </PageTitle>
       <Suspense fallback={<Loading label="Loading samples" />}>
         <Samples />

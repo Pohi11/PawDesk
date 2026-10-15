@@ -3,6 +3,7 @@
 Prepares a fresh `pawdesk_e2e` database seeded as of the demo day, switches the model
 client to replay recorded responses (or record them with PAWDESK_E2E_RECORD=1), and
 serves the API on port 8011. Started by Playwright's webServer; never used for real work.
+PAWDESK_E2E_DB and PAWDESK_E2E_API_PORT let two checkouts run the tests at once.
 """
 
 import os
@@ -14,7 +15,7 @@ from app.config import get_settings
 from app.demo import DEMO_TODAY
 from scripts.lab_database import database_url, prepare
 
-E2E_DATABASE = "pawdesk_e2e"
+E2E_DATABASE = os.environ.get("PAWDESK_E2E_DB", "pawdesk_e2e")
 PORT = int(os.environ.get("PAWDESK_E2E_API_PORT", "8011"))
 CASSETTES = Path(__file__).resolve().parents[1] / "tests" / "cassettes" / "e2e"
 

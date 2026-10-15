@@ -27,7 +27,7 @@ const STATE: Record<string, { label: string; tone: "work" | "act" | "done" | "fa
   checking: { label: "Checking", tone: "work" },
   resolving: { label: "Finding options", tone: "work" },
   drafting: { label: "Writing reply", tone: "work" },
-  ready: { label: "Approved by checks", tone: "work" },
+  ready: { label: "Approved by the checks", tone: "work" },
   approved: { label: "Approved", tone: "work" },
   needs_review: { label: "Waiting for you", tone: "act" },
   rejected: { label: "Declined", tone: "quiet" },
