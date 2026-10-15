@@ -1,7 +1,16 @@
 import { expect, vi } from "vitest";
 
 import { specTest } from "../tests/spec";
-import { RECENT_NAMES, certificateSrc, generateRequest, rememberName, submitDemo } from "./demo";
+import { petPhoto } from "./pet-photo";
+import {
+  RECENT_NAMES,
+  type GeneratedRequest,
+  certificateSrc,
+  generateRequest,
+  generatedPet,
+  rememberName,
+  submitDemo,
+} from "./demo";
 
 const TRY = "The Try page previews a request and its certificate";
 
@@ -55,3 +64,26 @@ specTest("run-dashboard", TRY, "the page remembers the latest names, newest firs
   expect(recent).toHaveLength(RECENT_NAMES);
   expect(recent[0]).toBe("Pet 19");
 });
+
+specTest(
+  "pet-photos",
+  "The Try page shows each request's pet photo",
+  "a generated pet keeps its photo once sent",
+  () => {
+    const preview = {
+      pet: "Xena",
+      pet_id: "0b7f6e1c-3a52-5d0e-9c41-2f6a7b8c9d10",
+      species: "dog",
+      breed: "Standard Poodle", // not in the photo set: a general photo picked from the id
+    } as GeneratedRequest;
+    // What the run page has once intake matches the pet added with the seed's id.
+    const sent = { pet: "Xena", pet_id: preview.pet_id, pet_species: "dog", pet_breed: "Standard Poodle" };
+
+    const shown = petPhoto(generatedPet(preview));
+
+    expect(shown).not.toBeNull();
+    expect(shown?.breed).toBeNull();
+    expect(shown).toEqual(petPhoto(sent));
+    expect(petPhoto(generatedPet({ ...preview, breed: "Beagle" }))?.breed).toBe("Beagle");
+  },
+);

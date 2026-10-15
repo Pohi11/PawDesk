@@ -1,9 +1,13 @@
 // Demo requests from the browser, through the dashboard's own proxy (spec: demo-generator).
 
+import type { PetFields } from "./types";
+
 export interface GeneratedRequest {
   seed: number;
   owner: string;
   pet: string;
+  /** The id the pet gets when the request is sent, derived from the seed. */
+  pet_id: string;
   species: string;
   breed: string;
   weight_lb: number;
@@ -26,6 +30,11 @@ export function certificateSrc(source: DemoSource): string {
   return "seed" in source
     ? `/api/demo/generated/${source.seed}/certificate.png`
     : `/api/demo/samples/${source.sample}/certificate.png`;
+}
+
+/** The fields the pet photo is chosen from, the same ones the run page has once it is sent. */
+export function generatedPet(request: GeneratedRequest): PetFields {
+  return { pet: request.pet, pet_id: request.pet_id, pet_species: request.species, pet_breed: request.breed };
 }
 
 /** How many generated names the Try page remembers and asks the server to avoid. */
