@@ -5,7 +5,7 @@
 - **`/` is the requests list** today, and `/demo` is the Try page (`DemoPanel` over the samples from `GET /demo/samples`).
 - **The explanation of the project** lives in the README: what the desk does, the hybrid workflow, the measured results, and the method. A visitor to the hosted demo sees only the dashboard.
 - **The How it was built page** (`/build`) already shows generated totals (requirements proven, tests, changes, decision records) from `content/walkthrough.json`.
-- **Interface copy** follows `docs/style/interface-copy.md` (decision record [0018](../../../docs/decisions/0018-plain-voice-for-interface-copy.md)). The build checks the banned words and em dashes in every page.
+- **Interface copy** follows `docs/style/interface-copy.md` (decision record [0018](../../../../docs/decisions/0018-plain-voice-for-interface-copy.md)). The build checks the banned words and em dashes in every page.
 
 ## Goals / Non-Goals
 
