@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, IBM_Plex_Sans } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -8,10 +8,11 @@ import type { ReviewItem } from "@/lib/types";
 
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+// Variable, with the optical size axis: display cuts for headlines, text cuts for labels.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  axes: ["opsz", "SOFT"],
 });
 
 const plex = IBM_Plex_Sans({
@@ -35,7 +36,7 @@ const NAV = [
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${plex.variable} h-full antialiased`}>
+    <html lang="en" className={`${fraunces.variable} ${plex.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <header className="border-b border-rule bg-surface/80 backdrop-blur">
           <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
