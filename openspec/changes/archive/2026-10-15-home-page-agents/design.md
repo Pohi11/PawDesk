@@ -2,9 +2,9 @@
 
 ## Context
 
-- **Four parts of the workflow use a model** (decision record [0008](../../../docs/decisions/0008-hybrid-workflow-over-agentic.md)):
+- **Four parts of the workflow use a model** (decision record [0008](../../../../docs/decisions/0008-hybrid-workflow-over-agentic.md)):
   - intake (`app/intake.py`) and records (`app/records.py`) each make one model call and return a validated schema;
-  - the resolver (`app/resolver.py`, record [0010](../../../docs/decisions/0010-bounded-proposal-only-resolver.md)) runs a loop of up to 6 model calls and 12 calls to 3 read-only tools, then proposes one offer;
+  - the resolver (`app/resolver.py`, record [0010](../../../../docs/decisions/0010-bounded-proposal-only-resolver.md)) runs a loop of up to 6 model calls and 12 calls to 3 read-only tools, then proposes one offer;
   - the reply (`app/reply.py`) makes one model call from facts code built.
 - **Code checks each output** before it counts: confidence below 0.7, ambiguities, date and label checks, the promise check on the draft.
 
