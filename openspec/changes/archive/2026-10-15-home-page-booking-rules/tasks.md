@@ -11,4 +11,4 @@
 
 ## 3. Integration
 
-- [ ] 3.1 Run every suite and the coverage check, archive, and regenerate the walkthrough.
+- [x] 3.1 Run every suite and the coverage check, archive, and regenerate the walkthrough.

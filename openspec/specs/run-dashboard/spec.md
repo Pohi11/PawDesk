@@ -104,11 +104,15 @@ Hovering or focusing a step in the run view's path SHALL show a tooltip with wha
 - **THEN** the same tooltip is shown and announced as the step's description, Escape hides it, and Enter opens the step in the inspector
 
 ### Requirement: The home page introduces PawDesk and holds the Try panel
-The home page (`/`) SHALL open with what PawDesk does, why it was built, its main features, and a worked request, then the Try panel. Below the panel it SHALL explain the steps, the guarantees the tests check, how the code is written, and which technologies serve each skill in the job posting. `/demo` SHALL redirect to `/`, and the requests list SHALL be at `/requests`.
+The home page (`/`) SHALL open with what PawDesk does, why it was built, its main features, and a worked request, then the Try panel. Below the panel it SHALL name each agent with what it reads, what it returns, and what code checks, then explain the steps, the guarantees the tests check, how the code is written, and which technologies serve each skill in the job posting. `/demo` SHALL redirect to `/`, and the requests list SHALL be at `/requests`.
 
 #### Scenario: Opening the home page
 - **WHEN** a visitor opens `/`
 - **THEN** the page says what PawDesk does and why it was built, shows the worked example, and shows the Try panel's samples and its "Make one up" choice
+
+#### Scenario: The agents
+- **WHEN** a visitor reads the agents section
+- **THEN** it names the intake, records, resolver, and reply agents, each with what it reads, what it returns, and what code checks
 
 #### Scenario: The old Try page address
 - **WHEN** a visitor opens `/demo`
@@ -117,3 +121,14 @@ The home page (`/`) SHALL open with what PawDesk does, why it was built, its mai
 #### Scenario: The requests list
 - **WHEN** a visitor follows the navigation's Requests link
 - **THEN** the browser opens `/requests`, which lists the requests
+
+### Requirement: The home page explains the booking rules
+The home page SHALL explain the rules code checks: for each service, how long a visit lasts, whether it needs a kennel, and the vaccines dogs and cats need; when a vaccine covers a stay; how a dog's weight sets its kennel size; which dates a request can ask for; and what happens when a rule isn't met. The vaccine lists, weight bands, and booking horizon SHALL match the ones the backend uses.
+
+#### Scenario: Services side by side
+- **WHEN** a visitor reads the booking rules
+- **THEN** boarding shows at least one night and a kennel, daycare and grooming show a single day and no kennel, and each shows its vaccines for dogs and cats
+
+#### Scenario: The rules match the backend
+- **WHEN** the rule data the page reads is compared with the seeded facility's vaccine rules, the size class thresholds, and the booking horizon
+- **THEN** they match
