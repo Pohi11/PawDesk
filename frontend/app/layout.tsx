@@ -28,7 +28,9 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/", label: "Try a request" },
+  // The Try panel on the home page (spec: run-dashboard "The navigation's Try a request
+  // link opens the Try panel").
+  { href: "/#try", label: "Try a request" },
   { href: "/requests", label: "Requests" },
   { href: "/metrics", label: "Metrics" },
   { href: "/evals", label: "Evals" },

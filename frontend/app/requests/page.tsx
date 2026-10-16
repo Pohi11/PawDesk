@@ -39,7 +39,7 @@ async function Desk() {
             Open the review queue
           </Link>
         ) : (
-          <Link href="/" className="rounded-full bg-ink px-5 py-2.5 font-medium text-white hover:brightness-125">
+          <Link href="/#try" className="rounded-full bg-ink px-5 py-2.5 font-medium text-white hover:brightness-125">
             Try a request
           </Link>
         )}
