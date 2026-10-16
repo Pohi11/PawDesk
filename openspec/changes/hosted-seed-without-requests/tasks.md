@@ -2,8 +2,8 @@
 
 ## 1. Seed without requests
 
-- [ ] 1.1 Add `--no-requests` to the seed command, leaving out booking requests, transitions, and approvals, with seed tests.
-- [ ] 1.2 Pass `--no-requests` from the Space start script, with a test, and update the hosting notes.
+- [x] 1.1 Add `--no-requests` to the seed command, leaving out booking requests, transitions, and approvals, with seed tests.
+- [x] 1.2 Pass `--no-requests` from the Space start script, with a test, and update the hosting notes.
 
 ## 2. Integration
 

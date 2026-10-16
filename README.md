@@ -145,7 +145,7 @@ No model key is used in CI.
 ## Hosted demo
 
 The public demo runs on a Hugging Face Docker Space with its database at Neon ([decision record 0019](docs/decisions/0019-host-demo-on-hugging-face-and-neon.md)):
-- **One container** ([`deploy/huggingface/`](deploy/huggingface/)): on start it migrates, reseeds the synthetic data, and runs the backend on the loopback address behind the dashboard on the public port.
+- **One container** ([`deploy/huggingface/`](deploy/huggingface/)): on start it migrates, reseeds the synthetic data without example requests, and runs the backend on the loopback address behind the dashboard on the public port.
 - **Model use is capped** per hour and per day (`DEMO_MODEL_CALLS_PER_HOUR`, `DEMO_MODEL_CALLS_PER_DAY`), counted from recorded model calls. Past a limit, sending answers 429 and the Try page says why.
 - **Everyone is staff** in the demo. Replies are never sent anywhere, and the data resets on every restart.
 - **Deploying** uploads only the files committed at `HEAD`. Secrets (`DATABASE_URL`, `OPENROUTER_API_KEY`, `PAWDESK_SEED_ALLOWED_HOST`) are set on the Space.
