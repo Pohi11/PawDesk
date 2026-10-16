@@ -6,6 +6,7 @@ import { KindDot, Loading, StateTag } from "@/components/ui";
 import rules from "@/content/booking-rules.json";
 import data from "@/content/walkthrough.json";
 import { backendJson } from "@/lib/backend";
+import { certificateSrc } from "@/lib/demo";
 import type { DemoSample, SpanKind } from "@/lib/types";
 import type { Walkthrough } from "@/lib/walkthrough";
 
@@ -245,6 +246,20 @@ function WorkedExample() {
         Hi! Could <Read>Biscuit</Read> <Read>board</Read> with you from <Read>March 24 to March 27</Read>?
         He eats grain-free food twice a day. His <Read>vaccine card</Read> is attached.
       </blockquote>
+
+      <figure className="mt-5">
+        {/* eslint-disable-next-line @next/next/no-img-element -- the clean sample's PNG from the API, the file the request sends */}
+        <img
+          src={certificateSrc({ sample: "clean" })}
+          alt="Biscuit's vaccine card, listing Rabies, DHPP, Bordetella, and Canine influenza with the dates given and expiry dates"
+          width={780}
+          height={338}
+          className="h-auto w-full rounded-lg bg-white ring-2 ring-model-soft"
+        />
+        <figcaption className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted">
+          <KindDot kind="llm" /> The attached card, read by the records agent
+        </figcaption>
+      </figure>
 
       <dl className="mt-6 space-y-2.5 border-t border-rule pt-5 text-sm">
         {facts.map((f) => (

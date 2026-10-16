@@ -3,7 +3,8 @@ import { expect, test } from "@playwright/test";
 import { specTag } from "../tests/spec-tag";
 
 const HOME = specTag("run-dashboard", "The home page introduces PawDesk and holds the Try panel");
-const RULES = specTag("run-dashboard", "The home page explains the booking rules");
+const CARD = specTag("run-dashboard", "The worked example shows the attached vaccine card");
+const RULES =specTag("run-dashboard", "The home page explains the booking rules");
 
 test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ page }) => {
   await page.goto("/");
@@ -22,6 +23,15 @@ test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ 
   for (const section of ["Booking rules", "The agents", "How a request moves", "What the tests hold it to", "Working with an AI assistant", "Skills from the posting"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }
+});
+
+test(`${CARD} the worked example shows the attached vaccine card`, async ({ page }) => {
+  await page.goto("/");
+
+  const card = page.getByRole("figure", { name: "One request from start to finish" }).getByRole("img", { name: /Biscuit's vaccine card/ });
+  await expect(card).toBeVisible();
+  await expect(card).toHaveAttribute("src", "/api/demo/samples/clean/certificate.png");
+  await expect.poll(() => card.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBeGreaterThan(0);
 });
 
 test(`${HOME} the old Try page address lands on the home page`, async ({ page }) => {
