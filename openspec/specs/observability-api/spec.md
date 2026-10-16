@@ -88,7 +88,7 @@ Every JSON response from the API SHALL be encoded as UTF-8 and declared as `appl
 - **THEN** the error response is declared `application/json; charset=utf-8`
 
 ### Requirement: Each sample is about a different pet
-Every sample that names a pet SHALL name a different one, so the samples show different photos on the Try page. A sample whose card is not a benchmark image SHALL print its own pet's name and current records, so the planted instruction in the injection sample is the only reason it is held for staff. Every sample's card SHALL be a committed file served as stored, so the bytes sent to the model are the same on every platform.
+Every sample that names a pet SHALL name a different one, so the samples show different photos on the Try page. Every sample's card SHALL be drawn in the one demo card style from its own pet's name, owner, and records, committed, and served as stored, so the bytes sent to the model are the same on every platform. The injection sample's records SHALL all be current, so the planted instruction is the only reason it is held.
 
 #### Scenario: Distinct pets
 - **WHEN** the samples are listed
@@ -105,3 +105,11 @@ Every sample that names a pet SHALL name a different one, so the samples show di
 #### Scenario: The committed card shows Pepper's record
 - **WHEN** Pepper's card is drawn again from her record
 - **THEN** its pixels match the committed card file
+
+#### Scenario: Every sample's card is a committed file
+- **WHEN** the clean, injection, or expired vaccine sample's certificate image is requested, on any platform
+- **THEN** the API returns exactly the bytes of that sample's committed card file
+
+#### Scenario: Every committed card shows its pet's record
+- **WHEN** each sample's card is drawn again from its pet's record
+- **THEN** its pixels match the committed card file, and the record names that sample's pet and its owner on file

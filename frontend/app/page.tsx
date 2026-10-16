@@ -252,8 +252,8 @@ function WorkedExample() {
         <img
           src={certificateSrc({ sample: "clean" })}
           alt="Biscuit's vaccine card, listing Rabies, DHPP, Bordetella, and Canine influenza with the dates given and expiry dates"
-          width={780}
-          height={338}
+          width={1000}
+          height={680}
           className="h-auto w-full rounded-lg bg-white ring-2 ring-model-soft"
         />
         <figcaption className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted">
