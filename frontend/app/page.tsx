@@ -100,7 +100,7 @@ const GUARANTEES: ReactNode[] = [
   </>,
 ];
 
-const POSTING: { skill: string; here: ReactNode }[] = [
+const STACK: { skill: string; here: ReactNode }[] = [
   {
     skill: "Python, FastAPI",
     here: "The API, the workflow, and the checks. Pydantic validates each model response before the code uses it.",
@@ -196,8 +196,8 @@ function Intro() {
           unclear or breaks a rule, the request waits in a review queue for someone on staff.
         </p>
         <p className="mt-4 text-lg leading-relaxed">
-          I built it to show full stack work and AI-driven
-          development, with the skills the posting lists:
+          I built it to show full stack work and AI-driven development in one project, with these
+          skills:
         </p>
         <ul className="mt-4 space-y-2">
           {FEATURES.map((f) => (
@@ -602,22 +602,21 @@ function HowItWorks() {
 
 function Skills() {
   return (
-    <Section id="skills" title="Skills from the posting">
+    <Section id="skills" title="Skills across the stack">
       <p className="mt-3 max-w-2xl leading-relaxed text-muted">
-        The posting asks for someone who works across the stack and uses AI tools every day while
-        checking what they produce. Each row pairs one of its skills with the parts of PawDesk that
-        use it.
+        PawDesk runs from the database to the browser, built with AI tools every day and checked by
+        tests at every step. Each row pairs a skill with the parts of PawDesk that use it.
       </p>
 
       <table className="mt-10 w-full max-w-4xl border-t border-ink text-left">
         <thead className="sr-only">
           <tr>
-            <th scope="col">Skill from the posting</th>
+            <th scope="col">Skill</th>
             <th scope="col">Where PawDesk uses it</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-rule">
-          {POSTING.map((row) => (
+          {STACK.map((row) => (
             <tr key={row.skill} className="flex flex-col gap-1 py-4 sm:table-row">
               <th scope="row" className="pr-8 align-top font-display font-semibold sm:w-60 sm:py-4">
                 {row.skill}
