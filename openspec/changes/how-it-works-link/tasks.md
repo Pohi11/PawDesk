@@ -2,7 +2,7 @@
 
 ## 1. Link target
 
-- [ ] 1.1 Point "How it works" at the booking rules section. Verify with the home page end-to-end test, lint, type check, and build.
+- [x] 1.1 Point "How it works" at the booking rules section. Verify with the home page end-to-end test, lint, type check, and build.
 
 ## 2. Integration
 
