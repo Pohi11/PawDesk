@@ -9,6 +9,7 @@ const RULES = specTag("run-dashboard", "The home page explains the booking rules
 const HOW = specTag("run-dashboard", "The hero's How it works link opens the booking rules");
 const OUTCOME = specTag("run-dashboard", "The worked example shows what PawDesk did");
 const EXAMPLE = specTag("run-dashboard", "The coverage diagram is a hypothetical example");
+const NAV_TRY = specTag("run-dashboard", "The navigation's Try a request link opens the Try panel");
 
 test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ page }) => {
   await page.goto("/");
@@ -89,6 +90,20 @@ test(`${HOW} How it works scrolls to the booking rules`, async ({ page }) => {
   await page.getByRole("link", { name: "How it works", exact: true }).click();
   await expect(page).toHaveURL(/#rules$/);
   await expect(page.getByRole("heading", { name: "Booking rules", level: 2 })).toBeInViewport();
+});
+
+test(`${NAV_TRY} the navigation's Try a request link scrolls to the Try panel`, async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation").getByRole("link", { name: "Try a request", exact: true }).click();
+  await expect(page).toHaveURL(/\/#try$/);
+  await expect(page.getByRole("heading", { name: "Try a request", level: 2 })).toBeInViewport();
+});
+
+test(`${NAV_TRY} the navigation's Try a request link opens the Try panel from another page`, async ({ page }) => {
+  await page.goto("/requests");
+  await page.getByRole("navigation").getByRole("link", { name: "Try a request", exact: true }).click();
+  await expect(page).toHaveURL(/\/#try$/);
+  await expect(page.getByRole("heading", { name: "Try a request", level: 2 })).toBeInViewport();
 });
 
 test(`${HOME} the navigation's Requests link opens the list`, async ({ page }) => {
