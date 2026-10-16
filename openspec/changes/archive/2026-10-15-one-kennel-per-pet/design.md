@@ -2,7 +2,7 @@
 
 ## Context
 
-- **Kennel overlap** is already guarded twice (design D5 of the domain model; stay dates per decision record [0005](../../../docs/decisions/0005-stay-date-semantics.md)): `find_kennel` skips kennels with a reservation sharing a night, and the exclusion constraint `ex_reservations_no_overlapping_stays` refuses a second reservation for the same kennel and night. Nothing looks at the pet.
+- **Kennel overlap** is already guarded twice (design D5 of the domain model; stay dates per decision record [0005](../../../../docs/decisions/0005-stay-date-semantics.md)): `find_kennel` skips kennels with a reservation sharing a night, and the exclusion constraint `ex_reservations_no_overlapping_stays` refuses a second reservation for the same kennel and night. Nothing looks at the pet.
 - **A confirmed boarding request reserves at send time** (`_reserve_if_confirmed`), after searching for a kennel again.
 - **The demo database is shared.** Every run of the clean sample is approved and reserves a medium kennel for Mar 24–27, and there are three. Generated boarding requests fall on Mar 8 to Apr 12 of the same demo year.
 
