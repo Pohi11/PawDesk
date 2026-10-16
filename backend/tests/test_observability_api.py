@@ -1,6 +1,7 @@
 """Spec: observability-api, through the FastAPI app against a real database."""
 
 import asyncio
+import io
 import json
 import uuid
 from datetime import timedelta
@@ -8,6 +9,7 @@ from decimal import Decimal
 
 import httpx
 import pytest
+from PIL import Image
 from sqlalchemy import func, select
 
 from app.api import (
@@ -17,8 +19,9 @@ from app.api import (
     get_results_dir,
     get_stream_timing,
 )
+from app.certificate_card import render
 from app.db import get_sessionmaker
-from app.demo import DEMO_TODAY, SAMPLES
+from app.demo import DEMO_TODAY, PEPPER_CARD, SAMPLES
 from app.documents import attach_certificate, load_certificate
 from app.enums import SpanKind, Species
 from app.intake import match_pet
@@ -27,6 +30,7 @@ from app.llm import RetryPolicy, make_client
 from app.main import app
 from app.models import BookingRequest, Owner, Pet, Span, Trace
 from app.orchestrator import process_request
+from scripts.draw_pepper_card import pepper_request
 from scripts.seed import seed
 from tests.test_llm import fake_settings
 from tests.test_orchestrator import (
@@ -526,12 +530,31 @@ async def test_no_two_samples_share_a_pet(api, committed, full_seed):
 
 
 @spec("observability-api", "Each sample is about a different pet")
-async def test_the_injection_samples_card_is_drawn_the_same_each_time(api):
+async def test_the_injection_samples_card_is_the_same_each_time(api):
     first = await api.get("/demo/samples/injection/certificate.png")
     second = await api.get("/demo/samples/injection/certificate.png")
 
     assert first.status_code == 200 and first.content.startswith(b"\x89PNG")
     assert first.content == second.content
+
+
+@spec("observability-api", "Each sample is about a different pet")
+async def test_the_injection_samples_card_is_served_as_committed(api):
+    served = await api.get("/demo/samples/injection/certificate.png")
+
+    assert served.content == PEPPER_CARD.read_bytes()
+
+
+@spec("observability-api", "Each sample is about a different pet")
+def test_the_committed_card_matches_a_fresh_drawing():
+    # Pixels, not bytes: the PNG compressor differs by platform, the drawing does not.
+    committed = Image.open(PEPPER_CARD)
+    drawn = Image.open(io.BytesIO(render(pepper_request())))
+
+    assert committed.size == drawn.size
+    assert committed.tobytes() == drawn.tobytes(), (
+        "redraw: uv run python -m scripts.draw_pepper_card"
+    )
 
 
 @spec("demo-generator", "Previews carry their pet's photo fields")
