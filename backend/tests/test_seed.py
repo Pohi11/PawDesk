@@ -8,7 +8,7 @@ from sqlalchemy import and_, func, select
 
 from app.enums import SizeClass
 from app.models import Kennel, Reservation, VaccineRecord
-from scripts.seed import SeedRefused, ensure_local, run, seed, table_counts
+from scripts.seed import SeedRefused, ensure_local, run, seed, table_counts, wants_requests
 
 spec = pytest.mark.spec
 TODAY = date(2027, 3, 1)
@@ -96,3 +96,27 @@ def test_the_named_remote_host_passes_the_check():
     ensure_local(f"postgresql://pawdesk:secret@{host}/pawdesk?sslmode=require", host)
     with pytest.raises(SeedRefused):
         ensure_local(f"postgresql://pawdesk:secret@{host}/pawdesk", "")
+
+
+REQUEST_TABLES = {"booking_requests", "booking_transitions", "approvals"}
+
+
+@spec("seed-data", "Seeding can leave out booking requests")
+async def test_seed_without_requests_keeps_everything_else(session):
+    await seed(session, TODAY)
+    full = await table_counts(session)
+
+    await seed(session, TODAY, requests=False)
+    bare = await table_counts(session)
+
+    assert all(full[t] > 0 for t in REQUEST_TABLES)
+    assert {t: bare[t] for t in REQUEST_TABLES} == dict.fromkeys(REQUEST_TABLES, 0)
+    assert {t: c for t, c in bare.items() if t not in REQUEST_TABLES} == {
+        t: c for t, c in full.items() if t not in REQUEST_TABLES
+    }
+
+
+@spec("seed-data", "Seeding can leave out booking requests")
+def test_requests_are_seeded_unless_left_out():
+    assert wants_requests([])
+    assert not wants_requests(["--no-requests"])

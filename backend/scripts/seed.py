@@ -1,11 +1,12 @@
 """Load the synthetic development dataset (spec: seed-data, design D14).
 
-Run from backend/:  uv run python -m scripts.seed
+Run from backend/:  uv run python -m scripts.seed [--no-requests]
 
 Deletes every row in the domain tables, then loads a fixed, fictional dataset in one
 transaction. Dates are relative to today, so "expires during an upcoming stay" stays true
 whenever the seed is run. Refuses anything but a local database, or the one remote host
 named in PAWDESK_SEED_ALLOWED_HOST (the hosted demo resets itself on start).
+--no-requests leaves out the example booking requests (the hosted demo starts with none).
 """
 
 import asyncio
@@ -103,7 +104,7 @@ PETS = [
 ]
 
 
-async def load(session: AsyncSession, today: date) -> None:
+async def load(session: AsyncSession, today: date, requests: bool = True) -> None:
     def days(n: int) -> date:
         return today + timedelta(days=n)
 
@@ -216,6 +217,8 @@ async def load(session: AsyncSession, today: date) -> None:
         ]
     )  # fmt: skip
     await session.flush()
+    if not requests:
+        return
 
     def request(owner: int, pet: str | None, message: str) -> BookingRequest:
         return BookingRequest(
@@ -260,9 +263,9 @@ async def load(session: AsyncSession, today: date) -> None:
     await transition(session, reviewed, State.APPROVED, Actor.STAFF)
 
 
-async def seed(session: AsyncSession, today: date) -> None:
+async def seed(session: AsyncSession, today: date, requests: bool = True) -> None:
     await reset(session)
-    await load(session, today)
+    await load(session, today, requests)
 
 
 async def table_counts(session: AsyncSession) -> dict[str, int]:
@@ -272,15 +275,21 @@ async def table_counts(session: AsyncSession) -> dict[str, int]:
     }
 
 
-async def run(database_url: str, today: date, allowed_host: str | None = None) -> dict[str, int]:
+async def run(
+    database_url: str, today: date, allowed_host: str | None = None, requests: bool = True
+) -> dict[str, int]:
     ensure_local(database_url, allowed_host)  # before connecting: a refused run touches nothing
     engine = make_engine(database_url)
     try:
         async with make_sessionmaker(engine)() as session, session.begin():
-            await seed(session, today)
+            await seed(session, today, requests)
             return await table_counts(session)
     finally:
         await engine.dispose()
+
+
+def wants_requests(argv: list[str]) -> bool:
+    return "--no-requests" not in argv
 
 
 def main() -> None:
@@ -290,6 +299,7 @@ def main() -> None:
                 get_settings().database_url,
                 date.today(),
                 os.environ.get("PAWDESK_SEED_ALLOWED_HOST"),
+                wants_requests(sys.argv[1:]),
             )
         )
     except SeedRefused as exc:
