@@ -5,10 +5,11 @@ set -euo pipefail
 cd /app/backend
 /opt/venv/bin/alembic upgrade head
 
-# Every start resets the demo to the seeded dataset. The seed refuses any remote host
+# Every start resets the demo to the seeded dataset, without example requests, so the
+# review queue and request list hold only what visitors send. The seed refuses any remote host
 # except the one named here, so leaving it unset keeps existing data.
 if [[ -n "${PAWDESK_SEED_ALLOWED_HOST:-}" ]]; then
-  /opt/venv/bin/python -m scripts.seed
+  /opt/venv/bin/python -m scripts.seed --no-requests
 fi
 
 # The backend listens on the loopback address only: the dashboard's allowlisted proxy

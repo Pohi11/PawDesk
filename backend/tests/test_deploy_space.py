@@ -76,3 +76,10 @@ def test_bundle_marks_binary_file_types_for_lfs(tmp_path):
     lines = (bundle / ".gitattributes").read_text().splitlines()
     assert lines[:2] == ["* text=auto eol=lf", "*.png binary"]  # the repository's rules first
     assert {line.split()[0] for line in lines if "filter=lfs" in line} == {"*.png", "*.ttf"}
+
+
+@spec("demo-hosting", "The hosted demo starts with no booking requests")
+def test_start_script_seeds_without_requests():
+    start = Path(__file__).parents[2] / "deploy/huggingface/start.sh"
+    seed_lines = [line.strip() for line in start.read_text().splitlines() if "scripts.seed" in line]
+    assert seed_lines == ["/opt/venv/bin/python -m scripts.seed --no-requests"]

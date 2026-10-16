@@ -52,3 +52,10 @@ The deploy bundle SHALL contain exactly the files committed at `HEAD`, with the 
 #### Scenario: Binary files marked for LFS
 - **WHEN** the deploy bundle is built from a commit with a font, a PNG, and text files
 - **THEN** the bundle's `.gitattributes` keeps the repository's rules and marks `*.ttf` and `*.png` for LFS, and marks no text file's extension
+
+### Requirement: The hosted demo starts with no booking requests
+Each start of the hosted demo SHALL reseed the database without booking requests, so the review queue and the request list hold only requests sent since that start.
+
+#### Scenario: Start script seeds without requests
+- **WHEN** the Space's start script is read
+- **THEN** it runs the seed command with `--no-requests`
