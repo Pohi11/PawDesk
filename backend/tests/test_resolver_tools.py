@@ -54,18 +54,22 @@ async def ctx(session):
     owner = Owner(full_name="Test Owner", email="resolver-tools@example.test")
     session.add_all([facility, owner])
     await session.flush()
-    pet = Pet(owner_id=owner.id, name="Other", species=Species.DOG, weight_lb=30)
+    # Two other dogs fill both medium kennels: one pet holds one kennel per night.
+    others = [
+        Pet(owner_id=owner.id, name=name, species=Species.DOG, weight_lb=30)
+        for name in ("Other", "Another")
+    ]
     kennels = [
         Kennel(facility_id=facility.id, name=name, size_class=size)
         for name, size in [("M1", "medium"), ("M2", "medium"), ("L1", "large"), ("S1", "small")]
     ]
-    session.add_all([pet, *kennels])
+    session.add_all([*others, *kennels])
     await session.flush()
     session.add_all(
         Reservation(
-            kennel_id=k.id, pet_id=pet.id, start_date=date(2027, 3, 7), end_date=date(2027, 3, 13)
+            kennel_id=k.id, pet_id=p.id, start_date=date(2027, 3, 7), end_date=date(2027, 3, 13)
         )
-        for k in kennels[:2]
+        for k, p in zip(kennels[:2], others, strict=True)
     )
     await session.flush()
     return ToolContext(

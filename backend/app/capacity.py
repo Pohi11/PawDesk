@@ -48,14 +48,35 @@ async def free_kennel_counts(
     return {SizeClass(size): count for size, count in rows}
 
 
-def _booked(start: date, end: date):
-    """EXISTS a reservation on the outer kennel row that shares a night with the stay."""
+async def find_pet_stay(
+    session: AsyncSession, pet_id: uuid.UUID, start: date, end: date
+) -> Reservation | None:
+    """The pet's earliest reservation that shares a night with the stay, in any kennel.
+
+    Advisory like `find_kennel`: the exclusion constraint on (pet, nights) is the guarantee
+    (change one-kennel-per-pet, D1).
+    """
+    return await session.scalar(
+        select(Reservation)
+        .where(Reservation.pet_id == pet_id, _overlaps(start, end))
+        .order_by(Reservation.start_date)
+        .limit(1)
+    )
+
+
+def _overlaps(start: date, end: date):
+    """The reservation's nights share at least one night with the stay's."""
     if end <= start:
         raise ValueError(f"a stay needs at least one night (got {start} to {end})")
     stay = func.daterange(literal(start, Date), literal(end, Date), NIGHTS)
+    return func.daterange(Reservation.start_date, Reservation.end_date, NIGHTS).op("&&")(stay)
+
+
+def _booked(start: date, end: date):
+    """EXISTS a reservation on the outer kennel row that shares a night with the stay."""
     return exists(
         select(Reservation.id).where(
             Reservation.kennel_id == Kennel.id,  # correlated to the outer kennel row
-            func.daterange(Reservation.start_date, Reservation.end_date, NIGHTS).op("&&")(stay),
+            _overlaps(start, end),
         )
     )
