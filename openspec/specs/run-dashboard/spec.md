@@ -133,6 +133,25 @@ The home page SHALL explain the rules code checks: for each service, how long a 
 - **WHEN** the rule data the page reads is compared with the seeded facility's vaccine rules, the size class thresholds, and the booking horizon
 - **THEN** they match
 
+### Requirement: Long pages offer a way back to the top
+Every dashboard page SHALL show a "Back to top" button once the visitor has scrolled further than one window height, and SHALL hide it again above that point. Pressing the button SHALL scroll the page to the top, smoothly unless the visitor's system asks for reduced motion. While hidden, the button SHALL not be reachable by keyboard or by assistive technology.
+
+#### Scenario: At the top of the page
+- **WHEN** a visitor opens a page and has not scrolled
+- **THEN** no "Back to top" button is visible or focusable
+
+#### Scenario: Scrolled past the first screen
+- **WHEN** a visitor scrolls further than one window height
+- **THEN** the "Back to top" button appears in the bottom right corner
+
+#### Scenario: Pressing the button
+- **WHEN** a visitor presses "Back to top"
+- **THEN** the page scrolls to the top and the button hides
+
+#### Scenario: Reduced motion
+- **WHEN** the visitor's system asks for reduced motion and they press "Back to top"
+- **THEN** the page jumps to the top without a smooth scroll
+
 ### Requirement: Tapping on a touch screen draws no highlight
 The dashboard SHALL NOT draw the browser's tap highlight on any element. On a device whose main pointer is a finger, a tapped text field, menu, or radio SHALL NOT draw a focus outline. A visitor who moves focus with the keyboard SHALL still see the focus outline on every control.
 

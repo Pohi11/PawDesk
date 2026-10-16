@@ -3,6 +3,7 @@ import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { BackToTop } from "@/components/back-to-top";
 import { backendJson } from "@/lib/backend";
 import type { ReviewItem } from "@/lib/types";
 
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </nav>
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+        <BackToTop />
       </body>
     </html>
   );
