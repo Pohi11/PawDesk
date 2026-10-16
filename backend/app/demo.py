@@ -12,12 +12,12 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.documents import attach_certificate
 from app.enums import Service, Species
-from app.models import BookingRequest, Facility, Owner, Pet
+from app.models import BookingRequest, Facility, Kennel, Owner, Pet, Reservation
 
 DEMO_TODAY = date(2027, 3, 3)
 # The samples' cards, drawn by scripts/draw_sample_cards.py. Committed rather than drawn
@@ -140,9 +140,34 @@ async def submit_sample(
     sample = SAMPLES.get(sample_id)
     if sample is None:
         raise LookupError(f"no demo sample {sample_id!r}")
+    await free_sample_stay(sessions, sample)
     return await store_request(
         sessions, sample.owner_email, message or sample.message, sample_certificate(sample_id)
     )
+
+
+async def free_sample_stay(sessions: async_sessionmaker[AsyncSession], sample: Sample) -> None:
+    """Release what earlier requests hold in a boarding sample's way, so the sample ends as
+    it says however often it runs (change one-kennel-per-pet, D4): reservations made by a
+    request, in a kennel of the sample pet's size class, sharing a night with its stay.
+    Seeded reservations (no request) are kept."""
+    if sample.service != Service.BOARDING:
+        return
+    async with sessions() as session:
+        _, pet = (await sample_pets(session))[sample.id]
+        if pet is None:
+            return
+        await session.execute(
+            delete(Reservation).where(
+                Reservation.booking_request_id.is_not(None),
+                Reservation.kennel_id.in_(
+                    select(Kennel.id).where(Kennel.size_class == pet.size_class)
+                ),
+                Reservation.start_date < sample.end_date,
+                Reservation.end_date > sample.start_date,
+            )
+        )
+        await session.commit()
 
 
 @dataclass(frozen=True)

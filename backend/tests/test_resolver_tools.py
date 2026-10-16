@@ -7,6 +7,7 @@ from datetime import date
 import httpx
 import pytest
 from pydantic import ValidationError
+from sqlalchemy import select
 
 from app.compliance import VaccineEvidence
 from app.enums import Service, SizeClass, Species, Vaccine
@@ -54,18 +55,22 @@ async def ctx(session):
     owner = Owner(full_name="Test Owner", email="resolver-tools@example.test")
     session.add_all([facility, owner])
     await session.flush()
-    pet = Pet(owner_id=owner.id, name="Other", species=Species.DOG, weight_lb=30)
+    # Two other dogs fill both medium kennels: one pet holds one kennel per night.
+    others = [
+        Pet(owner_id=owner.id, name=name, species=Species.DOG, weight_lb=30)
+        for name in ("Other", "Another")
+    ]
     kennels = [
         Kennel(facility_id=facility.id, name=name, size_class=size)
         for name, size in [("M1", "medium"), ("M2", "medium"), ("L1", "large"), ("S1", "small")]
     ]
-    session.add_all([pet, *kennels])
+    session.add_all([*others, *kennels])
     await session.flush()
     session.add_all(
         Reservation(
-            kennel_id=k.id, pet_id=pet.id, start_date=date(2027, 3, 7), end_date=date(2027, 3, 13)
+            kennel_id=k.id, pet_id=p.id, start_date=date(2027, 3, 7), end_date=date(2027, 3, 13)
         )
-        for k in kennels[:2]
+        for k, p in zip(kennels[:2], others, strict=True)
     )
     await session.flush()
     return ToolContext(
@@ -357,3 +362,37 @@ async def test_smaller_kennel_is_answered_and_the_loop_continues(run_resolver, c
     assert "larger than medium" in json.loads(sent(script, 1)[-1]["content"])["error"]
     assert resolution.outcome == ResolutionOutcome.PROPOSED
     assert resolution.turns == 2
+
+
+@spec("booking-resolution", "Proposals are verified by code and never approve")
+async def test_option_overlapping_the_pets_other_stay_is_not_verified(
+    session, run_resolver, covered
+):
+    """Change one-kennel-per-pet, D2: other dates can't run into the pet's own other stay."""
+    m1 = await session.scalar(select(Kennel).where(Kennel.name == "M1"))
+    pet = Pet(
+        owner_id=(await session.scalar(select(Owner.id))),
+        name="Biscuit",
+        species=Species.DOG,
+        weight_lb=30,
+    )
+    session.add(pet)
+    await session.flush()
+    session.add(
+        Reservation(
+            kennel_id=m1.id,
+            pet_id=pet.id,
+            start_date=date(2027, 3, 15),
+            end_date=date(2027, 3, 18),
+        )
+    )
+    await session.flush()
+    bound = ToolContext(**(vars(covered) | {"pet_id": pet.id}))
+
+    resolution, _ = await run_resolver(bound, tool_calls(propose(LATER)))
+
+    [option] = resolution.proposal["options"]
+    assert option["verified"] is False
+    assert option["remaining_problems"] == [
+        "capacity: the pet already has a kennel during 2027-03-13 to 2027-03-16"
+    ]

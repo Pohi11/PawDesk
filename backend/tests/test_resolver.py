@@ -115,3 +115,12 @@ def test_prompt_holds_only_code_values():
         "end_date": "2027-03-13",
         "days_on_site": 4,
     }
+
+
+@spec("booking-orchestration", "A pet already booked for the stay is not booked again")
+def test_already_booked_needs_a_person():
+    scope = resolution_scope(INTAKE, RECORDS, checks(capacity="already_booked"))
+
+    assert not scope.eligible
+    assert scope.capacity_full is False
+    assert scope.needs_person == ["capacity: Biscuit already has a kennel for these nights"]

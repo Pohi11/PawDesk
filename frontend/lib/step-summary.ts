@@ -145,6 +145,8 @@ function capacity(checks: Json | undefined, intent: Json | undefined): string {
       return `Kennel ${String(result.kennel)} is free for the stay.`;
     case "none_free":
       return `No ${String(result.size_class)} kennel is free for the stay.`;
+    case "already_booked":
+      return `${text(obj(checks?.pet)?.name) ?? "The pet"} already has a kennel for these nights.`;
     case "not_needed":
       return `Not needed: ${text(intent?.service) ?? "this service"} doesn't use a kennel.`;
     default:

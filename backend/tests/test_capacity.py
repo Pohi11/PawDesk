@@ -5,8 +5,9 @@ from decimal import Decimal
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
-from app.capacity import find_kennel
+from app.capacity import find_kennel, find_pet_stay
 from app.enums import SizeClass, Species
 from app.models import Facility, Kennel, Owner, Pet, Reservation
 from scripts.seed import seed
@@ -30,13 +31,20 @@ async def lodge(session):
     session.add_all([*kennels.values(), pet])
     await session.flush()
 
-    async def book(kennel_name, start, end):
-        session.add(
-            Reservation(
-                kennel_id=kennels[kennel_name].id, pet_id=pet.id, start_date=start, end_date=end
-            )
+    async def book(kennel_name, start, end, guest=None):
+        """Reserve for `guest`, or for a new dog: one pet holds one kennel per night."""
+        if guest is None:
+            guest = Pet(owner_id=owner.id, name="Guest", species=Species.DOG, weight_lb=24)
+            session.add(guest)
+            await session.flush()
+        reservation = Reservation(
+            kennel_id=kennels[kennel_name].id, pet_id=guest.id, start_date=start, end_date=end
         )
+        session.add(reservation)
         await session.flush()
+        return reservation
+
+    book.biscuit = pet
 
     async def find(size, start, end, facility_id=facility.id):
         kennel = await find_kennel(session, facility_id, size, start, end)
@@ -154,3 +162,33 @@ async def test_seeded_medium_availability(session, start_in, end_in, free):
     )
 
     assert (kennel is not None) == free
+
+
+# --- A pet holds at most one kennel per night -----------------------------------------
+
+
+@spec("kennel-capacity", "A pet holds at most one kennel per night")
+async def test_second_kennel_for_the_same_nights_is_refused(lodge, session):
+    book, _ = lodge
+    await book("M1", MAR(24), MAR(27), guest=book.biscuit)
+
+    with pytest.raises(IntegrityError, match="ex_reservations_one_kennel_per_pet"):
+        await book("M2", MAR(26), MAR(28), guest=book.biscuit)
+
+
+@spec("kennel-capacity", "A pet holds at most one kennel per night")
+async def test_back_to_back_stays_for_one_pet(lodge):
+    book, _ = lodge
+    await book("M1", MAR(24), MAR(27), guest=book.biscuit)
+
+    assert await book("M2", MAR(27), MAR(29), guest=book.biscuit)
+
+
+@spec("kennel-capacity", "A pet holds at most one kennel per night")
+async def test_finding_a_pets_overlapping_stay(lodge, session):
+    book, _ = lodge
+    stay = await book("M1", MAR(24), MAR(27), guest=book.biscuit)
+    await book("M2", MAR(26), MAR(30))  # another dog's stay doesn't count
+
+    assert await find_pet_stay(session, book.biscuit.id, MAR(26), MAR(30)) == stay
+    assert await find_pet_stay(session, book.biscuit.id, MAR(27), MAR(30)) is None
