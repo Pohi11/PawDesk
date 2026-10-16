@@ -54,3 +54,25 @@ def test_bundle_holds_committed_files_and_the_space_files(tmp_path):
     assert (bundle / "README.md").read_text() == "---\nsdk: docker\n---\n"
     assert (bundle / "Dockerfile").read_text() == "FROM scratch\n"
     assert (bundle / "backend/app.py").read_text() == "print('hi')\n"
+
+
+@spec("demo-hosting", "A deploy publishes only committed files")
+def test_bundle_marks_binary_file_types_for_lfs(tmp_path):
+    repo, bundle = tmp_path / "repo", tmp_path / "bundle"
+    (repo / "deploy/huggingface").mkdir(parents=True)
+    (repo / "fonts").mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    (repo / ".gitattributes").write_text("* text=auto eol=lf\n*.png binary\n")
+    (repo / "fonts/Caveat.ttf").write_bytes(b"\x00\x01\x00\x00font tables")
+    (repo / "card.png").write_bytes(b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR")
+    (repo / "notes.txt").write_text("plain text\n")
+    (repo / "deploy/huggingface/Dockerfile").write_text("FROM scratch\n")
+    (repo / "deploy/huggingface/README.md").write_text("---\nsdk: docker\n---\n")
+    commit_all(repo)
+    bundle.mkdir()
+
+    build_bundle(repo, bundle)
+
+    lines = (bundle / ".gitattributes").read_text().splitlines()
+    assert lines[:2] == ["* text=auto eol=lf", "*.png binary"]  # the repository's rules first
+    assert {line.split()[0] for line in lines if "filter=lfs" in line} == {"*.png", "*.ttf"}

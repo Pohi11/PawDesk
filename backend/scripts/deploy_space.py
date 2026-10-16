@@ -34,7 +34,35 @@ def build_bundle(repo: Path, dest: Path) -> str:
         tar.extractall(dest, filter="data")
     for name in ("Dockerfile", "README.md"):
         shutil.copyfile(dest / SPACE_FILES / name, dest / name)
+    mark_binaries_for_lfs(dest)
     return commit
+
+
+def mark_binaries_for_lfs(bundle: Path) -> None:
+    """Add an LFS rule for each extension that has a binary file in the bundle.
+
+    The Hub stores larger binaries (such as the card fonts) in LFS, and the Space's build only
+    resolves files its .gitattributes marks for LFS; without a rule it checks out the pointer
+    (change space-binary-files, D1). Files kept as plain git pass through git-lfs unchanged.
+    """
+    extensions = sorted(
+        {p.suffix.lower() for p in bundle.rglob("*") if p.is_file() and p.suffix and _binary(p)}
+    )
+    if not extensions:
+        return
+    attributes = bundle / ".gitattributes"
+    existing = attributes.read_text(encoding="utf-8") if attributes.is_file() else ""
+    if existing and not existing.endswith("\n"):
+        existing += "\n"
+    rules = [f"*{ext} filter=lfs diff=lfs merge=lfs -text" for ext in extensions]
+    lines = ["# Binary files the Hub may store in LFS (scripts/deploy_space.py).", *rules]
+    attributes.write_text(existing + "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+
+
+def _binary(path: Path) -> bool:
+    """Git's test for binary content: a NUL byte in the first 8,000 bytes."""
+    with path.open("rb") as f:
+        return b"\0" in f.read(8000)
 
 
 def git(repo: Path, *args: str) -> str:
