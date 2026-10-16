@@ -1,0 +1,54 @@
+{
+ "id": "gen-1792114951-pM3CnFpbjRYeReZYXb56",
+ "object": "chat.completion",
+ "created": 1792114951,
+ "model": "deepseek/deepseek-v4.1-flash",
+ "provider": "Parasail",
+ "system_fingerprint": null,
+ "service_tier": null,
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "{\"pet_name\":\"Pepper\",\"records\":[{\"label\":\"Rabies\",\"vaccine\":\"rabies\",\"administered_on\":\"2026-09-01\",\"expires_on\":\"2028-09-01\"},{\"label\":\"DHPP\",\"vaccine\":\"dhpp\",\"administered_on\":\"2026-09-01\",\"expires_on\":\"2028-09-01\"},{\"label\":\"Bordetella\",\"vaccine\":\"bordetella\",\"administered_on\":\"2026-09-01\",\"expires_on\":\"2028-09-01\"}],\"readable\":true,\"confidence\":0.97,\"ambiguities\":[]}",
+    "refusal": null,
+    "reasoning": "The certificate is clear. Pet name: Pepper. Records:\n\n1. Rabies, Sep 1, 2026 → 2026-09-01, expires Sep 1, 2028 → 2028-09-01\n2. DHPP, same dates\n3. Bordetella, same dates\n\nNo ambiguities. Confidence high.\n\nNote: rabies 3-year? Expiry printed, so use it.",
+    "reasoning_details": [
+     {
+      "type": "reasoning.text",
+      "text": "The certificate is clear. Pet name: Pepper. Records:\n\n1. Rabies, Sep 1, 2026 → 2026-09-01, expires Sep 1, 2028 → 2028-09-01\n2. DHPP, same dates\n3. Bordetella, same dates\n\nNo ambiguities. Confidence high.\n\nNote: rabies 3-year? Expiry printed, so use it.",
+      "format": "unknown",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 1288,
+  "completion_tokens": 224,
+  "total_tokens": 1512,
+  "cost": 0.000429408,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 768,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.000429408,
+   "upstream_inference_prompt_cost": 0.000160608,
+   "upstream_inference_completions_cost": 0.0002688
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 89,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}

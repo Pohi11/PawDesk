@@ -1,14 +1,16 @@
 """Spec: demo-generator, random requests and their certificates against a seeded database."""
 
+import io
 import itertools
 import re
 from collections import Counter
 from decimal import Decimal
 
 import pytest
+from PIL import Image
 from sqlalchemy import select
 
-from app.certificate_card import render
+from app.certificate_card import HEIGHT, PAPER, WIDTH, render
 from app.compliance import (
     Outcome,
     VaccineEvidence,
@@ -17,7 +19,7 @@ from app.compliance import (
     load_evidence,
     load_requirements,
 )
-from app.demo import DEMO_TODAY, SAMPLES
+from app.demo import DEMO_TODAY, SAMPLE_CARDS, SAMPLES
 from app.demo_generator import (
     BREEDS,
     FRESH_DRAWS,
@@ -216,3 +218,24 @@ async def test_a_used_up_pool_still_gives_a_seed(seeded):
 
     assert chosen == 7
     assert len(calls) == FRESH_DRAWS
+
+
+# --- Demo cards are marked synthetic in metadata ----------------------------------------
+
+
+@spec("demo-generator", "Demo cards are marked synthetic in metadata")
+async def test_nothing_below_the_signature(seeded):
+    card = Image.open(io.BytesIO(render(await generate(seeded, 42)))).convert("RGB")
+    below_label = card.crop((0, HEIGHT - 44, WIDTH, HEIGHT))  # the label ends ~50 px up
+
+    assert below_label.getcolors() == [(WIDTH * 44, PAPER)]
+
+
+@spec("demo-generator", "Demo cards are marked synthetic in metadata")
+@pytest.mark.parametrize("card", ["generated", *sorted(SAMPLE_CARDS.glob("*.png"))], ids=str)
+async def test_cards_are_marked_in_metadata(seeded, card):
+    data = render(await generate(seeded, 42)) if card == "generated" else card.read_bytes()
+
+    comment = Image.open(io.BytesIO(data)).text["Comment"]
+
+    assert comment.startswith("Synthetic PawDesk demo certificate.")
