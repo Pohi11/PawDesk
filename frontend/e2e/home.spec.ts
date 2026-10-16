@@ -25,7 +25,7 @@ test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ 
   for (const agent of ["Intake", "Records", "Resolver", "Reply"]) {
     await expect(agents.getByRole("rowheader", { name: new RegExp(`^${agent}`) })).toBeVisible();
   }
-  for (const section of ["Booking rules", "The agents", "How a request moves", "What the tests hold it to", "Working with an AI assistant", "Skills from the posting"]) {
+  for (const section of ["Booking rules", "The agents", "How a request moves", "What the tests hold it to", "Working with an AI assistant", "Skills across the stack"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }
 });
