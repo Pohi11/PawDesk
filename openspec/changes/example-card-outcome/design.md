@@ -15,7 +15,7 @@
 ## Decisions
 
 ### D1. The outcome shows the action and the reply, not a description of them
-- **Action line:** "Booked a medium kennel for March 24 to 27." Biscuit weighs 24 lb, so the size follows from the weight bands. The kennel's name isn't shown: it depends on which kennels are free in the database at the time.
+- **Action line:** "PawDesk booked that kennel and sent this reply:", right after the Kennel fact, which now says "A medium one is free all three nights" so the two don't repeat each other. Biscuit weighs 24 lb, so the size follows from the weight bands. The kennel's name isn't shown: it depends on which kennels are free in the database at the time.
 - **Reply:** subject in bold, then the first paragraph. The rest opens with "Show the full reply". The first paragraph carries the confirmation; the rest is pleasantries.
 - **"No one on staff involved"** moves next to the Sent tag as a short note, since the reply itself now shows what was sent.
 

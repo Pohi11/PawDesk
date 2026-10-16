@@ -1,11 +1,13 @@
 import { expect, test } from "@playwright/test";
 
+import worked from "../content/worked-example.json";
 import { specTag } from "../tests/spec-tag";
 
 const HOME = specTag("run-dashboard", "The home page introduces PawDesk and holds the Try panel");
 const CARD = specTag("run-dashboard", "The worked example shows the attached vaccine card");
 const RULES = specTag("run-dashboard", "The home page explains the booking rules");
 const HOW = specTag("run-dashboard", "The hero's How it works link opens the booking rules");
+const OUTCOME = specTag("run-dashboard", "The worked example shows what PawDesk did");
 const EXAMPLE = specTag("run-dashboard", "The coverage diagram is a hypothetical example");
 
 test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ page }) => {
@@ -14,7 +16,7 @@ test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("PawDesk handles pet care bookings and asks a person when it isn't sure.");
   const example = page.getByRole("figure", { name: "One request from start to finish" });
   await expect(example.getByRole("blockquote")).toContainText("Could Biscuit board with you from March 24 to March 27?");
-  await expect(example).toContainText("Every check passed, so PawDesk sent the reply");
+  await expect(example).toContainText("Example request.");
   await expect(page.getByRole("heading", { name: "Try a request" })).toBeVisible();
   await expect(page.getByText("Clean boarding request", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Make one up/ })).toBeVisible();
@@ -34,6 +36,46 @@ test(`${CARD} the worked example shows the attached vaccine card`, async ({ page
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute("src", "/api/demo/samples/clean/certificate.png");
   await expect.poll(() => card.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBeGreaterThan(0);
+});
+
+test(`${CARD} the worked example is labeled and its card expands`, async ({ page }) => {
+  await page.goto("/");
+
+  const example = page.getByRole("figure", { name: "One request from start to finish" });
+  await expect(example.getByText("Example request.", { exact: true })).toBeVisible();
+
+  const card = example.getByRole("img", { name: /Biscuit's vaccine card/ });
+  const toggle = example.getByRole("button", { name: "Show the full card" });
+  const clipped = (await card.evaluate((img) => img.parentElement!.getBoundingClientRect().height));
+  const full = (await card.boundingBox())!.height;
+  expect(clipped).toBeLessThan(full);
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+  await toggle.click();
+  const hide = example.getByRole("button", { name: "Hide the full card" });
+  await expect(hide).toHaveAttribute("aria-expanded", "true");
+  await expect.poll(() => card.evaluate((img) => img.parentElement!.getBoundingClientRect().height)).toBeGreaterThanOrEqual(full - 1);
+
+  await hide.click();
+  await expect(example.getByRole("button", { name: "Show the full card" })).toBeVisible();
+});
+
+test(`${OUTCOME} the worked example ends with the booking and the reply`, async ({ page }) => {
+  await page.goto("/");
+
+  const example = page.getByRole("figure", { name: "One request from start to finish" });
+  const [, opening, ...rest] = worked.reply.body.split("\n\n");
+  await expect(example).toContainText("A medium one is free all three nights");
+  await expect(example).toContainText("PawDesk booked that kennel and sent this reply:");
+  await expect(example.getByText("Sent", { exact: true })).toBeVisible();
+  await expect(example.getByText(worked.reply.subject, { exact: true })).toBeVisible();
+  await expect(example.getByText(opening, { exact: true })).toBeVisible();
+  const signOff = example.getByText(rest.at(-1)!.split("\n").at(-1)!);
+  await expect(signOff).toBeHidden();
+
+  await example.getByRole("button", { name: "Show the full reply" }).click();
+  await expect(signOff).toBeVisible();
+  await expect(example.getByRole("button", { name: "Hide the rest" })).toHaveAttribute("aria-expanded", "true");
 });
 
 test(`${HOME} the old Try page address lands on the home page`, async ({ page }) => {

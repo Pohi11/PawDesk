@@ -7,8 +7,8 @@
 
 ## 2. Dashboard
 
-- [ ] 2.1 Label the worked example, show the card as a preview that expands, and end with the kennel booked and the reply from `content/worked-example.json`. Verify with end-to-end checks, then lint, type check, and build.
-- [ ] 2.2 Check in the clean-sample run that its reply matches the worked example.
+- [x] 2.1 Label the worked example, show the card as a preview that expands, and end with the kennel booked and the reply from `content/worked-example.json`. Verify with end-to-end checks, then lint, type check, and build.
+- [x] 2.2 Check in the clean-sample run that its reply matches the worked example.
 - [ ] 2.3 Try it in a browser at desktop and phone width. Verify with a screenshot.
 
 ## 3. Integration
