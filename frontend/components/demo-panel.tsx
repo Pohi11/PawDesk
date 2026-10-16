@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   type DemoSource,
@@ -14,7 +14,7 @@ import {
   submitDemo,
 } from "@/lib/demo";
 import { formatService, formatStay } from "@/lib/format";
-import type { DemoSample } from "@/lib/types";
+import type { DemoSample, PetFields } from "@/lib/types";
 
 import { PetAvatar } from "./pet-avatar";
 
@@ -32,6 +32,34 @@ function loadRecent(): string[] {
   }
 }
 
+interface Summary {
+  pet: PetFields;
+  heading: string;
+  detail: string;
+}
+
+// The same summary opens every preview, whether the request is made up or a fixed sample.
+function generatedSummary(r: GeneratedRequest): Summary {
+  return {
+    pet: generatedPet(r),
+    heading: `${r.pet}, ${formatService(r.service).toLowerCase()}, ${formatStay(r.start_date, r.end_date)}`,
+    detail: `From ${r.owner}. ${r.breed}, ${r.weight_lb} lb. ${r.scenario_text}`,
+  };
+}
+
+function sampleSummary(s: DemoSample): Summary {
+  const parts = [
+    s.owner && `From ${s.owner}.`,
+    s.pet_breed && s.weight_lb !== null && `${s.pet_breed}, ${s.weight_lb} lb.`,
+    s.card_text,
+  ];
+  return {
+    pet: s,
+    heading: `${s.pet}, ${formatService(s.service).toLowerCase()}, ${formatStay(s.start_date, s.end_date)}`,
+    detail: parts.filter(Boolean).join(" "),
+  };
+}
+
 function saveRecent(names: string[]) {
   try {
     sessionStorage.setItem(RECENT_KEY, JSON.stringify(names));
@@ -42,7 +70,7 @@ function saveRecent(names: string[]) {
 
 export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   const router = useRouter();
-  const [chosen, setChosen] = useState<string>(samples[0]?.id ?? GENERATED);
+  const [chosen, setChosen] = useState<string>(GENERATED);
   const [generated, setGenerated] = useState<GeneratedRequest | null>(null);
   const [messages, setMessages] = useState<Record<string, string>>(() =>
     Object.fromEntries(samples.map((s) => [s.id, s.message])),
@@ -59,6 +87,7 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   const messageKey = chosen === GENERATED ? `seed-${generated?.seed}` : chosen;
   const message = messages[messageKey] ?? original ?? "";
   const hasCertificate = chosen === GENERATED ? generated !== null : Boolean(sample?.certificate);
+  const summary = chosen === GENERATED ? generated && generatedSummary(generated) : sample && sampleSummary(sample);
 
   async function makeOne() {
     setChosen(GENERATED);
@@ -75,6 +104,15 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
     }
     setBusy(false);
   }
+
+  // The page opens on "Make one up", so make one up at once. The ref stops React's
+  // development double mount from making two and using up two names.
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    void makeOne();
+  });
 
   async function send() {
     if (!source) return;
@@ -130,16 +168,12 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
           <p className="text-muted">{busy ? "Making up a request" : "Choose “Make one up” to create a request."}</p>
         ) : (
           <>
-            {chosen === GENERATED && generated && (
+            {summary && (
               <div className="mb-5 flex items-start gap-4">
-                <PetAvatar pet={generatedPet(generated)} size="lg" />
+                <PetAvatar pet={summary.pet} size="lg" />
                 <div>
-                  <p className="font-display text-xl font-semibold">
-                    {generated.pet}, {formatService(generated.service).toLowerCase()}, {formatStay(generated.start_date, generated.end_date)}
-                  </p>
-                  <p className="text-muted">
-                    From {generated.owner}. {generated.breed}, {generated.weight_lb} lb. {generated.scenario_text}
-                  </p>
+                  <p className="font-display text-xl font-semibold">{summary.heading}</p>
+                  <p className="text-muted">{summary.detail}</p>
                 </div>
               </div>
             )}

@@ -118,5 +118,12 @@ export interface DemoSample extends PetFields {
   title: string;
   expect: string;
   message: string;
+  service: string;
+  start_date: string;
+  end_date: string;
+  owner: string | null;
+  weight_lb: number | null;
+  /** What the sample's vaccine card shows, in plain words. */
+  card_text: string;
   certificate: string | null;
 }

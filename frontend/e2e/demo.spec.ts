@@ -75,3 +75,21 @@ test(`${REQ} the injection sample waits for review and is approved to sent`, asy
   await expect(card).toBeHidden(); // decided, so it leaves the queue
   await frame(page, "06-approved");
 });
+
+const TRY = specTag("run-dashboard", "The Try page previews a request and its certificate");
+
+test(`${TRY} the page opens on a made-up request`, async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("button", { name: /Make one up/ })).toHaveClass(/ring-ink/);
+  await expect(page.locator("p.font-display.text-xl")).toContainText(/, (boarding|daycare|grooming), /);
+  await expect(page.getByRole("img", { name: /^Vaccine certificate attached to the request for / })).toBeVisible();
+});
+
+test(`${TRY} a sample's preview opens with its summary`, async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Clean boarding request", { exact: true }).click();
+
+  await expect(page.locator("p.font-display.text-xl")).toHaveText("Biscuit, boarding, Mar 24–27, 2027");
+  await expect(page.getByText(/^From Avery Lindqvist\. Beagle, 24 lb\. Every vaccine on the card is current for the whole stay\.$/)).toBeVisible();
+});

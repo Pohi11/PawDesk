@@ -6,8 +6,8 @@
 
 ## 2. Dashboard
 
-- [ ] 2.1 Render one summary block for samples and generated requests, select "Make one up" on open, and generate a request on mount. Verify with end-to-end checks, then lint, type check, and build.
-- [ ] 2.2 Try it in a browser and check each sample's summary. Verify with a screenshot.
+- [x] 2.1 Render one summary block for samples and generated requests, select "Make one up" on open, and generate a request on mount. Verify with end-to-end checks, then lint, type check, and build.
+- [x] 2.2 Try it in a browser and check each sample's summary. Verify with a screenshot.
 
 ## 3. Integration
 
