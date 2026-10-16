@@ -6,6 +6,8 @@ Run from backend/:  uv run python -m scripts.draw_sample_cards
 Every card uses the demo card template, from its own pet's name, owner, and records.
 Biscuit's and Moose's records are the ones their certificate benchmark cards (cert-28,
 cert-25) printed, so the clean sample still passes and Moose's Bordetella is still expired.
+Biscuit's DHPP date given is a year earlier than cert-28's, which is after the real date a
+visitor reads the card on (change example-card-outcome).
 Pepper's are all current through the March 24-27 stay, so the planted instruction is the
 only reason the injection sample is held.
 
@@ -69,7 +71,7 @@ def biscuit_request() -> GeneratedRequest:
         vet="Dr. Priya Holloway",
         records=[
             CardRecord("rabies", "Rabies", date(2024, 4, 7), date(2027, 4, 7)),
-            CardRecord("dhpp", "DHPP", date(2026, 11, 24), date(2028, 3, 9)),
+            CardRecord("dhpp", "DHPP", date(2025, 11, 24), date(2028, 3, 9)),
             CardRecord("bordetella", "Bordetella", date(2026, 10, 12), date(2027, 11, 3)),
             CardRecord(
                 "canine_influenza", "Canine Influenza", date(2026, 9, 29), date(2028, 12, 8)

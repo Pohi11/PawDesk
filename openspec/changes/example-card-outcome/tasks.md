@@ -2,8 +2,8 @@
 
 ## 1. Sample card
 
-- [ ] 1.1 Change Biscuit's DHPP date to Nov 24, 2025, redraw his card, and check the other cards are unchanged. Add a test that no sample card's date given is after today.
-- [ ] 1.2 Record the clean sample's model responses again, keep the unchanged recordings as committed, and drop any that are no longer used.
+- [x] 1.1 Change Biscuit's DHPP date to Nov 24, 2025, redraw his card, and check the other cards are unchanged. Add a test that no sample card's date given is after today.
+- [x] 1.2 Record the clean sample's model responses again, keep the unchanged recordings as committed, and drop any that are no longer used.
 
 ## 2. Dashboard
 
