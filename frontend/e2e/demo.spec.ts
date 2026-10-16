@@ -101,3 +101,23 @@ test(`${TRY} a sample's preview opens with its summary`, async ({ page }) => {
   await expect(page.locator("p.font-display.text-xl")).toHaveText("Biscuit, boarding, Mar 24–27, 2027");
   await expect(page.getByText(/^From Avery Lindqvist\. Beagle, 24 lb\. Every vaccine on the card is current for the whole stay\.$/)).toBeVisible();
 });
+
+test(`${TRY} a sample chosen while the opening request is made up stays chosen`, async ({ page }) => {
+  // Hold the opening made-up request until the sample is chosen.
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/api/demo/generate*", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto("/");
+  await page.getByText("Clean boarding request", { exact: true }).click();
+  const arrived = page.waitForResponse("**/api/demo/generate*");
+  release();
+  await arrived;
+
+  await expect(page.locator("p.font-display.text-xl")).toHaveText("Biscuit, boarding, Mar 24–27, 2027");
+  const sent = page.waitForRequest((r) => r.method() === "POST" && r.url().endsWith("/api/demo/requests"));
+  await page.getByRole("button", { name: "Send and watch it run" }).click();
+  expect((await sent).postDataJSON()).toEqual({ sample: "clean" });
+});
