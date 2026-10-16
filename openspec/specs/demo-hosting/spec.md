@@ -4,6 +4,7 @@
 Keeps the public hosted demo safe and cheap to run: model use has a hard ceiling, the hosted database is reachable as its provider gives it, and a deploy can only publish committed files.
 
 ## Requirements
+
 ### Requirement: Model use is capped per hour and per day
 When an hourly or daily limit on model calls is configured, sending a demo request SHALL be refused with status 429 and a plain explanation once the model calls recorded in the last hour or the last 24 hours reach that limit. A refused request SHALL store nothing. With no limit configured, submissions SHALL never be refused for volume.
 
@@ -42,8 +43,12 @@ A `DATABASE_URL` carrying the libpq options `sslmode` and `channel_binding`, as 
 - **THEN** the async URL is unchanged apart from the driver name
 
 ### Requirement: A deploy publishes only committed files
-The deploy bundle SHALL contain exactly the files committed at `HEAD`, with the Space's Dockerfile and README in place of the repository's root ones. Uncommitted files, ignored files (such as `.env`), and private working notes SHALL never be included.
+The deploy bundle SHALL contain exactly the files committed at `HEAD`, with the Space's Dockerfile and README in place of the repository's root ones. Uncommitted files, ignored files (such as `.env`), and private working notes SHALL never be included. The bundle's `.gitattributes` SHALL keep the repository's rules and mark every file extension that has a binary file in the bundle for LFS, so files the Hub stores in LFS are resolved when the Space builds.
 
 #### Scenario: Bundle contents
 - **WHEN** the deploy bundle is built from a checkout that also has `.env` and an untracked file
 - **THEN** the bundle holds the committed files plus the Space Dockerfile and README, and neither `.env` nor the untracked file
+
+#### Scenario: Binary files marked for LFS
+- **WHEN** the deploy bundle is built from a commit with a font, a PNG, and text files
+- **THEN** the bundle's `.gitattributes` keeps the repository's rules and marks `*.ttf` and `*.png` for LFS, and marks no text file's extension
