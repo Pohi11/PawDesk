@@ -2,8 +2,8 @@
 
 ## 1. Vaccine card in the worked example
 
-- [ ] 1.1 Show the clean sample's vaccine card in the worked example. Verify with the home page end-to-end test, lint, type check, and build.
-- [ ] 1.2 Check it in a browser at desktop and phone widths. Verify with screenshots.
+- [x] 1.1 Show the clean sample's vaccine card in the worked example. Verify with the home page end-to-end test, lint, type check, and build.
+- [x] 1.2 Check it in a browser at desktop and phone widths. Verify with screenshots.
 
 ## 2. Integration
 
