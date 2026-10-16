@@ -25,8 +25,11 @@ SYNTHETIC = (
 
 
 def _font(size: int, name: str | None = None) -> ImageFont.FreeTypeFont:
+    # Basic layout even where Raqm is installed: Raqm shapes the Caveat signature differently,
+    # and the committed sample cards must match a fresh drawing on every machine (change
+    # basic-text-layout, D1). load_default always uses basic layout.
     if name:
-        return ImageFont.truetype(str(FONTS / name), size)
+        return ImageFont.truetype(str(FONTS / name), size, layout_engine=ImageFont.Layout.BASIC)
     return ImageFont.load_default(size=size)
 
 

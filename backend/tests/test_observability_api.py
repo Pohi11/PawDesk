@@ -9,7 +9,7 @@ from decimal import Decimal
 
 import httpx
 import pytest
-from PIL import Image
+from PIL import Image, ImageChops
 from sqlalchemy import func, select
 
 from app.api import (
@@ -581,6 +581,7 @@ async def test_each_samples_card_is_served_as_committed(api, sample_id):
 
 
 @spec("observability-api", "Each sample is about a different pet")
+@spec("demo-generator", "Cards draw the same on every machine")
 @pytest.mark.parametrize("sample_id", sorted(CARDS))
 async def test_each_committed_card_matches_a_fresh_drawing(committed, full_seed, sample_id):
     file, request = CARDS[sample_id]
@@ -601,7 +602,11 @@ async def test_each_committed_card_matches_a_fresh_drawing(committed, full_seed,
     stored = Image.open(SAMPLE_CARDS / file)
     drawn = Image.open(io.BytesIO(render(record)))
     assert stored.size == drawn.size
-    assert stored.tobytes() == drawn.tobytes(), "redraw: uv run python -m scripts.draw_sample_cards"
+    # The differing region, not a diff of the raw pixels, which pytest takes minutes to build.
+    changed = ImageChops.difference(stored.convert("RGB"), drawn.convert("RGB")).getbbox()
+    assert changed is None, (
+        f"{file} differs in {changed}: uv run python -m scripts.draw_sample_cards"
+    )
 
 
 @spec("observability-api", "Each sample is about a different pet")
