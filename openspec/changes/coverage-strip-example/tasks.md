@@ -2,7 +2,7 @@
 
 ## 1. Coverage diagram
 
-- [ ] 1.1 Relabel the coverage diagram as a hypothetical dog's stay. Verify with the booking rules end-to-end test, lint, type check, and build.
+- [x] 1.1 Relabel the coverage diagram as a hypothetical dog's stay. Verify with the booking rules end-to-end test, lint, type check, and build.
 
 ## 2. Integration
 
