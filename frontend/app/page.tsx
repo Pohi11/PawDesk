@@ -2,9 +2,11 @@ import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
 
 import { DemoPanel } from "@/components/demo-panel";
+import { Expandable } from "@/components/expandable";
 import { KindDot, Loading, StateTag } from "@/components/ui";
 import rules from "@/content/booking-rules.json";
 import data from "@/content/walkthrough.json";
+import worked from "@/content/worked-example.json";
 import { backendJson } from "@/lib/backend";
 import { certificateSrc } from "@/lib/demo";
 import type { DemoSample, SpanKind } from "@/lib/types";
@@ -230,35 +232,41 @@ function Read({ children }: { children: ReactNode }) {
 
 /**
  * The clean sample, start to finish: violet marks what a model read, blue what code
- * checked, the same colors the run graph uses.
+ * checked, the same colors the run graph uses. It ends with what the recorded run did.
  */
 function WorkedExample() {
+  const kennel = rules.dog_sizes.find((d) => d.size === worked.kennel_size)!.label.toLowerCase();
+  const [greeting, opening, ...rest] = worked.reply.body.split("\n\n");
   const facts: { kind: SpanKind; label: string; value: string }[] = [
     { kind: "llm", label: "Pet", value: "Biscuit, a Beagle on file" },
     { kind: "llm", label: "Stay", value: "Boarding, March 24 to 27" },
     { kind: "code", label: "Vaccines", value: "Rabies, DHPP, and Bordetella cover all three nights" },
-    { kind: "code", label: "Kennel", value: "One free for his size" },
+    { kind: "code", label: "Kennel", value: `A ${kennel} one is free all three nights` },
   ];
   return (
     <figure aria-label="One request from start to finish" className="rounded-2xl bg-surface p-5 ring-1 ring-rule sm:p-7">
-      <p className="text-sm text-faint">Avery Lindqvist wrote, with a photo attached:</p>
+      <p className="text-sm text-faint">
+        <span className="font-medium text-ink">Example request.</span> Avery Lindqvist wrote, with a photo attached:
+      </p>
       <blockquote className="mt-2 font-display text-xl leading-snug font-medium sm:text-2xl lg:text-xl">
         Hi! Could <Read>Biscuit</Read> <Read>board</Read> with you from <Read>March 24 to March 27</Read>?
         He eats grain-free food twice a day. His <Read>vaccine card</Read> is attached.
       </blockquote>
 
       <figure className="mt-5">
-        {/* eslint-disable-next-line @next/next/no-img-element -- the clean sample's PNG from the API, the file the request sends */}
-        <img
-          src={certificateSrc({ sample: "clean" })}
-          alt="Biscuit's vaccine card, listing Rabies, DHPP, Bordetella, and Canine influenza with the dates given and expiry dates"
-          width={1000}
-          height={680}
-          className="h-auto w-full rounded-lg bg-white ring-2 ring-model-soft"
-        />
-        <figcaption className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted">
+        <figcaption className="mb-2 inline-flex items-center gap-1.5 text-xs text-muted">
           <KindDot kind="llm" /> The attached card, read by the records agent
         </figcaption>
+        <Expandable showLabel="Show the full card" hideLabel="Hide the full card" clip={7}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- the clean sample's PNG from the API, the file the request sends */}
+          <img
+            src={certificateSrc({ sample: "clean" })}
+            alt="Biscuit's vaccine card, listing Rabies, DHPP, Bordetella, and Canine influenza with the dates given and expiry dates"
+            width={1000}
+            height={680}
+            className="h-auto w-full rounded-lg bg-white ring-2 ring-model-soft ring-inset"
+          />
+        </Expandable>
       </figure>
 
       <dl className="mt-6 space-y-2.5 border-t border-rule pt-5 text-sm">
@@ -271,9 +279,24 @@ function WorkedExample() {
         ))}
       </dl>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-rule pt-5 text-sm">
-        <StateTag status="sent" />
-        <span>Every check passed, so PawDesk sent the reply with no one on staff involved.</span>
+      <div className="mt-5 border-t border-rule pt-5 text-sm">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <StateTag status="sent" />
+          <span className="text-muted">Every check passed, so no one on staff was involved.</span>
+        </div>
+        <p className="mt-3 font-medium">PawDesk booked that kennel and sent this reply:</p>
+        <div className="mt-3 rounded-lg bg-paper px-4 py-3 leading-relaxed">
+          <p className="font-semibold">{worked.reply.subject}</p>
+          <p className="mt-2">{greeting}</p>
+          <p className="mt-2">{opening}</p>
+          <Expandable showLabel="Show the full reply" hideLabel="Hide the rest">
+            {rest.map((para) => (
+              <p key={para} className="mt-2 whitespace-pre-line">
+                {para}
+              </p>
+            ))}
+          </Expandable>
+        </div>
       </div>
 
       <figcaption className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">

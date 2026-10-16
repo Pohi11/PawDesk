@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import worked from "../content/worked-example.json";
 import { specTag } from "../tests/spec-tag";
 
 const REQ = specTag("delivery-pipeline", "The demo runs end to end against recorded responses");
@@ -25,6 +26,13 @@ test(`${REQ} the clean sample runs live to sent`, async ({ page }) => {
   await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
   await expect(page.getByText("Every check passed.")).toBeVisible();
   await frame(page, "02-clean-sent");
+
+  // The home page's worked example quotes this reply (run-dashboard "The worked example
+  // shows what PawDesk did"). Checked here, not in a run of its own: every clean run books a
+  // medium kennel for the same nights, and another one would leave a later run without one.
+  const sent = page.locator("section", { has: page.getByRole("heading", { name: "Sent reply" }) });
+  await expect(sent.getByText(worked.reply.subject, { exact: true })).toBeVisible();
+  expect(await sent.locator("p.whitespace-pre-wrap").innerText()).toBe(worked.reply.body);
 
   await page.getByRole("button", { name: /intake\.extract/ }).click();
   await expect(page.getByText("deepseek/deepseek-v4.1-flash").first()).toBeVisible();

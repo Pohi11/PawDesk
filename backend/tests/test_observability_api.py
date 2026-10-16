@@ -604,6 +604,15 @@ async def test_each_committed_card_matches_a_fresh_drawing(committed, full_seed,
     assert stored.tobytes() == drawn.tobytes(), "redraw: uv run python -m scripts.draw_sample_cards"
 
 
+@spec("observability-api", "Each sample is about a different pet")
+@pytest.mark.parametrize("sample_id", sorted(CARDS))
+def test_no_card_shows_a_shot_from_the_future(sample_id):
+    # The real date, not DEMO_TODAY: visitors read the card today, whatever date the demo runs on.
+    record = CARDS[sample_id][1]()
+    future = [r.label for r in record.records if r.administered_on > date.today()]
+    assert not future, f"{sample_id}: given after today: {future}"
+
+
 @spec("demo-generator", "Previews carry their pet's photo fields")
 async def test_the_seed_fixes_the_pet_id(api, committed, full_seed, scripted_background):
     first = (await api.get("/demo/generate", params={"seed": 42})).json()
