@@ -28,7 +28,7 @@ from pydantic import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.capacity import find_kennel, free_kennel_counts
+from app.capacity import already_booked_reason, find_kennel, find_pet_stay, free_kennel_counts
 from app.compliance import VaccineEvidence, VaccineStatus, check
 from app.enums import Service, SizeClass, SpanKind, Species, Vaccine
 from app.intake import BOOKING_HORIZON_DAYS
@@ -87,6 +87,9 @@ def resolution_scope(intake: dict, records: dict, checks: dict) -> Scope:
     capacity = checks["capacity"] or {}
     if capacity.get("status") == "not_checked":
         needs_person.append("capacity: not checked")
+    if capacity.get("status") == "already_booked":
+        # Other dates or a larger kennel don't help a pet already staying (design D2).
+        needs_person.append(already_booked_reason(checks["pet"]["name"]))
 
     return Scope(needs_person, vaccines, capacity.get("status") == "none_free")
 
@@ -165,6 +168,7 @@ class ToolContext:
     today: date
     required: frozenset[Vaccine]
     evidence: tuple[VaccineEvidence, ...]  # records on file plus records from the certificate
+    pet_id: uuid.UUID | None = None  # the request's pet, whose other stays an option must avoid
 
 
 class _Args(BaseModel):
@@ -375,6 +379,12 @@ async def verify_option(session: AsyncSession, ctx: ToolContext, option: Option)
             remaining.append("capacity: a kennel stay needs at least one night")
         elif await find_kennel(session, ctx.facility_id, size, start, end) is None:
             remaining.append(f"capacity: no free {size} kennel for {start} to {end}")
+        if (
+            end > start
+            and ctx.pet_id is not None
+            and await find_pet_stay(session, ctx.pet_id, start, end) is not None
+        ):
+            remaining.append(f"capacity: the pet already has a kennel during {start} to {end}")
 
     failing = _failing(ctx, start, end)
     if isinstance(option, VaccineUpdateOption):

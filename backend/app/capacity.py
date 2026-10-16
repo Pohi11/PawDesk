@@ -14,6 +14,11 @@ from app.models import Kennel, Reservation
 NIGHTS = literal_column("'[)'")
 
 
+def already_booked_reason(pet_name: str | None) -> str:
+    """The routing reason for a pet that already holds a kennel on a night of the stay."""
+    return f"capacity: {pet_name or 'the pet'} already has a kennel for these nights"
+
+
 async def find_kennel(
     session: AsyncSession, facility_id: uuid.UUID, size_class: SizeClass, start: date, end: date
 ) -> Kennel | None:
