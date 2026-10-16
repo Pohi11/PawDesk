@@ -2,7 +2,7 @@
 
 ## Context
 
-- **The hosted start script reseeds on every start** ([0019](../../../docs/decisions/0019-host-demo-on-hugging-face-and-neon.md)): it truncates every table and loads the seed, so data on the Space only lives until the next restart.
+- **The hosted start script reseeds on every start** ([0019](../../../../docs/decisions/0019-host-demo-on-hugging-face-and-neon.md)): it truncates every table and loads the seed, so data on the Space only lives until the next restart.
 - **The seed's requests depend on nothing else and nothing depends on them.** No seeded reservation points at a seeded request, and the one approval belongs to the Biscuit request. The demo samples, the generator, and the capacity checks read the facility, owners, pets, and reservations only.
 - **Local tooling relies on the requests.** Tests and the e2e suite use the seeded requests (for example the review queue and request list pages), so the default seed keeps them.
 
