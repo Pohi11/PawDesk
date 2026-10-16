@@ -17,7 +17,7 @@ None.
 
 ### Modified Capabilities
 - `demo-generator`: samples carry a request summary.
-- `run-dashboard`: the Try page shows the summary for samples too and opens on "Make one up".
+- `run-dashboard`: every Try preview opens with a summary, and the page opens on "Make one up".
 
 ## Impact
 

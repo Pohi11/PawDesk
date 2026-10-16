@@ -76,7 +76,7 @@ test(`${REQ} the injection sample waits for review and is approved to sent`, asy
   await frame(page, "06-approved");
 });
 
-const TRY = specTag("run-dashboard", "The Try page previews a request and its certificate");
+const TRY = specTag("run-dashboard", "Every Try preview opens with a summary");
 
 test(`${TRY} the page opens on a made-up request`, async ({ page }) => {
   await page.goto("/");
