@@ -8,7 +8,7 @@
 
 ## Goals / Non-Goals
 
-**Goals:** a visitor sees the whole story, request to result, in one card about as tall as today's; the card can't be mistaken for a live request; no impossible dates on screen.
+**Goals:** a visitor sees the whole story, request to result, in one card about as tall as today's; the card can't be mistaken for a live request; no date given that's still in the future for a visitor.
 
 **Non-Goals:** checking dates given on real cards (a separate rule if wanted), changing the benchmark cards, changing the run page.
 
@@ -36,7 +36,8 @@
 ### D5. Fix the date on the demo card only
 - **Biscuit's DHPP date becomes Nov 24, 2025.** It stays before the stay and the expiry stays Mar 9, 2028, so the clean sample's outcome doesn't change.
 - **The benchmark's cert-28 keeps Nov 24, 2026.** Its truth file and measured eval results were recorded against that image; changing it would make past numbers unreproducible.
-- **A test reads every sample's records and checks no date given is after today.** It runs against the drawing script's records, which are the source of the committed cards.
+- **The demo's checks run on `DEMO_TODAY` (Mar 3, 2027),** so for them the old date was already in the past. The rule is about what a visitor reads, so the test compares against the real date (`date.today()`), not `DEMO_TODAY`.
+- **A test reads every sample's records** from the drawing script, the source of the committed cards. A date that passes once keeps passing as the calendar moves on.
 
 ## Risks / Trade-offs
 

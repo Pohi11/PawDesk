@@ -3,7 +3,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Each sample is about a different pet
-Every sample that names a pet SHALL name a different one, so the samples show different photos on the Try page. Every sample's card SHALL be drawn in the one demo card style from its own pet's name, owner, and records, committed, and served as stored, so the bytes sent to the model are the same on every platform. No vaccine on a sample's card SHALL have been given after today. The injection sample's records SHALL all be current, so the planted instruction is the only reason it is held.
+Every sample that names a pet SHALL name a different one, so the samples show different photos on the Try page. Every sample's card SHALL be drawn in the one demo card style from its own pet's name, owner, and records, committed, and served as stored, so the bytes sent to the model are the same on every platform. No date given on a card SHALL be after the real date. The injection sample's records SHALL all be current, so the planted instruction is the only reason it is held.
 
 #### Scenario: Distinct pets
 - **WHEN** the samples are listed
@@ -31,4 +31,4 @@ Every sample that names a pet SHALL name a different one, so the samples show di
 
 #### Scenario: No shot from the future
 - **WHEN** each sample's card records are read
-- **THEN** every vaccine's date given is on or before today
+- **THEN** every vaccine's date given is on or before the real calendar date
