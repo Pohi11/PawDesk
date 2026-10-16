@@ -238,7 +238,7 @@ The booking rules' coverage diagram SHALL describe a hypothetical dog's stay, no
 - **THEN** it is labeled as a hypothetical dog's stay, and it still shows one shot that covers the stay and one that expires during it
 
 ### Requirement: Every Try preview opens with a summary
-Every preview on the Try page, of a sample or a generated request, SHALL open with the same summary: the pet, service, and dates, then the owner, the pet's breed and weight when known, and what the vaccine card shows. The page SHALL open with "Make one up" selected and a generated request in the preview. Making up that opening request SHALL NOT change the visitor's choice.
+Every preview on the Try page, of a sample or a generated request, SHALL open with the same summary: the pet, service, and dates, then the owner, the pet's breed and weight when known, and what the vaccine card shows. The page SHALL open with "Make one up" selected and a generated request in the preview. Making up that opening request SHALL NOT change the visitor's choice. Choosing "Make one up" SHALL show the request already made up; only "Make another" or a page load SHALL make up a new one.
 
 #### Scenario: Opens on Make one up
 - **WHEN** the visitor opens the Try page
@@ -251,6 +251,14 @@ Every preview on the Try page, of a sample or a generated request, SHALL open wi
 #### Scenario: A sample chosen while the opening request is made up
 - **WHEN** the visitor chooses the clean boarding sample before the opening generated request has arrived, and then sends
 - **THEN** the clean sample stays chosen after the generated request arrives, and the clean sample is the request sent
+
+#### Scenario: Going back to Make one up keeps the request
+- **WHEN** the visitor chooses a sample and then chooses "Make one up" again
+- **THEN** the preview shows the same generated request as before, and no new one is made up
+
+#### Scenario: Make another makes a new request
+- **WHEN** the visitor clicks "Make another"
+- **THEN** a new generated request is made up
 
 ### Requirement: The worked example shows what PawDesk did
 The worked example SHALL end with the outcome of the clean sample's run: that it booked a medium kennel for the stay and sent the reply with no one on staff involved, then the reply's subject and first paragraph. The rest of the reply SHALL open on demand. The reply SHALL be the one the clean sample's recorded run sends.
