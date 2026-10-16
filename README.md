@@ -8,7 +8,7 @@ A booking intake desk for pet care businesses (boarding, daycare, grooming). A p
 
 Anything risky waits for a staff member. Every step is traced, and visible live in a dashboard.
 
-**Try it:** [huggingface.co/spaces/pohi111/pawdesk](https://huggingface.co/spaces/pohi111/pawdesk). See [Hosted demo](#hosted-demo).
+**Live demo:** [pohi111-pawdesk.hf.space](https://pohi111-pawdesk.hf.space/). See [Hosted demo](#hosted-demo).
 
 ![Demo: a clean request runs to sent; a prompt-injection attempt waits for review and is approved by staff](docs/demo.gif)
 
