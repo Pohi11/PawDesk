@@ -7,7 +7,7 @@ from collections import Counter
 from decimal import Decimal
 
 import pytest
-from PIL import Image
+from PIL import Image, ImageFont
 from sqlalchemy import select
 
 from app.certificate_card import HEIGHT, PAPER, WIDTH, render
@@ -221,6 +221,22 @@ async def test_a_used_up_pool_still_gives_a_seed(seeded):
 
 
 # --- Demo cards are marked synthetic in metadata ----------------------------------------
+
+
+@spec("demo-generator", "Cards draw the same on every machine")
+async def test_every_card_font_uses_basic_layout(seeded, monkeypatch):
+    # The engine each font asks for: without one, Pillow picks Raqm wherever it is installed.
+    engines = []
+    truetype = ImageFont.truetype
+
+    def spy(*args, **kwargs):
+        engines.append(kwargs.get("layout_engine"))
+        return truetype(*args, **kwargs)
+
+    monkeypatch.setattr(ImageFont, "truetype", spy)
+    render(await generate(seeded, 42))
+
+    assert engines and set(engines) == {ImageFont.Layout.BASIC}
 
 
 @spec("demo-generator", "Demo cards are marked synthetic in metadata")
