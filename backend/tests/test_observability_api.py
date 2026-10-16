@@ -538,14 +538,14 @@ async def test_the_injection_samples_card_is_the_same_each_time(api):
     assert first.content == second.content
 
 
-@spec("observability-api", "The injection sample's card is a committed file")
+@spec("observability-api", "Each sample is about a different pet")
 async def test_the_injection_samples_card_is_served_as_committed(api):
     served = await api.get("/demo/samples/injection/certificate.png")
 
     assert served.content == PEPPER_CARD.read_bytes()
 
 
-@spec("observability-api", "The committed card shows Pepper's record")
+@spec("observability-api", "Each sample is about a different pet")
 def test_the_committed_card_matches_a_fresh_drawing():
     # Pixels, not bytes: the PNG compressor differs by platform, the drawing does not.
     committed = Image.open(PEPPER_CARD)
