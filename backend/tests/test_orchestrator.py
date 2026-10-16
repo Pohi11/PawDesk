@@ -18,6 +18,7 @@ from app.models import (
     BookingRequest,
     BookingStepResult,
     BookingTransition,
+    Kennel,
     OutboundMessage,
     Reservation,
     Span,
@@ -840,3 +841,71 @@ async def test_reply_model_failure_fails_drafting_and_retries(committed, submit,
 
     assert state == State.SENT
     assert (retry.calls["intake"], retry.calls["reply"]) == (0, 1)
+
+
+# --- A pet already booked for the stay is not booked again -----------------------------
+
+
+async def add_kennel(committed, desk, name="M2"):
+    async with committed() as s:
+        kennel = Kennel(facility_id=desk.facility_id, name=name, size_class="medium")
+        s.add(kennel)
+        await s.commit()
+        return kennel.id
+
+
+async def book(committed, kennel_id, pet_id, start=START, end=END):
+    async with committed() as s:
+        s.add(Reservation(kennel_id=kennel_id, pet_id=pet_id, start_date=start, end_date=end))
+        await s.commit()
+
+
+@spec("booking-orchestration", "A pet already booked for the stay is not booked again")
+async def test_same_pet_same_nights_goes_to_a_person(committed, desk, submit, process):
+    await book(committed, await add_kennel(committed, desk), desk.biscuit_id)
+    request_id = await submit()  # M1 is still free
+
+    state = await process(request_id, FakeModel())
+
+    results = await saved(committed, request_id)
+    assert state == State.NEEDS_REVIEW
+    assert results[Step.CHECKS]["capacity"] == {
+        "status": "already_booked",
+        "size_class": "medium",
+        "kennel": None,
+    }
+    assert results[Step.ROUTE]["reasons"] == [
+        "capacity: Biscuit already has a kennel for these nights"
+    ]
+    assert results[Step.RESOLUTION]["outcome"] == "not_attempted"
+    assert await reservations_for(committed, request_id) == []
+
+
+@spec("booking-orchestration", "A pet already booked for the stay is not booked again")
+async def test_another_pets_stay_does_not_count(committed, desk, submit, process):
+    await book(committed, desk.kennel_id, desk.olive_id)
+    await add_kennel(committed, desk)
+    request_id = await submit()
+
+    state = await process(request_id, FakeModel())
+
+    capacity = (await saved(committed, request_id))[Step.CHECKS]["capacity"]
+    assert state == State.SENT
+    assert (capacity["status"], capacity["kennel"]) == ("found", "M2")
+
+
+@spec("booking-orchestration", "Sending checks the pet again")
+async def test_pet_booked_before_sending(committed, desk, submit, process):
+    request_id = await submit()
+    with pytest.raises(Crash):
+        await process(request_id, FakeModel(), crash_after=crash_after(State.DRAFTING))
+    await book(committed, await add_kennel(committed, desk), desk.biscuit_id)
+
+    state = await process(request_id, FakeModel())
+
+    request = await request_row(committed, request_id)
+    assert state == request.status == State.FAILED
+    assert request.failed_step == State.APPROVED
+    assert "Biscuit already has a kennel for these nights at send time" in request.last_error
+    assert await reservations_for(committed, request_id) == []
+    assert await outbound(committed, request_id) == []

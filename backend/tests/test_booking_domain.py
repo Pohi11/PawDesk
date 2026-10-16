@@ -49,6 +49,14 @@ async def make_pet(session, species=Species.DOG, weight="40", owner=None) -> Pet
     return pet
 
 
+async def second_pet(session, pet) -> Pet:
+    """Another dog of the same owner, for reservations that must not be the same pet's."""
+    other = Pet(owner_id=pet.owner_id, name="Pepper", species=Species.DOG, weight_lb=Decimal(40))
+    session.add(other)
+    await session.flush()
+    return other
+
+
 async def make_kennel(session, facility, name="K1", size=SizeClass.MEDIUM) -> Kennel:
     kennel = Kennel(facility_id=facility.id, name=name, size_class=size)
     session.add(kennel)
@@ -274,7 +282,9 @@ async def test_overlapping_reservation_is_rejected(session):
     await reserve(session, kennel, pet, date(2027, 3, 6), date(2027, 3, 9))
 
     with pytest.raises(IntegrityError, match="ex_reservations_no_overlapping_stays"):
-        await reserve(session, kennel, pet, date(2027, 3, 8), date(2027, 3, 10))
+        await reserve(
+            session, kennel, await second_pet(session, pet), date(2027, 3, 8), date(2027, 3, 10)
+        )
 
 
 @spec("booking-domain", "Reservations never overlap on the same kennel")
@@ -293,9 +303,10 @@ async def test_same_dates_on_different_kennels_are_allowed(session):
     k1 = await make_kennel(session, facility, name="K1")
     k2 = await make_kennel(session, facility, name="K2")
     pet = await make_pet(session)
+    other = await second_pet(session, pet)  # one pet holds one kennel per night
 
     await reserve(session, k1, pet, date(2027, 3, 6), date(2027, 3, 9))
-    await reserve(session, k2, pet, date(2027, 3, 6), date(2027, 3, 9))
+    await reserve(session, k2, other, date(2027, 3, 6), date(2027, 3, 9))
 
 
 @spec("booking-domain", "Reservations never overlap on the same kennel")

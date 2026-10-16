@@ -205,3 +205,20 @@ specTest("run-dashboard", REQ, "missing or odd fields fall back to plain text, n
     "Couldn't read a booking from the message.",
   );
 });
+
+specTest(
+  "booking-orchestration",
+  "A pet already booked for the stay is not booked again",
+  "an already-booked pet is named on the capacity step",
+  () => {
+    const detail = withSteps({
+      checks: {
+        not_checked: null,
+        pet: { name: "Biscuit" },
+        capacity: { status: "already_booked", size_class: "medium", kennel: null },
+      },
+    });
+
+    expect(ok("capacity", detail)).toBe("Biscuit already has a kennel for these nights.");
+  },
+);

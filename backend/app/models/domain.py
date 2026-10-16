@@ -136,6 +136,13 @@ class Reservation(UUIDPrimaryKey, Base):
             name="ex_reservations_no_overlapping_stays",
             using="gist",
         ),
+        # Nor may two reservations for the same pet (change one-kennel-per-pet, D1).
+        ExcludeConstraint(
+            ("pet_id", "="),
+            (func.daterange(column("start_date"), column("end_date"), "[)"), "&&"),
+            name="ex_reservations_one_kennel_per_pet",
+            using="gist",
+        ),
     )
 
     kennel_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("kennels.id"))

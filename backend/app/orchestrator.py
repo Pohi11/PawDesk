@@ -27,7 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.capacity import find_kennel
+from app.capacity import already_booked_reason, find_kennel, find_pet_stay
 from app.compliance import Outcome, VaccineEvidence, check, load_evidence, load_requirements
 from app.dates import facility_date
 from app.documents import load_certificate
@@ -339,6 +339,7 @@ async def _resolver_inputs(
         today=today,
         required=await load_requirements(session, facility.id, service, pet.species),
         evidence=tuple(on_file + _evidence(saved[Step.RECORDS])),
+        pet_id=pet.id,
     )
     return ctx, facts
 
@@ -451,7 +452,9 @@ async def _reserve_if_confirmed(
         return
     start, end = date.fromisoformat(facts["start_date"]), date.fromisoformat(facts["end_date"])
     pet = await session.get_one(Pet, request.pet_id)
-    # Checked again now: the kennel found during checking may have been taken since.
+    # Checked again now: the pet may have been booked, or the kennel taken, since checking.
+    if await find_pet_stay(session, pet.id, start, end) is not None:
+        raise StepFailed(f"{pet.name} already has a kennel for these nights at send time")
     kennel = await find_kennel(session, request.facility_id, pet.size_class, start, end)
     if kennel is None:
         raise StepFailed(f"no free {pet.size_class} kennel at send time")
@@ -467,11 +470,13 @@ async def _reserve_if_confirmed(
     try:
         await session.flush()
     except IntegrityError as exc:
-        # Another transaction reserved the same kennel between our search and this insert;
-        # the exclusion constraint is the real guarantee against double-booking.
-        if "ex_reservations_no_overlapping_stays" not in str(exc):
-            raise
-        raise StepFailed("kennel taken at send time by another booking") from exc
+        # Another transaction reserved the same kennel, or this pet, between our search and
+        # this insert; the exclusion constraints are the real guarantee against double-booking.
+        if "ex_reservations_no_overlapping_stays" in str(exc):
+            raise StepFailed("kennel taken at send time by another booking") from exc
+        if "ex_reservations_one_kennel_per_pet" in str(exc):
+            raise StepFailed("pet booked at send time by another booking") from exc
+        raise
 
 
 def decline_message(facts: dict) -> tuple[str, str]:
@@ -616,6 +621,11 @@ async def _capacity(
         # Intake already reports "boarding needs at least one night".
         return {"status": "not_checked", "size_class": str(pet.size_class), "kennel": None}
     async with span("capacity", SpanKind.TOOL, input={"size_class": str(pet.size_class)}) as s:
+        # A pet already staying those nights is not booked again (change one-kennel-per-pet).
+        if await find_pet_stay(session, pet.id, start, end) is not None:
+            result = {"status": "already_booked", "size_class": str(pet.size_class), "kennel": None}
+            s.output = result
+            return result
         kennel = await find_kennel(session, facility_id, pet.size_class, start, end)
         result = {
             "status": "found" if kennel else "none_free",
@@ -648,5 +658,7 @@ def decide_route(intake: dict, records: dict, checks: dict) -> tuple[State, list
         reasons.append(f"capacity: no free {capacity['size_class']} kennel for the stay")
     if capacity and capacity["status"] == "not_checked":
         reasons.append("capacity: not checked")
+    if capacity and capacity["status"] == "already_booked":
+        reasons.append(already_booked_reason(checks["pet"]["name"]))
 
     return (State.RESOLVING if reasons else State.DRAFTING), reasons

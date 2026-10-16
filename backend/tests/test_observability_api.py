@@ -19,16 +19,17 @@ from app.api import (
     get_results_dir,
     get_stream_timing,
 )
+from app.capacity import find_kennel
 from app.certificate_card import render
 from app.db import get_sessionmaker
-from app.demo import DEMO_TODAY, SAMPLE_CARDS, SAMPLES
+from app.demo import DEMO_TODAY, SAMPLE_CARDS, SAMPLES, submit_sample
 from app.documents import attach_certificate, load_certificate
-from app.enums import SpanKind, Species
+from app.enums import SizeClass, SpanKind, Species
 from app.intake import match_pet
 from app.limits import DemoLimits
 from app.llm import RetryPolicy, make_client
 from app.main import app
-from app.models import BookingRequest, Owner, Pet, Span, Trace
+from app.models import BookingRequest, Kennel, Owner, Pet, Reservation, Span, Trace
 from app.orchestrator import process_request
 from scripts.draw_sample_cards import CARDS
 from scripts.seed import seed
@@ -720,3 +721,89 @@ async def test_no_limit_configured(api, committed, demo_owner, limits, scripted_
 
     assert response.status_code == 202
     await wait_for(committed, uuid.UUID(response.json()["id"]), {"needs_review", "sent", "failed"})
+
+
+# --- Running a boarding sample frees its stay ------------------------------------------
+
+
+async def hold(committed, kennel_name, start, end, *, by_request=True):
+    """Reserve a kennel for a fresh dog, made by a request unless `by_request` is False."""
+    async with committed() as s:
+        kennel = await s.scalar(select(Kennel).where(Kennel.name == kennel_name))
+        owner = await s.scalar(select(Owner).order_by(Owner.email).limit(1))
+        guest = Pet(owner_id=owner.id, name="Guest", species=Species.DOG, weight_lb=Decimal(30))
+        s.add(guest)
+        await s.flush()
+        request_id = None
+        if by_request:
+            request = BookingRequest(
+                facility_id=kennel.facility_id, owner_id=owner.id, raw_message="earlier"
+            )
+            s.add(request)
+            await s.flush()
+            request_id = request.id
+        reservation = Reservation(
+            kennel_id=kennel.id,
+            pet_id=guest.id,
+            booking_request_id=request_id,
+            start_date=start,
+            end_date=end,
+        )
+        s.add(reservation)
+        await s.commit()
+        return reservation.id
+
+
+async def reservations_left(committed, ids):
+    async with committed() as s:
+        return set(await s.scalars(select(Reservation.id).where(Reservation.id.in_(ids))))
+
+
+CLEAN = SAMPLES["clean"]
+
+
+@spec("observability-api", "Running a boarding sample frees its stay")
+async def test_earlier_runs_filled_the_kennels(committed, full_seed):
+    held = [await hold(committed, k, CLEAN.start_date, CLEAN.end_date) for k in ("M1", "M2", "M3")]
+
+    request_id = await submit_sample(committed, "clean")
+
+    async with committed() as s:
+        facility_id = (await s.get(BookingRequest, request_id)).facility_id
+        kennel = await find_kennel(
+            s, facility_id, SizeClass.MEDIUM, CLEAN.start_date, CLEAN.end_date
+        )
+    assert await reservations_left(committed, held) == set()
+    assert kennel is not None
+
+
+@spec("observability-api", "Running a boarding sample frees its stay")
+async def test_seeded_reservations_stay(committed, full_seed):
+    seeded = await hold(
+        committed, "M1", CLEAN.start_date, CLEAN.start_date + timedelta(days=1), by_request=False
+    )
+
+    await submit_sample(committed, "clean")
+
+    assert await reservations_left(committed, [seeded]) == {seeded}
+
+
+@spec("observability-api", "Running a boarding sample frees its stay")
+async def test_other_stays_stay(committed, full_seed):
+    later = await hold(
+        committed, "M1", CLEAN.end_date + timedelta(days=1), CLEAN.end_date + timedelta(days=3)
+    )
+    large = await hold(committed, "L1", CLEAN.start_date, CLEAN.end_date)
+
+    await submit_sample(committed, "clean")
+
+    assert await reservations_left(committed, [later, large]) == {later, large}
+
+
+@spec("observability-api", "Running a boarding sample frees its stay")
+async def test_non_boarding_samples_release_nothing(committed, full_seed):
+    held = await hold(committed, "M1", date(2027, 3, 15), date(2027, 3, 16))
+
+    await submit_sample(committed, "unknown-pet")  # daycare on Mar 15
+
+    assert await reservations_left(committed, [held]) == {held}
