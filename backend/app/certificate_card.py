@@ -8,6 +8,7 @@ import io
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
+from PIL.PngImagePlugin import PngInfo
 
 from app.demo_generator import GeneratedRequest, printed
 
@@ -18,6 +19,9 @@ FAINT = (110, 120, 135)
 RULE = (200, 206, 198)
 PAPER = (252, 251, 247)
 ACCENT = (31, 111, 85)
+SYNTHETIC = (
+    "Synthetic PawDesk demo certificate. The pet, owner, clinic, and veterinarian are fictional."
+)
 
 
 def _font(size: int, name: str | None = None) -> ImageFont.FreeTypeFont:
@@ -66,17 +70,15 @@ def render(request: GeneratedRequest) -> bytes:
         y += 40
         draw.line([40, y - 8, WIDTH - 40, y - 8], fill=(232, 236, 230), width=1)
 
-    # Signature and the synthetic marking.
+    # Signature. Nothing below it: the records step reads every line, and a line saying the
+    # card isn't real is rightly a reason for doubt (change card-synthetic-marking, D1).
     draw.text((40, HEIGHT - 128), request.vet, font=_font(40, "Caveat.ttf"), fill=(40, 60, 120))
     draw.line([40, HEIGHT - 80, 380, HEIGHT - 80], fill=RULE, width=2)
     draw.text((40, HEIGHT - 72), "Attending veterinarian", font=label, fill=FAINT)
-    draw.text(
-        (40, HEIGHT - 34),
-        "PawDesk demo certificate. Not a real record.",
-        font=_font(14),
-        fill=FAINT,
-    )
 
+    # The synthetic marking travels in the file's metadata, which the model never sees (D2).
+    info = PngInfo()
+    info.add_text("Comment", SYNTHETIC)
     out = io.BytesIO()
-    image.save(out, format="PNG", optimize=True)
+    image.save(out, format="PNG", optimize=True, pnginfo=info)
     return out.getvalue()
