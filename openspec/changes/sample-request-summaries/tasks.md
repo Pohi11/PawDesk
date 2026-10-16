@@ -2,7 +2,7 @@
 
 ## 1. API
 
-- [ ] 1.1 Give each sample its service, dates, and card summary, and return them with the owner's name and the pet's weight from `GET /demo/samples`. Verify with an API test of the clean and unknown-pet samples.
+- [x] 1.1 Give each sample its service, dates, and card summary, and return them with the owner's name and the pet's weight from `GET /demo/samples`. Verify with an API test of the clean and unknown-pet samples.
 
 ## 2. Dashboard
 

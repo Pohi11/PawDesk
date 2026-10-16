@@ -521,6 +521,37 @@ async def test_samples_carry_their_pets_photo_fields(api, committed, full_seed):
     assert (unknown["pet_id"], unknown["pet_species"], unknown["pet_breed"]) == (None, None, None)
 
 
+@spec("demo-generator", "Samples carry a request summary")
+async def test_samples_carry_a_request_summary(api, committed, full_seed):
+    samples = {s["id"]: s for s in (await api.get("/demo/samples")).json()}
+
+    async with committed() as s:
+        biscuit = await s.scalar(select(Pet).where(Pet.name == "Biscuit"))
+        avery = await s.scalar(select(Owner).where(Owner.id == biscuit.owner_id))
+    clean, unknown = samples["clean"], samples["unknown-pet"]
+    assert clean["service"] == "boarding"
+    assert (clean["start_date"], clean["end_date"]) == ("2027-03-24", "2027-03-27")
+    assert (clean["owner"], clean["weight_lb"]) == (avery.full_name, float(biscuit.weight_lb))
+    assert clean["card_text"] == "Every vaccine on the card is current for the whole stay."
+
+    assert (unknown["pet"], unknown["service"]) == ("Rex", "daycare")
+    assert (unknown["start_date"], unknown["end_date"]) == ("2027-03-15", "2027-03-15")
+    assert unknown["owner"] and unknown["weight_lb"] is None
+    assert "no vaccine card is attached" in unknown["card_text"]
+
+
+@spec("demo-generator", "Samples carry a request summary")
+@pytest.mark.parametrize("sample_id", sorted(CARDS))
+def test_sample_dates_match_their_card(sample_id):
+    record = CARDS[sample_id][1]()
+    sample = SAMPLES[sample_id]
+    assert (sample.service, sample.start_date, sample.end_date) == (
+        record.service,
+        record.start_date,
+        record.end_date,
+    )
+
+
 @spec("observability-api", "Each sample is about a different pet")
 async def test_no_two_samples_share_a_pet(api, committed, full_seed):
     samples = (await api.get("/demo/samples")).json()

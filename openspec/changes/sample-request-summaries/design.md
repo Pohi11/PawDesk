@@ -18,7 +18,7 @@
 - **Owner name, breed, and weight** come from the database, through the lookup that already finds each sample's pet, so they can't drift from the seed data.
 - **Service, dates, and the card summary** are new fields on `Sample`. They describe what the message asks for and what the card shows, which only the sample's author knows.
 - **The card summary is written by hand,** in the generator's wording ("Every vaccine on the card is current for the whole stay."; "Bordetella expired on Nov 14, 2026, before the stay."). Deriving it from the card's records would mean moving those records out of the drawing script for one sentence per sample.
-- **The unknown-pet sample** has no breed, weight, or card, so its summary says the pet isn't on file and no card is attached.
+- **The unknown-pet sample** now names its pet (Rex) instead of `None`, so its heading has a name. The lookup still finds no Rex on file, so it has no breed, weight, or card, and its summary says so.
 
 ### D2. One summary block for both kinds of request
 - **The panel builds a summary** (pet fields, heading, detail line) from either a generated request or a sample, and renders one block. The two can't drift apart in layout.
