@@ -55,7 +55,7 @@ test(`${TRY_PAGE} samples and a generated pet show their photos before sending`,
   const unknown = page.locator("label").filter({ hasText: "Pet not on file" });
   await expect(unknown.getByRole("img", { name: "No pet matched yet" })).toBeVisible();
 
-  await page.getByRole("button", { name: /Make one up/ }).click();
+  // The page opens on a made-up request.
   const heading = page.locator("p.font-display.text-xl");
   await expect(heading).toBeVisible();
   const pet = (await heading.textContent())!.split(",")[0];

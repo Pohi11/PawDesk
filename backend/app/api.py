@@ -194,18 +194,22 @@ async def evals(results_dir: ResultsDir) -> list[dict[str, Any]]:
 
 @router.get("/demo/samples")
 async def demo_samples(sessions: Sessions) -> list[dict[str, Any]]:
-    """The fixed samples, each with its pet's photo fields (null when not on file)."""
+    """The fixed samples, each with its owner's name and its pet's photo fields and weight
+    (null when not on file)."""
     async with sessions() as session:
-        pets = await sample_pets(session)
+        found = await sample_pets(session)
     return [
         sample.to_json()
         | {
-            "pet": pet.name if (pet := pets[sample.id]) else sample.pet,
+            "owner": owner.full_name if owner else None,
+            "pet": pet.name if pet else sample.pet,
             "pet_id": str(pet.id) if pet else None,
             "pet_species": str(pet.species) if pet else None,
             "pet_breed": pet.breed if pet else None,
+            "weight_lb": float(pet.weight_lb) if pet else None,
         }
         for sample in SAMPLES.values()
+        for owner, pet in [found[sample.id]]
     ]
 
 
