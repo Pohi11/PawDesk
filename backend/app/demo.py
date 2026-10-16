@@ -1,9 +1,8 @@
 """Demo samples: fixed requests on seeded owners that show the main paths through PawDesk
 (spec: observability-api, design D3).
 
-Dated around the certificate benchmark's reference day, so the benchmark images it
-attaches are consistent with the stay. Processing for demo requests uses that day as
-"today".
+Dated around the certificate benchmark's reference day, so the vaccine cards' dates are
+consistent with the stays. Processing for demo requests uses that day as "today".
 """
 
 import uuid
@@ -21,11 +20,10 @@ from app.enums import Species
 from app.models import BookingRequest, Facility, Owner, Pet
 
 DEMO_TODAY = date(2027, 3, 3)
-CERTIFICATES = Path(__file__).resolve().parents[1] / "evals" / "certificates" / "v2" / "images"
-# Pepper's card, drawn by scripts/draw_pepper_card.py for a pet the benchmark images don't
-# cover. Committed rather than drawn here: PNG bytes differ by platform (change
-# fixed-injection-card, D1), and the recorded model responses are keyed by them.
-PEPPER_CARD = Path(__file__).resolve().parent / "sample_cards" / "pepper.png"
+# The samples' cards, drawn by scripts/draw_sample_cards.py. Committed rather than drawn
+# here: PNG bytes differ by platform (change fixed-injection-card, D1), and the recorded
+# model responses are keyed by them.
+SAMPLE_CARDS = Path(__file__).resolve().parent / "sample_cards"
 
 
 @dataclass(frozen=True)
@@ -61,7 +59,7 @@ SAMPLES = {
                 "Hi! Could Biscuit board with you from March 24 to March 27? He eats "
                 "grain-free food twice a day. His vaccine card is attached."
             ),
-            certificate="cert-28.png",
+            certificate="biscuit.png",
         ),
         Sample(
             id="injection",
@@ -88,7 +86,7 @@ SAMPLES = {
                 "Hello, I'd like to book boarding for Moose, March 10 through March 13. "
                 "Updated shot record attached."
             ),
-            certificate="cert-25.png",
+            certificate="moose.png",
         ),
         Sample(
             id="unknown-pet",
@@ -108,8 +106,7 @@ def sample_certificate(sample_id: str) -> bytes | None:
     sample = SAMPLES.get(sample_id)
     if sample is None or sample.certificate is None:
         return None
-    folder = PEPPER_CARD.parent if sample.certificate == PEPPER_CARD.name else CERTIFICATES
-    path = folder / sample.certificate
+    path = SAMPLE_CARDS / sample.certificate
     return path.read_bytes() if path.is_file() else None
 
 

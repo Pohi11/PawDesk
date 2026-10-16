@@ -21,7 +21,7 @@ from app.api import (
 )
 from app.certificate_card import render
 from app.db import get_sessionmaker
-from app.demo import DEMO_TODAY, PEPPER_CARD, SAMPLES
+from app.demo import DEMO_TODAY, SAMPLE_CARDS, SAMPLES
 from app.documents import attach_certificate, load_certificate
 from app.enums import SpanKind, Species
 from app.intake import match_pet
@@ -30,7 +30,7 @@ from app.llm import RetryPolicy, make_client
 from app.main import app
 from app.models import BookingRequest, Owner, Pet, Span, Trace
 from app.orchestrator import process_request
-from scripts.draw_pepper_card import pepper_request
+from scripts.draw_sample_cards import CARDS
 from scripts.seed import seed
 from tests.test_llm import fake_settings
 from tests.test_orchestrator import (
@@ -539,22 +539,37 @@ async def test_the_injection_samples_card_is_the_same_each_time(api):
 
 
 @spec("observability-api", "Each sample is about a different pet")
-async def test_the_injection_samples_card_is_served_as_committed(api):
-    served = await api.get("/demo/samples/injection/certificate.png")
+@pytest.mark.parametrize("sample_id", sorted(CARDS))
+async def test_each_samples_card_is_served_as_committed(api, sample_id):
+    served = await api.get(f"/demo/samples/{sample_id}/certificate.png")
 
-    assert served.content == PEPPER_CARD.read_bytes()
+    file, _ = CARDS[sample_id]
+    assert SAMPLES[sample_id].certificate == file
+    assert served.content == (SAMPLE_CARDS / file).read_bytes()
 
 
 @spec("observability-api", "Each sample is about a different pet")
-def test_the_committed_card_matches_a_fresh_drawing():
-    # Pixels, not bytes: the PNG compressor differs by platform, the drawing does not.
-    committed = Image.open(PEPPER_CARD)
-    drawn = Image.open(io.BytesIO(render(pepper_request())))
+@pytest.mark.parametrize("sample_id", sorted(CARDS))
+async def test_each_committed_card_matches_a_fresh_drawing(committed, full_seed, sample_id):
+    file, request = CARDS[sample_id]
+    record = request()
 
-    assert committed.size == drawn.size
-    assert committed.tobytes() == drawn.tobytes(), (
-        "redraw: uv run python -m scripts.draw_pepper_card"
+    # About the sample's pet, printed with its owner on file's initial and surname.
+    sample = SAMPLES[sample_id]
+    async with committed() as session:
+        owner = await session.scalar(select(Owner).where(Owner.email == sample.owner_email))
+    first, *_, last = owner.full_name.split()
+    assert (record.pet, record.owner_email, record.owner) == (
+        sample.pet,
+        sample.owner_email,
+        f"{first[0]}. {last}",
     )
+
+    # Pixels, not bytes: the PNG compressor differs by platform, the drawing does not.
+    stored = Image.open(SAMPLE_CARDS / file)
+    drawn = Image.open(io.BytesIO(render(record)))
+    assert stored.size == drawn.size
+    assert stored.tobytes() == drawn.tobytes(), "redraw: uv run python -m scripts.draw_sample_cards"
 
 
 @spec("demo-generator", "Previews carry their pet's photo fields")
