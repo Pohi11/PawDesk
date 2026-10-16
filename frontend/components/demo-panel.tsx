@@ -89,8 +89,14 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   const hasCertificate = chosen === GENERATED ? generated !== null : Boolean(sample?.certificate);
   const summary = chosen === GENERATED ? generated && generatedSummary(generated) : sample && sampleSummary(sample);
 
-  async function makeOne() {
+  function makeOne() {
     setChosen(GENERATED);
+    void generate();
+  }
+
+  // Fills the "Make one up" preview without selecting it, so a sample chosen while the opening
+  // request is on its way stays chosen (change keep-chosen-sample).
+  async function generate() {
     setError(null);
     setBusy(true);
     try {
@@ -111,7 +117,7 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    void makeOne();
+    void generate();
   });
 
   async function send() {
