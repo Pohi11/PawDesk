@@ -214,3 +214,10 @@ The home page's worked example SHALL show the vaccine card image that the clean 
 #### Scenario: The card in the worked example
 - **WHEN** a visitor opens `/`
 - **THEN** the worked example shows Biscuit's vaccine card image, and the image loads
+
+### Requirement: The coverage diagram is a hypothetical example
+The booking rules' coverage diagram SHALL describe a hypothetical dog's stay, not a pet on file, because its expiry dates are chosen to show one shot that covers the stay and one that expires during it.
+
+#### Scenario: The diagram's subject
+- **WHEN** a visitor reads the coverage diagram in the booking rules
+- **THEN** it is labeled as a hypothetical dog's stay, and it still shows one shot that covers the stay and one that expires during it
