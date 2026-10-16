@@ -1,0 +1,29 @@
+{
+  "about": "The lifecycle and step map the Architecture page draws. backend/tests/test_architecture_page.py checks them against app/lifecycle.py and app/orchestrator.py.",
+  "transitions": [
+    { "from": "received", "to": "extracting", "actor": "system" },
+    { "from": "extracting", "to": "checking", "actor": "system" },
+    { "from": "checking", "to": "resolving", "actor": "system" },
+    { "from": "checking", "to": "drafting", "actor": "system" },
+    { "from": "resolving", "to": "drafting", "actor": "system" },
+    { "from": "drafting", "to": "needs_review", "actor": "system" },
+    { "from": "drafting", "to": "ready", "actor": "system" },
+    { "from": "ready", "to": "approved", "actor": "system" },
+    { "from": "ready", "to": "rejected", "actor": "staff" },
+    { "from": "needs_review", "to": "approved", "actor": "staff" },
+    { "from": "needs_review", "to": "rejected", "actor": "staff" },
+    { "from": "approved", "to": "sent", "actor": "system" },
+    { "from": "rejected", "to": "sent", "actor": "system" }
+  ],
+  "can_fail": ["extracting", "checking", "resolving", "drafting", "approved", "rejected"],
+  "steps": [
+    { "state": "received", "step": "_start", "does": "Moves the request to extracting before any model call" },
+    { "state": "extracting", "step": "_extract", "does": "Runs the intake and records agents at the same time" },
+    { "state": "checking", "step": "_check_and_route", "does": "Checks vaccines and kennels, then picks the route" },
+    { "state": "resolving", "step": "_resolve", "does": "Runs the resolver when code allows it" },
+    { "state": "drafting", "step": "_draft", "does": "Writes the reply and decides whether a person sees it" },
+    { "state": "ready", "step": "_auto_approve", "does": "Approves a request that passed every check" },
+    { "state": "approved", "step": "_send", "does": "Saves the reply, and reserves the kennel for a confirmed stay" },
+    { "state": "rejected", "step": "_send", "does": "Saves the decline message" }
+  ]
+}
