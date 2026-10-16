@@ -211,7 +211,7 @@ function Intro() {
           <a href="#try" className="rounded-full bg-ink px-5 py-2.5 font-medium text-white hover:brightness-125">
             Try a request
           </a>
-          <a href="#how" className={link}>
+          <a href="#rules" className={link}>
             How it works
           </a>
           <a href="#skills" className={link}>

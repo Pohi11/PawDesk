@@ -214,3 +214,10 @@ The home page's worked example SHALL show the vaccine card image that the clean 
 #### Scenario: The card in the worked example
 - **WHEN** a visitor opens `/`
 - **THEN** the worked example shows Biscuit's vaccine card image, and the image loads
+
+### Requirement: The hero's How it works link opens the booking rules
+The home page's "How it works" link SHALL scroll the page to the booking rules section, the first section of the explanation.
+
+#### Scenario: Following How it works
+- **WHEN** a visitor on `/` follows the "How it works" link
+- **THEN** the page scrolls to the booking rules section and its heading is in view

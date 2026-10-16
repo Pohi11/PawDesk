@@ -5,6 +5,7 @@ import { specTag } from "../tests/spec-tag";
 const HOME = specTag("run-dashboard", "The home page introduces PawDesk and holds the Try panel");
 const CARD = specTag("run-dashboard", "The worked example shows the attached vaccine card");
 const RULES =specTag("run-dashboard", "The home page explains the booking rules");
+const HOW = specTag("run-dashboard", "The hero's How it works link opens the booking rules");
 
 test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ page }) => {
   await page.goto("/");
@@ -38,6 +39,13 @@ test(`${HOME} the old Try page address lands on the home page`, async ({ page })
   await page.goto("/demo");
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("heading", { name: "Try a request" })).toBeVisible();
+});
+
+test(`${HOW} How it works scrolls to the booking rules`, async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "How it works", exact: true }).click();
+  await expect(page).toHaveURL(/#rules$/);
+  await expect(page.getByRole("heading", { name: "Booking rules", level: 2 })).toBeInViewport();
 });
 
 test(`${HOME} the navigation's Requests link opens the list`, async ({ page }) => {
