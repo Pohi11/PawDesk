@@ -27,20 +27,16 @@ test(`${REQ} the clean sample runs live to sent`, async ({ page }) => {
   await expect(page.getByText("Every check passed.")).toBeVisible();
   await frame(page, "02-clean-sent");
 
-  await page.getByRole("button", { name: /intake\.extract/ }).click();
-  await expect(page.getByText("deepseek/deepseek-v4.1-flash").first()).toBeVisible();
-  await frame(page, "03-inspector");
-});
-
-const QUOTED = specTag("run-dashboard", "The worked example shows what PawDesk did");
-
-test(`${QUOTED} the clean sample sends the reply the home page quotes`, async ({ page }) => {
-  await sendSample(page, "Clean boarding request");
-  await expect(page.getByText("The checks passed it, so it went out without a person.")).toBeVisible();
-
+  // The home page's worked example quotes this reply (run-dashboard "The worked example
+  // shows what PawDesk did"). Checked here, not in a run of its own: every clean run books a
+  // medium kennel for the same nights, and another one would leave a later run without one.
   const sent = page.locator("section", { has: page.getByRole("heading", { name: "Sent reply" }) });
   await expect(sent.getByText(worked.reply.subject, { exact: true })).toBeVisible();
   expect(await sent.locator("p.whitespace-pre-wrap").innerText()).toBe(worked.reply.body);
+
+  await page.getByRole("button", { name: /intake\.extract/ }).click();
+  await expect(page.getByText("deepseek/deepseek-v4.1-flash").first()).toBeVisible();
+  await frame(page, "03-inspector");
 });
 
 const TOOLTIPS = specTag("run-dashboard", "Path steps explain themselves");
