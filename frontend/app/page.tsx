@@ -420,7 +420,7 @@ function bandRange(i: number): string {
   return `${from} to under ${band.under_lb} lb`;
 }
 
-/** Biscuit's stay from the worked example, with one shot that covers it and one that doesn't. */
+/** A hypothetical dog's stay, with one shot that covers it and one that doesn't. */
 function CoverageStrip() {
   const days = [23, 24, 25, 26, 27, 28];
   const onSite = (d: number) => d >= 24 && d <= 27;
@@ -438,7 +438,7 @@ function CoverageStrip() {
   );
   return (
     <figure
-      aria-label="Two vaccines against Biscuit's stay from March 24 to 27"
+      aria-label="Two vaccines against a hypothetical dog's stay from March 24 to 27"
       className="mt-6 rounded-2xl bg-surface p-5 ring-1 ring-rule"
     >
       <div className="grid grid-cols-6 text-center text-xs text-muted">
@@ -450,7 +450,7 @@ function CoverageStrip() {
       </div>
       {lane(
         <span className="absolute inset-y-0 right-[16.67%] left-[16.67%] flex items-center justify-center text-xs font-medium text-kennel">
-          Biscuit on site
+          Dog on site
         </span>,
       )}
       {shots.map((shot) => (
@@ -469,8 +469,8 @@ function CoverageStrip() {
         </div>
       ))}
       <figcaption className="mt-4 text-xs leading-relaxed text-muted">
-        Drop-off March 24, pickup March 27. The DHPP shot runs out before pickup, so it fails even
-        though it was valid at drop-off.
+        A hypothetical dog: drop-off March 24, pickup March 27. The DHPP shot runs out before
+        pickup, so it fails even though it was valid at drop-off.
       </figcaption>
     </figure>
   );

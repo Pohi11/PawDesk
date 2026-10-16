@@ -4,8 +4,9 @@ import { specTag } from "../tests/spec-tag";
 
 const HOME = specTag("run-dashboard", "The home page introduces PawDesk and holds the Try panel");
 const CARD = specTag("run-dashboard", "The worked example shows the attached vaccine card");
-const RULES =specTag("run-dashboard", "The home page explains the booking rules");
+const RULES = specTag("run-dashboard", "The home page explains the booking rules");
 const HOW = specTag("run-dashboard", "The hero's How it works link opens the booking rules");
+const EXAMPLE = specTag("run-dashboard", "The coverage diagram is a hypothetical example");
 
 test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ page }) => {
   await page.goto("/");
@@ -64,8 +65,17 @@ test(`${RULES} the services, the coverage rule, and kennel sizes are on the page
   await expect(row("Daycare")).toContainText("Canine influenza");
   await expect(row("Grooming")).toContainText("None");
 
-  const strip = page.getByRole("figure", { name: "Two vaccines against Biscuit's stay from March 24 to 27" });
+  const strip = page.getByRole("figure", { name: "Two vaccines against a hypothetical dog's stay from March 24 to 27" });
   await expect(strip).toContainText("Covers the stay");
   await expect(strip).toContainText("Expires during the stay");
   await expect(page.locator("#rules")).toContainText("20 to under 50 lb");
+});
+
+test(`${EXAMPLE} the coverage diagram describes a hypothetical dog, not a pet on file`, async ({ page }) => {
+  await page.goto("/");
+  const strip = page.getByRole("figure", { name: "Two vaccines against a hypothetical dog's stay from March 24 to 27" });
+  await expect(strip).toContainText("A hypothetical dog");
+  await expect(strip).not.toContainText("Biscuit");
+  await expect(strip).toContainText("Covers the stay");
+  await expect(strip).toContainText("Expires during the stay");
 });
