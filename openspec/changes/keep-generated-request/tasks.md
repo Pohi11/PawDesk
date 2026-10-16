@@ -2,7 +2,7 @@
 
 ## 1. Keep the generated request
 
-- [ ] 1.1 Make the "Make one up" choice select the existing request, and add the end-to-end test. Verify with lint, type check, and the demo end-to-end tests.
+- [x] 1.1 Make the "Make one up" choice select the existing request, and add the end-to-end test. Verify with lint, type check, and the demo end-to-end tests.
 
 ## 2. Integration
 

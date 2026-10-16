@@ -89,9 +89,17 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
   const hasCertificate = chosen === GENERATED ? generated !== null : Boolean(sample?.certificate);
   const summary = chosen === GENERATED ? generated && generatedSummary(generated) : sample && sampleSummary(sample);
 
+  // "Make another" always makes a new request.
   function makeOne() {
     setChosen(GENERATED);
     void generate();
+  }
+
+  // The "Make one up" choice shows the request already made up, and makes one only when there
+  // is none, such as after a failed opening request (change keep-generated-request).
+  function chooseGenerated() {
+    setChosen(GENERATED);
+    if (!generated && !busy) void generate();
   }
 
   // Fills the "Make one up" preview without selecting it, so a sample chosen while the opening
@@ -139,7 +147,7 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
         <legend className="mb-2 text-sm font-medium">Choose a request</legend>
         <button
           type="button"
-          onClick={makeOne}
+          onClick={chooseGenerated}
           className={`block w-full rounded-2xl p-4 text-left ring-1 ${chosen === GENERATED ? "bg-surface ring-2 ring-ink" : "ring-rule hover:bg-surface"}`}
         >
           <span className="flex items-start gap-3">

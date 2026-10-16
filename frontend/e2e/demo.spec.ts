@@ -121,3 +121,25 @@ test(`${TRY} a sample chosen while the opening request is made up stays chosen`,
   await page.getByRole("button", { name: "Send and watch it run" }).click();
   expect((await sent).postDataJSON()).toEqual({ sample: "clean" });
 });
+
+test(`${TRY} going back to Make one up keeps the request, and Make another makes a new one`, async ({ page }) => {
+  let calls = 0;
+  page.on("request", (r) => {
+    if (new URL(r.url()).pathname === "/api/demo/generate") calls += 1; // not the card's /generated/ URL
+  });
+  await page.goto("/");
+  const heading = page.locator("p.font-display.text-xl");
+  await expect(heading).toContainText(/, (boarding|daycare|grooming), /);
+  const first = await heading.innerText();
+  expect(calls).toBe(1);
+
+  await page.getByText("Clean boarding request", { exact: true }).click();
+  await page.getByRole("button", { name: /Make one up/ }).click();
+  await expect(heading).toHaveText(first);
+  expect(calls).toBe(1);
+
+  const another = page.waitForResponse("**/api/demo/generate*");
+  await page.getByRole("button", { name: "Make another" }).click();
+  await another;
+  expect(calls).toBe(2);
+});
