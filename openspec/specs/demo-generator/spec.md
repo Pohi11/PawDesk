@@ -126,3 +126,14 @@ A demo card, generated or a fixed sample's, SHALL NOT draw any text saying it is
 #### Scenario: Marked in metadata
 - **WHEN** the card for seed 42, or any fixed sample's card, is read as a PNG
 - **THEN** its `Comment` text says it is a synthetic PawDesk demo certificate
+
+### Requirement: Cards draw the same on every machine
+Card drawing SHALL lay out all text with Pillow's basic layout engine, so a card's pixels do not depend on whether the machine has an optional text-shaping library such as Raqm.
+
+#### Scenario: Fonts use basic layout
+- **WHEN** the card's fonts are loaded
+- **THEN** each one uses the basic layout engine
+
+#### Scenario: Raqm installed
+- **WHEN** a sample's card is drawn on a machine where Raqm is available
+- **THEN** its pixels match the committed card
