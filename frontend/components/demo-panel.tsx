@@ -76,6 +76,7 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
     Object.fromEntries(samples.map((s) => [s.id, s.message])),
   );
   const [busy, setBusy] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Not rendered, so reading storage while rendering can't cause a hydration mismatch.
   const [recent, setRecent] = useState<string[]>(loadRecent);
@@ -128,16 +129,21 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
     void generate();
   });
 
+  // A sent request stays "Sending" until its run opens. The page isn't unmounted then: it is
+  // kept hidden with its state (cacheComponents), and React runs effect cleanups when it hides
+  // it, so the panel is ready again when the visitor comes back (change send-ready-after-back).
+  useEffect(() => () => setSending(false), []);
+
   async function send() {
     if (!source) return;
-    setBusy(true);
+    setSending(true);
     setError(null);
     try {
       router.push(await submitDemo(source, message !== original ? message : undefined));
     } catch (e) {
       if (e instanceof DemoRefused) setError(`Not sent: ${e.message}`);
       else setError(e instanceof Error ? `Not sent: ${e.message}. Is the API running?` : String(e));
-      setBusy(false);
+      setSending(false);
     }
   }
 
@@ -216,14 +222,14 @@ export function DemoPanel({ samples }: { samples: DemoSample[] }) {
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                disabled={busy || !message.trim() || !source}
+                disabled={busy || sending || !message.trim() || !source}
                 onClick={send}
                 className="rounded-full bg-ink px-6 py-2.5 font-medium text-white disabled:opacity-40"
               >
-                {busy ? "Sending" : "Send and watch it run"}
+                {sending ? "Sending" : "Send and watch it run"}
               </button>
               {chosen === GENERATED && (
-                <button type="button" disabled={busy} onClick={makeOne} className="rounded-full px-5 py-2.5 ring-1 ring-rule hover:bg-wash disabled:opacity-40">
+                <button type="button" disabled={busy || sending} onClick={makeOne} className="rounded-full px-5 py-2.5 ring-1 ring-rule hover:bg-wash disabled:opacity-40">
                   Make another
                 </button>
               )}
