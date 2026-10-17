@@ -54,7 +54,7 @@ async def test_seeded_pet_with_unknown_expiry(seeded):
 
 @spec("vaccine-compliance", "Rules and records come from the facility and the pet")
 async def test_seeded_pet_whose_rabies_expires_during_its_booked_stay(seeded):
-    result, statuses = await check_seeded(seeded, "Moose", Service.BOARDING, 7, 14)
+    result, statuses = await check_seeded(seeded, "Moose", Service.BOARDING, 21, 28)
 
     assert statuses[Vaccine.RABIES] == VaccineStatus.EXPIRES_DURING_STAY
     assert result.outcome == Outcome.NOT_COMPLIANT

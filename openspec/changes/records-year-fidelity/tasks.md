@@ -14,9 +14,9 @@
 
 ## 3. Seed anchored to the demo day
 
-- [ ] 3.1 Make the seed command pass `DEMO_TODAY` as the anchor (design D4), and update the module docstring. Verify with tests tagged `@spec("seed-data", "Seeded dates are anchored to the demo day")`: the arguments are read with the demo day as the anchor, and Biscuit's Bordetella on file is at -60/+120 days from it.
-- [ ] 3.2 Move Moose's Bordetella on file to the dates on his card, his seeded large-kennel stay to days +21 to +28, and his rabies expiry to day +24 (design D5). Update `tests/test_compliance_db.py` to check his stay on the new days. Verify the full backend suite passes, including the existing seed edge-case tests.
-- [ ] 3.3 Add the sample-promise test (design D6), tagged `@spec("observability-api", "Samples end as promised from seeded and printed records")`, with one test per scenario: clean, injection, expired-vaccine only on Bordetella, and clean on records on file alone. Verify it passes. Also verify that it fails when the 3.2 Moose edit is reverted locally.
+- [x] 3.1 Make the seed command pass `DEMO_TODAY` as the anchor (design D4), and update the module docstring. Verify with tests tagged `@spec("seed-data", "Seeded dates are anchored to the demo day")`: the arguments are read with the demo day as the anchor, and Biscuit's Bordetella on file is at -60/+120 days from it.
+- [x] 3.2 Move Moose's Bordetella on file to the dates on his card, his seeded large-kennel stay to days +21 to +28, and his rabies expiry to day +24 (design D5). Update `tests/test_compliance_db.py` to check his stay on the new days. Verify the full backend suite passes, including the existing seed edge-case tests.
+- [x] 3.3 Add the sample-promise test (design D6), tagged `@spec("observability-api", "Samples end as promised from seeded and printed records")`, with one test per scenario: clean, injection, expired-vaccine only on Bordetella, and clean on records on file alone. Verify it passes. Also verify that it fails when the 3.2 Moose edit is reverted locally.
 
 ## 4. Recordings and end-to-end
 
