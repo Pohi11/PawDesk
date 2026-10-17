@@ -23,6 +23,7 @@ export default function EvalsPage() {
 const KIND: Record<string, string> = {
   intake: "Reading booking messages",
   records: "Reading vaccine certificates",
+  sample: "Reading the demo cards again and again",
 };
 
 const MEASURE: Record<string, string> = {
@@ -35,6 +36,11 @@ const MEASURE: Record<string, string> = {
   invented_expiries: "Expiry dates made up",
   sent_to_review: "Certificates sent to a person",
   errors: "Failed runs",
+  reads: "Reads",
+  misreads: "Reads with a date wrong",
+  decision_flips: "Reads that change the decision",
+  silent_flips: "Changed decisions not sent to a person",
+  failed: "Failed reads",
 };
 
 async function Reports() {
@@ -58,7 +64,7 @@ async function Reports() {
               </p>
               <dl className="mt-4 space-y-1.5">
                 {Object.entries(r.headline).map(([key, value]) => {
-                  const alarming = (key === "silent_disagreements" || key === "invented_expiries") && Number(value) > 0;
+                  const alarming = (key === "silent_disagreements" || key === "invented_expiries" || key === "silent_flips") && Number(value) > 0;
                   return (
                     <div key={key} className="flex justify-between gap-4">
                       <dt className="text-muted">{MEASURE[key] ?? key.replaceAll("_", " ")}</dt>
