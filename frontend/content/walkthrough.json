@@ -1,20 +1,20 @@
 {
- "generated_at": "2026-10-17T12:10:52+00:00",
+ "generated_at": "2026-10-17T13:44:14+00:00",
  "reports": {
-  "backend": "2026-10-17T07:10:07.878623-05:00",
-  "frontend": "2026-10-17T12:10:51.104Z",
-  "e2e": "2026-10-17T12:01:18.621Z"
+  "backend": "2026-10-17T08:37:29.702874-05:00",
+  "frontend": "2026-10-17T13:37:51.425Z",
+  "e2e": "2026-10-17T13:37:59.889Z"
  },
  "totals": {
-  "changes": 47,
-  "requirements": 175,
-  "verified": 175,
+  "changes": 48,
+  "requirements": 176,
+  "verified": 176,
   "tests": {
    "backend": 955,
    "frontend": 71,
-   "e2e": 32
+   "e2e": 34
   },
-  "linked_tests": 1015
+  "linked_tests": 1017
  },
  "changes": [
   {
@@ -3708,6 +3708,50 @@
     "0007",
     "0016"
    ]
+  },
+  {
+   "id": "2026-10-17-send-ready-after-back",
+   "slug": "send-ready-after-back",
+   "title": "Send ready after back",
+   "date": "2026-10-17",
+   "archived_at": "2026-10-17T08:44:02-05:00",
+   "why": "Sending a request from the home page's Try panel opens its run. Coming back to the home page, with the browser's Back button or the navigation's \"Try a request\" link, shows the panel's buttons still disabled and labelled \"Sending\". The panel stays unusable until the page is reloaded, so a visitor can't try a second request.",
+   "what_changes": "- **The Try panel is ready again when the visitor comes back from a run.** The send button reads \"Send and watch it run\" and is enabled, and \"Make another\" is enabled.\n- **Sending and making up a request are tracked apart,** so clearing one never interrupts the other.",
+   "tasks": [
+    {
+     "title": "1. Ready after a run",
+     "items": [
+      {
+       "id": "1.1",
+       "done": true,
+       "text": "Add the end-to-end tests and see them fail."
+      },
+      {
+       "id": "1.2",
+       "done": true,
+       "text": "Track sending apart from making up a request, and clear it when the panel is hidden. Verify with lint, type check, and the demo end-to-end tests."
+      }
+     ]
+    },
+    {
+     "title": "2. Integration",
+     "items": [
+      {
+       "id": "2.1",
+       "done": true,
+       "text": "Run every suite and the coverage check."
+      }
+     ]
+    }
+   ],
+   "requirements": [
+    {
+     "capability": "run-dashboard",
+     "kind": "added",
+     "name": "The Try panel is ready again after a run"
+    }
+   ],
+   "decisions": []
   }
  ],
  "specs": [
@@ -3746,31 +3790,31 @@
        "suite": "backend",
        "id": "tests.test_autonomous::test_agent_confirms_after_checking",
        "status": "passed",
-       "seconds": 0.29
+       "seconds": 0.36
       },
       {
        "suite": "backend",
        "id": "tests.test_autonomous::test_repeated_call_stops_as_needs_human",
        "status": "passed",
-       "seconds": 0.088
+       "seconds": 0.111
       },
       {
        "suite": "backend",
        "id": "tests.test_autonomous::test_answer_without_a_tool_is_needs_human",
        "status": "passed",
-       "seconds": 0.045
+       "seconds": 0.059
       },
       {
        "suite": "backend",
        "id": "tests.test_autonomous::test_vaccine_check_combines_on_file_and_certificate_records",
        "status": "passed",
-       "seconds": 0.02
+       "seconds": 0.023
       },
       {
        "suite": "backend",
        "id": "tests.test_autonomous::test_unknown_pet_is_an_error_the_agent_can_read",
        "status": "passed",
-       "seconds": 0.07
+       "seconds": 0.098
       }
      ],
      "status": "verified"
@@ -3799,31 +3843,31 @@
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_truth_makes_a_case_confirmable",
        "status": "passed",
-       "seconds": 0.026
+       "seconds": 0.027
       },
       {
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_without_the_certificate_the_same_case_is_not_confirmable",
        "status": "passed",
-       "seconds": 0.02
+       "seconds": 0.022
       },
       {
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_injection_is_never_confirmable",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_unknown_pet_and_unclear_dates_need_a_person",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_pets_with_a_certificate_start_without_records_on_file",
        "status": "passed",
-       "seconds": 0.026
+       "seconds": 0.031
       }
      ],
      "status": "verified"
@@ -3870,19 +3914,19 @@
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_two_cases_run_through_both_architectures_and_nothing_is_sent",
        "status": "passed",
-       "seconds": 0.533
+       "seconds": 0.713
       },
       {
        "suite": "frontend",
        "id": "lib/comparison.test.ts::the dashboard marks the better side of each metric the same way for both",
        "status": "passed",
-       "seconds": 0.0034068
+       "seconds": 0.0019646
       },
       {
        "suite": "frontend",
        "id": "lib/comparison.test.ts::fractions compare by value",
        "status": "passed",
-       "seconds": 0.0003667
+       "seconds": 0.0002979
       }
      ],
      "status": "verified"
@@ -3917,7 +3961,7 @@
        "suite": "backend",
        "id": "tests.test_compare_architectures::test_two_cases_run_through_both_architectures_and_nothing_is_sent",
        "status": "passed",
-       "seconds": 0.533
+       "seconds": 0.713
       }
      ],
      "status": "verified"
@@ -3965,13 +4009,13 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_unsupported_species_is_rejected",
        "status": "passed",
-       "seconds": 0.007
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_non_positive_weight_is_rejected",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.008
       }
      ],
      "status": "verified"
@@ -4014,61 +4058,61 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[cat-14-cat]",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.008
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[cat-120-cat]",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.008
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[dog-19.9-small]",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.009
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[dog-20-medium]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[dog-49.9-medium]",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.011
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[dog-50-large]",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.012
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[dog-89.9-large]",
        "status": "passed",
-       "seconds": 0.007
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_boundaries[dog-90-xlarge]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_weight_change_moves_the_class",
        "status": "passed",
-       "seconds": 0.014
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_size_class_cannot_be_written_directly",
        "status": "passed",
-       "seconds": 0.013
+       "seconds": 0.012
       }
      ],
      "status": "verified"
@@ -4090,7 +4134,7 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_invalid_time_zone_is_rejected",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -4125,13 +4169,13 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_rules_differ_per_service",
        "status": "passed",
-       "seconds": 0.015
+       "seconds": 0.011
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_duplicate_rule_is_rejected",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.011
       }
      ],
      "status": "verified"
@@ -4160,13 +4204,13 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_record_without_expiry_is_kept_as_unknown",
        "status": "passed",
-       "seconds": 0.015
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_expiry_before_administration_is_rejected",
        "status": "passed",
-       "seconds": 0.014
+       "seconds": 0.01
       }
      ],
      "status": "verified"
@@ -4188,7 +4232,7 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_kennel_with_unknown_size_class_is_rejected",
        "status": "passed",
-       "seconds": 0.013
+       "seconds": 0.008
       }
      ],
      "status": "verified"
@@ -4231,19 +4275,19 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_overlapping_reservation_is_rejected",
        "status": "passed",
-       "seconds": 0.024
+       "seconds": 0.016
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_back_to_back_reservations_are_allowed",
        "status": "passed",
-       "seconds": 0.019
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_domain::test_same_dates_on_different_kennels_are_allowed",
        "status": "passed",
-       "seconds": 0.019
+       "seconds": 0.015
       },
       {
        "suite": "backend",
@@ -4271,7 +4315,7 @@
        "suite": "backend",
        "id": "tests.test_booking_domain::test_second_reservation_for_same_request_is_rejected",
        "status": "passed",
-       "seconds": 0.02
+       "seconds": 0.018
       }
      ],
      "status": "verified"
@@ -4355,43 +4399,43 @@
        "suite": "backend",
        "id": "tests.test_bookings_cli::test_submit_stores_the_request_and_certificate",
        "status": "passed",
-       "seconds": 0.07
+       "seconds": 0.091
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_image_round_trips_with_hash_type_and_size",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.016
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_second_certificate_rejected",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_unsupported_file_refused_before_storing[pdf]",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_unsupported_file_refused_before_storing[empty]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.012
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_unsupported_file_refused_before_storing[over-5mb]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.011
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_database_refuses_a_mismatched_type_even_without_the_check",
        "status": "passed",
-       "seconds": 0.009
+       "seconds": 0.01
       }
      ],
      "status": "verified"
@@ -4433,19 +4477,19 @@
        "suite": "backend",
        "id": "tests.test_intake::test_well_formed_output",
        "status": "passed",
-       "seconds": 0.047
+       "seconds": 0.088
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_invalid_output_is_never_used[extra]",
        "status": "passed",
-       "seconds": 0.053
+       "seconds": 0.082
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_invalid_output_is_never_used[range]",
        "status": "passed",
-       "seconds": 0.052
+       "seconds": 0.073
       },
       {
        "suite": "backend",
@@ -4463,7 +4507,7 @@
        "suite": "backend",
        "id": "tests.test_intake_schema::test_unknown_extra_field_is_rejected",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.003
       },
       {
        "suite": "backend",
@@ -4487,7 +4531,7 @@
        "suite": "backend",
        "id": "tests.test_intake_schema::test_invalid_values_are_rejected[start_date-2027-02-30]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.002
       },
       {
        "suite": "backend",
@@ -4541,19 +4585,19 @@
        "suite": "backend",
        "id": "tests.test_intake::test_repair_succeeds",
        "status": "passed",
-       "seconds": 0.051
+       "seconds": 0.076
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_repair_fails",
        "status": "passed",
-       "seconds": 0.05
+       "seconds": 0.088
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_repair_sees_the_errors",
        "status": "passed",
-       "seconds": 0.056
+       "seconds": 0.073
       }
      ],
      "status": "verified"
@@ -4575,7 +4619,7 @@
        "suite": "backend",
        "id": "tests.test_intake::test_request_carries_strict_schema_and_temperature_zero",
        "status": "passed",
-       "seconds": 0.039
+       "seconds": 0.063
       },
       {
        "suite": "backend",
@@ -4642,43 +4686,43 @@
        "suite": "backend",
        "id": "tests.test_intake::test_date_issues[past]",
        "status": "passed",
-       "seconds": 0.038
+       "seconds": 0.067
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_date_issues[no-night]",
        "status": "passed",
-       "seconds": 0.036
+       "seconds": 0.067
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_date_issues[multi-day-grooming]",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.058
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_date_issues[reversed]",
        "status": "passed",
-       "seconds": 0.036
+       "seconds": 0.064
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_date_issues[too-far]",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.054
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_date_issues[missing]",
        "status": "passed",
-       "seconds": 0.042
+       "seconds": 0.056
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_valid_dates_raise_no_date_issue",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.048
       }
      ],
      "status": "verified"
@@ -4707,13 +4751,13 @@
        "suite": "backend",
        "id": "tests.test_intake::test_case_insensitive_pet_match",
        "status": "passed",
-       "seconds": 0.035
+       "seconds": 0.05
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_unknown_pet",
        "status": "passed",
-       "seconds": 0.038
+       "seconds": 0.052
       }
      ],
      "status": "verified"
@@ -4763,31 +4807,31 @@
        "suite": "backend",
        "id": "tests.test_intake::test_low_confidence",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.048
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_reported_ambiguity",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.048
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_missing_service",
        "status": "passed",
-       "seconds": 0.036
+       "seconds": 0.057
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_high_confidence_does_not_hide_a_problem",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.053
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_clean_request",
        "status": "passed",
-       "seconds": 0.034
+       "seconds": 0.084
       }
      ],
      "status": "verified"
@@ -4823,19 +4867,19 @@
        "suite": "backend",
        "id": "tests.test_intake::test_message_is_delimited_in_the_request",
        "status": "passed",
-       "seconds": 0.045
+       "seconds": 0.108
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_oversized_message_is_refused_without_a_model_call",
        "status": "passed",
-       "seconds": 0.03
+       "seconds": 0.082
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_injection_cannot_add_authority",
        "status": "passed",
-       "seconds": 0.095
+       "seconds": 0.185
       },
       {
        "suite": "backend",
@@ -4889,7 +4933,7 @@
        "suite": "backend",
        "id": "tests.test_intake::test_injected_confidence_is_flagged_even_if_the_model_obeys",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.066
       },
       {
        "suite": "backend",
@@ -4925,25 +4969,25 @@
        "suite": "backend",
        "id": "tests.test_intake::test_ordinary_messages_are_not_flagged[Hi! Can Biscuit board with you Friday to Monday? He's shy at night.]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_ordinary_messages_are_not_flagged[Olive needs her nails trimmed Saturday. She hates the dryer, please be gentle.]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_ordinary_messages_are_not_flagged[We'd love approval soon if possible, we fly out on the 6th!]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_intake::test_ordinary_messages_are_not_flagged[My system for feeding: half a cup morning and night.]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       }
      ],
      "status": "verified"
@@ -4965,7 +5009,7 @@
        "suite": "backend",
        "id": "tests.test_intake::test_run_with_a_repair_is_traced",
        "status": "passed",
-       "seconds": 0.064
+       "seconds": 0.103
       }
      ],
      "status": "verified"
@@ -4994,7 +5038,7 @@
        "suite": "backend",
        "id": "tests.test_intake_eval::test_labeled_set_is_well_formed",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5006,7 +5050,7 @@
        "suite": "backend",
        "id": "tests.test_intake_eval::test_evaluation_report_with_scripted_answers",
        "status": "passed",
-       "seconds": 0.075
+       "seconds": 0.076
       }
      ],
      "status": "verified"
@@ -5041,7 +5085,7 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_new_request_starts_received",
        "status": "passed",
-       "seconds": 0.013
+       "seconds": 0.01
       },
       {
        "suite": "backend",
@@ -5084,7 +5128,7 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_rejected_transition_changes_and_logs_nothing",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.013
       },
       {
        "suite": "backend",
@@ -5102,31 +5146,31 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_listed_transition_is_allowed[extracting->failed by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_listed_transition_is_allowed[checking->resolving by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_listed_transition_is_allowed[checking->drafting by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_listed_transition_is_allowed[checking->failed by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_listed_transition_is_allowed[resolving->drafting by system]",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5234,7 +5278,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_listed_transition_is_allowed[failed->resolving by staff[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5420,7 +5464,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[received->sent by staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.002
       },
       {
        "suite": "backend",
@@ -5510,7 +5554,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[extracting->ready by staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -5576,31 +5620,31 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->extracting by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->checking by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->checking by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->resolving by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->drafting by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5612,7 +5656,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->needs_review by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5624,7 +5668,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->ready by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5636,31 +5680,31 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->approved by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->rejected by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->rejected by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->sent by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[checking->sent by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5696,31 +5740,31 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->checking by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->checking by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->resolving by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->resolving by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->drafting by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5732,25 +5776,25 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->needs_review by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->ready by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->ready by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->approved by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5762,19 +5806,19 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->rejected by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->rejected by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[resolving->sent by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5816,31 +5860,31 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->checking by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->checking by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->resolving by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->resolving by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->drafting by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5852,13 +5896,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->needs_review by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->ready by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5888,13 +5932,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->sent by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[drafting->sent by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -5912,55 +5956,55 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->received by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->extracting by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->extracting by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->checking by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->checking by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->resolving by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->resolving by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->drafting by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[needs_review->drafting by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6068,7 +6112,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[ready->resolving by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6116,7 +6160,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[ready->rejected by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6260,7 +6304,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[approved->failed by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6308,13 +6352,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[rejected->resolving by staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[rejected->drafting by system]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -6326,25 +6370,25 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[rejected->needs_review by system]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[rejected->needs_review by staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[rejected->ready by system]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[rejected->ready by staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -6692,7 +6736,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->checking by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6734,7 +6778,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->checking by staff[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6752,19 +6796,19 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by system[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by system[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by system[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6782,7 +6826,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -6794,7 +6838,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by staff[failed in checking]]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -6806,25 +6850,25 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by staff[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->resolving by staff[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by system]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by system[failed in approved]]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -6836,43 +6880,43 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by system[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by system[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by staff[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by staff[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->drafting by staff[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6890,7 +6934,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -6932,115 +6976,115 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->needs_review by staff[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by system[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by staff[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by staff[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by staff[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by staff[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7052,31 +7096,31 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->ready by staff[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->approved by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->approved by system[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->approved by system[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->approved by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7130,37 +7174,37 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->rejected by system]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->rejected by system[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->rejected by system[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->rejected by system[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->rejected by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->rejected by system[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7172,55 +7216,55 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by system[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by system[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by system[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by system[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by system[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by staff[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by staff[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7244,7 +7288,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->sent by staff[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7262,25 +7306,25 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by system[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by system[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by system[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by system[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7292,43 +7336,43 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff[failed in approved]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff[failed in checking]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff[failed in drafting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff[failed in extracting]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff[failed in rejected]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_unlisted_transition_is_rejected_naming_both_states[failed->failed by staff[failed in resolving]]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7340,25 +7384,25 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-received]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-extracting]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-checking]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-resolving]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7370,13 +7414,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-needs_review]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-ready]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7388,13 +7432,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-rejected]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[system-sent]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -7430,13 +7474,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[staff-drafting]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[staff-needs_review]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -7448,7 +7492,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_sent_is_terminal[staff-approved]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -7495,13 +7539,13 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_allowed_processing_transition_is_saved",
        "status": "passed",
-       "seconds": 0.019
+       "seconds": 0.023
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_staff_cannot_drive_processing",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       }
      ],
      "status": "verified"
@@ -7530,7 +7574,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_system_cannot_reject",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       }
      ],
      "status": "verified"
@@ -7552,19 +7596,19 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_system_sends_decided_requests[approved]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_system_sends_decided_requests[rejected]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_staff_cannot_send[approved]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -7656,7 +7700,7 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_approval_cannot_skip_the_checks[system-drafting]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -7674,13 +7718,13 @@
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_approval_cannot_skip_the_checks[staff-checking]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_system_cannot_approve_a_flagged_request",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       }
      ],
      "status": "verified"
@@ -7723,61 +7767,61 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_failed_step_is_set_exactly_when_failed[failed-without-step]",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_failed_step_is_set_exactly_when_failed[step-without-failed]",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.011
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_failure_is_recorded",
        "status": "passed",
-       "seconds": 0.014
+       "seconds": 0.018
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_failing_without_an_error_message_is_refused",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_retry_returns_to_the_failed_step_and_clears_it",
        "status": "passed",
-       "seconds": 0.013
+       "seconds": 0.017
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_staff_gives_up_on_a_failed_request",
        "status": "passed",
-       "seconds": 0.016
+       "seconds": 0.018
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_retry_returns_to_the_failed_step[system]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_retry_returns_to_the_failed_step[staff]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_retry_to_a_different_step_is_rejected",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_lifecycle_guard::test_failed_without_a_recorded_step_cannot_retry",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -7812,13 +7856,13 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_successful_transition_adds_a_log_entry",
        "status": "passed",
-       "seconds": 0.025
+       "seconds": 0.029
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_rejected_transition_changes_and_logs_nothing",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.013
       }
      ],
      "status": "verified"
@@ -7841,7 +7885,7 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_stale_update_is_rejected",
        "status": "passed",
-       "seconds": 0.036
+       "seconds": 0.05
       }
      ],
      "status": "verified"
@@ -7863,19 +7907,19 @@
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_reject_without_a_reason_is_rejected[null]",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_reject_without_a_reason_is_rejected[empty]",
        "status": "passed",
-       "seconds": 0.014
+       "seconds": 0.017
       },
       {
        "suite": "backend",
        "id": "tests.test_booking_lifecycle::test_reject_without_a_reason_is_rejected[blank]",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.012
       },
       {
        "suite": "backend",
@@ -7916,13 +7960,13 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_both_extraction_steps_start_before_either_ends",
        "status": "passed",
-       "seconds": 0.866
+       "seconds": 0.917
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_request_without_a_certificate",
        "status": "passed",
-       "seconds": 0.262
+       "seconds": 0.351
       }
      ],
      "status": "verified"
@@ -7951,19 +7995,19 @@
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_one_result_per_step",
        "status": "passed",
-       "seconds": 0.009
+       "seconds": 0.012
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestration_storage::test_step_output_must_be_an_object",
        "status": "passed",
-       "seconds": 0.007
+       "seconds": 0.012
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_results_and_state_change_land_together",
        "status": "passed",
-       "seconds": 0.155
+       "seconds": 0.17
       }
      ],
      "status": "verified"
@@ -7999,19 +8043,19 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_crash_after_extraction_resumes_without_model_calls",
        "status": "passed",
-       "seconds": 0.265
+       "seconds": 0.495
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_crash_during_extraction_repeats_only_extraction",
        "status": "passed",
-       "seconds": 0.258
+       "seconds": 0.505
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_finished_request_is_left_alone",
        "status": "passed",
-       "seconds": 0.241
+       "seconds": 0.375
       }
      ],
      "status": "verified"
@@ -8047,19 +8091,19 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_extracted_records_complete_what_is_on_file",
        "status": "passed",
-       "seconds": 0.23
+       "seconds": 0.339
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_certificate_for_another_pet",
        "status": "passed",
-       "seconds": 0.233
+       "seconds": 0.368
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_no_kennel_needed_for_grooming",
        "status": "passed",
-       "seconds": 0.21
+       "seconds": 0.453
       }
      ],
      "status": "verified"
@@ -8102,31 +8146,31 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_everything_clear_routes_to_drafting",
        "status": "passed",
-       "seconds": 0.225
+       "seconds": 0.401
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_several_problems_are_all_listed",
        "status": "passed",
-       "seconds": 0.246
+       "seconds": 0.424
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_no_pet_matched",
        "status": "passed",
-       "seconds": 0.213
+       "seconds": 0.353
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_no_certificate_but_records_on_file_cover_the_stay",
        "status": "passed",
-       "seconds": 0.214
+       "seconds": 0.367
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_the_matched_pet_is_saved_on_the_request",
        "status": "passed",
-       "seconds": 0.246
+       "seconds": 0.45
       }
      ],
      "status": "verified"
@@ -8155,37 +8199,37 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_model_unavailable_during_extraction",
        "status": "passed",
-       "seconds": 0.139
+       "seconds": 0.196
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_both_failures_are_recorded",
        "status": "passed",
-       "seconds": 0.126
+       "seconds": 0.203
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_output_still_invalid_after_repair_fails_the_step",
        "status": "passed",
-       "seconds": 0.139
+       "seconds": 0.238
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_retry_after_failure",
        "status": "passed",
-       "seconds": 0.31
+       "seconds": 0.464
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_a_bug_is_not_hidden_as_a_failed_step",
        "status": "passed",
-       "seconds": 0.127
+       "seconds": 0.235
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_reply_model_failure_fails_drafting_and_retries",
        "status": "passed",
-       "seconds": 0.356
+       "seconds": 0.489
       }
      ],
      "status": "verified"
@@ -8207,7 +8251,7 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_traced_run",
        "status": "passed",
-       "seconds": 0.237
+       "seconds": 0.448
       }
      ],
      "status": "verified"
@@ -8243,19 +8287,19 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_resolution_saved_with_the_move",
        "status": "passed",
-       "seconds": 0.295
+       "seconds": 0.587
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_not_attempted_still_moves_on",
        "status": "passed",
-       "seconds": 0.226
+       "seconds": 0.42
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_model_unavailable_during_resolution_then_retried",
        "status": "passed",
-       "seconds": 0.336
+       "seconds": 0.644
       }
      ],
      "status": "verified"
@@ -8291,19 +8335,19 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_clean_boarding_request_runs_to_sent",
        "status": "passed",
-       "seconds": 0.247
+       "seconds": 0.429
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_kennel_taken_before_sending",
        "status": "passed",
-       "seconds": 0.262
+       "seconds": 0.472
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_waiting_request_is_left_alone",
        "status": "passed",
-       "seconds": 0.203
+       "seconds": 0.373
       }
      ],
      "status": "verified"
@@ -8332,25 +8376,25 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_same_pet_same_nights_goes_to_a_person",
        "status": "passed",
-       "seconds": 0.309
+       "seconds": 0.439
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_another_pets_stay_does_not_count",
        "status": "passed",
-       "seconds": 0.324
+       "seconds": 0.416
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver::test_already_booked_needs_a_person",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::an already-booked pet is named on the capacity step",
        "status": "passed",
-       "seconds": 0.0001699
+       "seconds": 0.0002627
       }
      ],
      "status": "verified"
@@ -8372,7 +8416,7 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_pet_booked_before_sending",
        "status": "passed",
-       "seconds": 0.261
+       "seconds": 0.447
       }
      ],
      "status": "verified"
@@ -8414,7 +8458,7 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_message_text_never_reaches_the_reply_model",
        "status": "passed",
-       "seconds": 0.238
+       "seconds": 0.401
       },
       {
        "suite": "backend",
@@ -8426,7 +8470,7 @@
        "suite": "backend",
        "id": "tests.test_reply::test_only_verified_options_are_offered",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -8505,7 +8549,7 @@
        "suite": "backend",
        "id": "tests.test_reply::test_price[$45 per night]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.002
       },
       {
        "suite": "backend",
@@ -8571,19 +8615,19 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_clean_boarding_request_runs_to_sent",
        "status": "passed",
-       "seconds": 0.247
+       "seconds": 0.429
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_resolved_request_waits_with_the_resolution_as_reason",
        "status": "passed",
-       "seconds": 0.302
+       "seconds": 0.534
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_failed_promise_check_waits",
        "status": "passed",
-       "seconds": 0.203
+       "seconds": 0.349
       }
      ],
      "status": "verified"
@@ -8677,7 +8721,7 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_message_text_never_reaches_the_resolver",
        "status": "passed",
-       "seconds": 0.249
+       "seconds": 0.408
       },
       {
        "suite": "backend",
@@ -8733,25 +8777,25 @@
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_alternative_dates_three_days_later",
        "status": "passed",
-       "seconds": 0.03
+       "seconds": 0.051
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_no_window_found_says_so",
        "status": "passed",
-       "seconds": 0.018
+       "seconds": 0.029
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_missing_vaccines_for_a_window_with_expired_bordetella",
        "status": "passed",
-       "seconds": 0.013
+       "seconds": 0.027
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_kennel_sizes_with_medium_full_and_large_free",
        "status": "passed",
-       "seconds": 0.018
+       "seconds": 0.032
       },
       {
        "suite": "backend",
@@ -8763,7 +8807,7 @@
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_window_before_today_is_refused",
        "status": "passed",
-       "seconds": 0.02
+       "seconds": 0.022
       },
       {
        "suite": "backend",
@@ -8775,13 +8819,13 @@
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_unknown_tool_is_answered_and_nothing_is_approved",
        "status": "passed",
-       "seconds": 0.069
+       "seconds": 0.107
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_invalid_arguments_are_answered_with_an_error",
        "status": "passed",
-       "seconds": 0.087
+       "seconds": 0.142
       }
      ],
      "status": "verified"
@@ -8824,37 +8868,37 @@
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_proposal_ends_the_loop",
        "status": "passed",
-       "seconds": 0.088
+       "seconds": 0.178
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_repeated_call_is_stuck",
        "status": "passed",
-       "seconds": 0.071
+       "seconds": 0.129
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_repeat_is_caught_even_with_other_calls_in_between",
        "status": "passed",
-       "seconds": 0.106
+       "seconds": 0.147
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_step_limit",
        "status": "passed",
-       "seconds": 0.226
+       "seconds": 0.316
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_tool_call_limit",
        "status": "passed",
-       "seconds": 0.365
+       "seconds": 0.424
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_answer_without_a_proposal",
        "status": "passed",
-       "seconds": 0.039
+       "seconds": 0.072
       }
      ],
      "status": "verified"
@@ -8890,49 +8934,49 @@
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_kennel_that_is_not_larger_is_refused[small]",
        "status": "passed",
-       "seconds": 0.018
+       "seconds": 0.024
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_kennel_that_is_not_larger_is_refused[medium]",
        "status": "passed",
-       "seconds": 0.017
+       "seconds": 0.032
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_kennel_that_is_not_larger_is_refused[cat]",
        "status": "passed",
-       "seconds": 0.018
+       "seconds": 0.026
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_verified_alternative",
        "status": "passed",
-       "seconds": 0.049
+       "seconds": 0.082
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_unverified_alternative",
        "status": "passed",
-       "seconds": 0.058
+       "seconds": 0.087
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_vaccine_update_must_name_exactly_the_failing_vaccines",
        "status": "passed",
-       "seconds": 0.045
+       "seconds": 0.071
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_smaller_kennel_is_answered_and_the_loop_continues",
        "status": "passed",
-       "seconds": 0.073
+       "seconds": 0.1
       },
       {
        "suite": "backend",
        "id": "tests.test_resolver_tools::test_option_overlapping_the_pets_other_stay_is_not_verified",
        "status": "passed",
-       "seconds": 0.069
+       "seconds": 0.086
       }
      ],
      "status": "verified"
@@ -8967,13 +9011,13 @@
        "suite": "backend",
        "id": "tests.test_walkthrough::test_every_archived_change_appears_in_date_order",
        "status": "passed",
-       "seconds": 0.117
+       "seconds": 0.139
       },
       {
        "suite": "backend",
        "id": "tests.test_walkthrough::test_private_files_are_never_read",
        "status": "passed",
-       "seconds": 0.084
+       "seconds": 0.108
       }
      ],
      "status": "verified"
@@ -9016,19 +9060,19 @@
        "suite": "backend",
        "id": "tests.test_walkthrough::test_verified_requirement_lists_backend_and_frontend_tests",
        "status": "passed",
-       "seconds": 0.081
+       "seconds": 0.166
       },
       {
        "suite": "backend",
        "id": "tests.test_walkthrough::test_failing_and_untested_requirements",
        "status": "passed",
-       "seconds": 0.075
+       "seconds": 0.132
       },
       {
        "suite": "backend",
        "id": "tests.test_walkthrough::test_end_to_end_tests_count",
        "status": "passed",
-       "seconds": 0.096
+       "seconds": 0.168
       }
      ],
      "status": "verified"
@@ -9050,7 +9094,7 @@
        "suite": "backend",
        "id": "tests.test_walkthrough::test_decision_linked_from_a_change",
        "status": "passed",
-       "seconds": 0.09
+       "seconds": 0.139
       }
      ],
      "status": "verified"
@@ -9079,19 +9123,19 @@
        "suite": "backend",
        "id": "tests.test_walkthrough::test_gaps_fail_the_check",
        "status": "passed",
-       "seconds": 0.125
+       "seconds": 0.118
       },
       {
        "suite": "backend",
        "id": "tests.test_walkthrough::test_complete_coverage_passes",
        "status": "passed",
-       "seconds": 0.075
+       "seconds": 0.118
       },
       {
        "suite": "backend",
        "id": "tests.test_walkthrough::test_requirements_of_an_unarchived_change_must_be_covered_too",
        "status": "passed",
-       "seconds": 0.141
+       "seconds": 0.247
       }
      ],
      "status": "verified"
@@ -9120,19 +9164,19 @@
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::anchors are stable and distinct",
        "status": "passed",
-       "seconds": 0.0030993
+       "seconds": 0.0021278
       },
       {
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::a change's requirements lead to their tests and results",
        "status": "passed",
-       "seconds": 0.0008429
+       "seconds": 0.0007501
       },
       {
        "suite": "frontend",
        "id": "lib/walkthrough.test.ts::a change's decisions lead to the decision records",
        "status": "passed",
-       "seconds": 0.0009088
+       "seconds": 0.000698
       }
      ],
      "status": "verified"
@@ -9167,13 +9211,13 @@
        "suite": "backend",
        "id": "tests.test_certificate_set::test_committed_set_matches_its_generator[v1]",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.004
       },
       {
        "suite": "backend",
        "id": "tests.test_certificate_set::test_committed_set_matches_its_generator[v2]",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.004
       },
       {
        "suite": "backend",
@@ -9191,13 +9235,13 @@
        "suite": "backend",
        "id": "tests.test_certificates::test_fonts_are_embedded_not_fetched_from_disk",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.002
       },
       {
        "suite": "backend",
        "id": "tests.test_certificates::test_v2_ground_truth_is_deterministic",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.004
       }
      ],
      "status": "verified"
@@ -9247,7 +9291,7 @@
        "suite": "backend",
        "id": "tests.test_certificates::test_every_certificate_is_marked_synthetic_and_fictional",
        "status": "passed",
-       "seconds": 0.041
+       "seconds": 0.045
       }
      ],
      "status": "verified"
@@ -9294,7 +9338,7 @@
        "suite": "backend",
        "id": "tests.test_records_eval::test_scripted_end_to_end_on_two_certificates",
        "status": "passed",
-       "seconds": 0.087
+       "seconds": 0.103
       }
      ],
      "status": "verified"
@@ -9322,19 +9366,19 @@
        "suite": "backend",
        "id": "tests.test_records_eval::test_disagreement_sent_to_review_is_not_silent",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_records_eval::test_scripted_end_to_end_on_two_certificates",
        "status": "passed",
-       "seconds": 0.087
+       "seconds": 0.103
       },
       {
        "suite": "backend",
        "id": "tests.test_records_eval::test_failed_model_call_is_scored_as_error_not_a_crash",
        "status": "passed",
-       "seconds": 0.055
+       "seconds": 0.083
       }
      ],
      "status": "verified"
@@ -9370,7 +9414,7 @@
        "suite": "backend",
        "id": "tests.test_certificates::test_v2_decision_mix",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.003
       },
       {
        "suite": "backend",
@@ -9411,19 +9455,19 @@
        "suite": "backend",
        "id": "tests.test_certificate_set::test_committed_set_matches_its_generator[v1]",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.004
       },
       {
        "suite": "backend",
        "id": "tests.test_certificate_set::test_committed_set_matches_its_generator[v2]",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.004
       },
       {
        "suite": "backend",
        "id": "tests.test_records_eval::test_evaluation_defaults_to_v2_and_report_names_it",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.003
       }
      ],
      "status": "verified"
@@ -9497,7 +9541,7 @@
        "suite": "backend",
        "id": "tests.test_eval_sample_cards::test_a_failed_read_is_counted_apart",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -9538,13 +9582,13 @@
        "suite": "e2e",
        "id": "demo.spec.ts::the clean sample runs live to sent",
        "status": "passed",
-       "seconds": 4.032
+       "seconds": 3.061
       },
       {
        "suite": "e2e",
        "id": "demo.spec.ts::the injection sample waits for review and is approved to sent",
        "status": "passed",
-       "seconds": 3.01
+       "seconds": 3.661
       }
      ],
      "status": "verified"
@@ -9573,7 +9617,7 @@
        "suite": "backend",
        "id": "tests.test_ci_workflow::test_runs_on_every_push_and_pull_request",
        "status": "passed",
-       "seconds": 0.013
+       "seconds": 0.01
       },
       {
        "suite": "backend",
@@ -9591,7 +9635,7 @@
        "suite": "backend",
        "id": "tests.test_runtime_dependencies::test_every_imported_package_is_a_declared_runtime_dependency",
        "status": "passed",
-       "seconds": 0.805
+       "seconds": 2.025
       }
      ],
      "status": "verified"
@@ -9620,13 +9664,13 @@
        "suite": "backend",
        "id": "tests.test_secrets::test_key_shaped_value_in_a_tracked_file_is_found",
        "status": "passed",
-       "seconds": 0.077
+       "seconds": 0.132
       },
       {
        "suite": "backend",
        "id": "tests.test_secrets::test_the_repository_is_clean",
        "status": "passed",
-       "seconds": 0.309
+       "seconds": 0.399
       },
       {
        "suite": "backend",
@@ -9667,13 +9711,13 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_same_seed_gives_the_same_request_and_image",
        "status": "passed",
-       "seconds": 0.35
+       "seconds": 0.374
       },
       {
        "suite": "backend",
        "id": "tests.test_demo_generator::test_seeds_vary_the_request",
        "status": "passed",
-       "seconds": 0.432
+       "seconds": 0.481
       }
      ],
      "status": "verified"
@@ -9702,13 +9746,13 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_card_names_a_seeded_owner",
        "status": "passed",
-       "seconds": 0.323
+       "seconds": 0.491
       },
       {
        "suite": "backend",
        "id": "tests.test_demo_generator::test_card_dates_match_the_scenario_text",
        "status": "passed",
-       "seconds": 0.333
+       "seconds": 0.454
       }
      ],
      "status": "verified"
@@ -9730,7 +9774,7 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_scenario_holds_with_the_records_on_file",
        "status": "passed",
-       "seconds": 0.441
+       "seconds": 0.622
       }
      ],
      "status": "verified"
@@ -9759,19 +9803,19 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_generated_preview_and_image",
        "status": "passed",
-       "seconds": 0.246
+       "seconds": 0.265
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_sample_certificates",
        "status": "passed",
-       "seconds": 0.034
+       "seconds": 0.039
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_send_a_generated_request",
        "status": "passed",
-       "seconds": 0.508
+       "seconds": 0.601
       }
      ],
      "status": "verified"
@@ -9793,7 +9837,7 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_send_a_generated_request",
        "status": "passed",
-       "seconds": 0.508
+       "seconds": 0.601
       }
      ],
      "status": "verified"
@@ -9835,13 +9879,13 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_the_pet_is_new_with_a_fitting_breed_and_weight",
        "status": "passed",
-       "seconds": 0.379
+       "seconds": 0.46
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_sending_adds_the_pet_once",
        "status": "passed",
-       "seconds": 0.698
+       "seconds": 0.898
       }
      ],
      "status": "verified"
@@ -9877,25 +9921,25 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_a_name_on_file_is_skipped",
        "status": "passed",
-       "seconds": 0.125
+       "seconds": 0.16
       },
       {
        "suite": "backend",
        "id": "tests.test_demo_generator::test_recent_names_are_skipped",
        "status": "passed",
-       "seconds": 0.115
+       "seconds": 0.146
       },
       {
        "suite": "backend",
        "id": "tests.test_demo_generator::test_a_used_up_pool_still_gives_a_seed",
        "status": "passed",
-       "seconds": 0.108
+       "seconds": 0.143
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_generated_names_avoid_pets_on_file_and_recent_names",
        "status": "passed",
-       "seconds": 0.33
+       "seconds": 0.509
       }
      ],
      "status": "verified"
@@ -9924,13 +9968,13 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_samples_carry_their_pets_photo_fields",
        "status": "passed",
-       "seconds": 0.149
+       "seconds": 0.186
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_the_seed_fixes_the_pet_id",
        "status": "passed",
-       "seconds": 0.416
+       "seconds": 0.5
       }
      ],
      "status": "verified"
@@ -9959,7 +10003,7 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_samples_carry_a_request_summary",
        "status": "passed",
-       "seconds": 0.167
+       "seconds": 0.199
       },
       {
        "suite": "backend",
@@ -9977,7 +10021,7 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_sample_dates_match_their_card[injection]",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       }
      ],
      "status": "verified"
@@ -10006,31 +10050,31 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_nothing_below_the_signature",
        "status": "passed",
-       "seconds": 0.189
+       "seconds": 0.198
       },
       {
        "suite": "backend",
        "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[generated]",
        "status": "passed",
-       "seconds": 0.18
+       "seconds": 0.222
       },
       {
        "suite": "backend",
-       "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[C:\\\\dev\\\\PawDesk\\\\backend\\\\app\\\\sample_cards\\\\biscuit.png]",
+       "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[C:\\\\dev\\\\PawDesk\\\\.claude\\\\worktrees\\\\send-ready-after-back\\\\backend\\\\app\\\\sample_cards\\\\biscuit.png]",
        "status": "passed",
-       "seconds": 0.109
+       "seconds": 0.135
       },
       {
        "suite": "backend",
-       "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[C:\\\\dev\\\\PawDesk\\\\backend\\\\app\\\\sample_cards\\\\moose.png]",
+       "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[C:\\\\dev\\\\PawDesk\\\\.claude\\\\worktrees\\\\send-ready-after-back\\\\backend\\\\app\\\\sample_cards\\\\moose.png]",
        "status": "passed",
-       "seconds": 0.118
+       "seconds": 0.15
       },
       {
        "suite": "backend",
-       "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[C:\\\\dev\\\\PawDesk\\\\backend\\\\app\\\\sample_cards\\\\pepper.png]",
+       "id": "tests.test_demo_generator::test_cards_are_marked_in_metadata[C:\\\\dev\\\\PawDesk\\\\.claude\\\\worktrees\\\\send-ready-after-back\\\\backend\\\\app\\\\sample_cards\\\\pepper.png]",
        "status": "passed",
-       "seconds": 0.107
+       "seconds": 0.154
       }
      ],
      "status": "verified"
@@ -10059,25 +10103,25 @@
        "suite": "backend",
        "id": "tests.test_demo_generator::test_every_card_font_uses_basic_layout",
        "status": "passed",
-       "seconds": 0.163
+       "seconds": 0.213
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_committed_card_matches_a_fresh_drawing[clean]",
        "status": "passed",
-       "seconds": 0.211
+       "seconds": 0.248
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_committed_card_matches_a_fresh_drawing[expired-vaccine]",
        "status": "passed",
-       "seconds": 0.202
+       "seconds": 0.218
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_committed_card_matches_a_fresh_drawing[injection]",
        "status": "passed",
-       "seconds": 0.21
+       "seconds": 0.251
       }
      ],
      "status": "verified"
@@ -10126,25 +10170,25 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_hourly_limit_reached",
        "status": "passed",
-       "seconds": 0.073
+       "seconds": 0.077
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_daily_limit_reached",
        "status": "passed",
-       "seconds": 0.066
+       "seconds": 0.073
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_only_recent_model_calls_count",
        "status": "passed",
-       "seconds": 0.36
+       "seconds": 0.331
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_no_limit_configured",
        "status": "passed",
-       "seconds": 0.394
+       "seconds": 0.352
       }
      ],
      "status": "verified"
@@ -10166,7 +10210,7 @@
        "suite": "frontend",
        "id": "lib/demo.test.ts::a refused request carries the server's explanation",
        "status": "passed",
-       "seconds": 0.0005883
+       "seconds": 0.001381
       }
      ],
      "status": "verified"
@@ -10195,13 +10239,13 @@
        "suite": "backend",
        "id": "tests.test_db::test_hosted_url_requires_ssl_the_asyncpg_way",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_db::test_local_url_keeps_its_form_and_other_options",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       }
      ],
      "status": "verified"
@@ -10230,13 +10274,13 @@
        "suite": "backend",
        "id": "tests.test_deploy_space::test_bundle_holds_committed_files_and_the_space_files",
        "status": "passed",
-       "seconds": 0.227
+       "seconds": 0.244
       },
       {
        "suite": "backend",
        "id": "tests.test_deploy_space::test_bundle_marks_binary_file_types_for_lfs",
        "status": "passed",
-       "seconds": 0.182
+       "seconds": 0.188
       }
      ],
      "status": "verified"
@@ -10300,25 +10344,25 @@
        "suite": "frontend",
        "id": "tests/copy.test.ts::a banned word in rendered text is reported with its file and line",
        "status": "passed",
-       "seconds": 0.0073738
+       "seconds": 0.0072642
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::string values and phrases are checked, with curly apostrophes too",
        "status": "passed",
-       "seconds": 0.0017959
+       "seconds": 0.001641
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::class names, imports, comments, types, and object keys are not text",
        "status": "passed",
-       "seconds": 0.0024931
+       "seconds": 0.0022238
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::the current dashboard has no banned words",
        "status": "passed",
-       "seconds": 0.1725148
+       "seconds": 0.1138047
       }
      ],
      "status": "verified"
@@ -10347,19 +10391,19 @@
        "suite": "frontend",
        "id": "tests/copy.test.ts::an em dash inside a sentence is reported",
        "status": "passed",
-       "seconds": 0.0003897
+       "seconds": 0.000356
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::a lone em dash marking a missing value is allowed",
        "status": "passed",
-       "seconds": 0.0012082
+       "seconds": 0.0012727
       },
       {
        "suite": "frontend",
        "id": "tests/copy.test.ts::the current dashboard has no em dash inside a sentence",
        "status": "passed",
-       "seconds": 0.0790521
+       "seconds": 0.0683319
       }
      ],
      "status": "verified"
@@ -10388,13 +10432,13 @@
        "suite": "backend",
        "id": "tests.test_demo_copy::test_every_sample_title_and_description_passes",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.002
       },
       {
        "suite": "backend",
        "id": "tests.test_demo_copy::test_the_check_rejects_what_the_shared_list_bans",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.001
       }
      ],
      "status": "verified"
@@ -10430,13 +10474,13 @@
        "suite": "frontend",
        "id": "lib/story.test.ts::a request sent with no approval says the checks passed it",
        "status": "passed",
-       "seconds": 0.0019118
+       "seconds": 0.0029254
       },
       {
        "suite": "frontend",
        "id": "lib/story.test.ts::a staff decision starts with the staff member's name",
        "status": "passed",
-       "seconds": 0.000303
+       "seconds": 0.0005886
       }
      ],
      "status": "verified"
@@ -10465,7 +10509,7 @@
        "suite": "frontend",
        "id": "lib/story.test.ts::a failure names its step in words, never as a state",
        "status": "passed",
-       "seconds": 0.0005974
+       "seconds": 0.0013824
       }
      ],
      "status": "verified"
@@ -10500,25 +10544,25 @@
        "suite": "backend",
        "id": "tests.test_capacity::test_partly_booked_kennels_are_not_free",
        "status": "passed",
-       "seconds": 0.023
+       "seconds": 0.031
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_back_to_back_stay_fits",
        "status": "passed",
-       "seconds": 0.014
+       "seconds": 0.021
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_stay_ending_on_an_existing_check_in_fits",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.019
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_stay_surrounding_an_existing_booking_overlaps",
        "status": "passed",
-       "seconds": 0.015
+       "seconds": 0.019
       }
      ],
      "status": "verified"
@@ -10547,7 +10591,7 @@
        "suite": "backend",
        "id": "tests.test_capacity::test_a_free_larger_kennel_is_not_offered",
        "status": "passed",
-       "seconds": 0.019
+       "seconds": 0.024
       },
       {
        "suite": "backend",
@@ -10575,7 +10619,7 @@
        "suite": "backend",
        "id": "tests.test_capacity::test_first_free_kennel_by_name",
        "status": "passed",
-       "seconds": 0.015
+       "seconds": 0.02
       }
      ],
      "status": "verified"
@@ -10597,13 +10641,13 @@
        "suite": "backend",
        "id": "tests.test_capacity::test_stay_without_nights_is_rejected[zero]",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.015
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_stay_without_nights_is_rejected[negative]",
        "status": "passed",
-       "seconds": 0.011
+       "seconds": 0.016
       }
      ],
      "status": "verified"
@@ -10632,13 +10676,13 @@
        "suite": "backend",
        "id": "tests.test_capacity::test_seeded_medium_availability[full]",
        "status": "passed",
-       "seconds": 0.119
+       "seconds": 0.15
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_seeded_medium_availability[free]",
        "status": "passed",
-       "seconds": 0.13
+       "seconds": 0.141
       }
      ],
      "status": "verified"
@@ -10674,19 +10718,19 @@
        "suite": "backend",
        "id": "tests.test_capacity::test_second_kennel_for_the_same_nights_is_refused",
        "status": "passed",
-       "seconds": 0.016
+       "seconds": 0.018
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_back_to_back_stays_for_one_pet",
        "status": "passed",
-       "seconds": 0.014
+       "seconds": 0.018
       },
       {
        "suite": "backend",
        "id": "tests.test_capacity::test_finding_a_pets_overlapping_stay",
        "status": "passed",
-       "seconds": 0.02
+       "seconds": 0.022
       }
      ],
      "status": "verified"
@@ -10714,7 +10758,7 @@
        "suite": "backend",
        "id": "tests.test_llm::test_call_outside_a_trace_is_refused_before_any_request",
        "status": "passed",
-       "seconds": 0.137
+       "seconds": 0.005
       }
      ],
      "status": "verified"
@@ -10743,13 +10787,13 @@
        "suite": "backend",
        "id": "tests.test_llm::test_successful_call_records_one_complete_span",
        "status": "passed",
-       "seconds": 0.036
+       "seconds": 0.048
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_rate_limited_then_succeeds_is_one_span_with_two_attempts",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.029
       }
      ],
      "status": "verified"
@@ -10778,13 +10822,13 @@
        "suite": "backend",
        "id": "tests.test_llm::test_reported_cost_is_stored_exactly",
        "status": "passed",
-       "seconds": 0.028
+       "seconds": 0.031
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_missing_cost_stays_empty",
        "status": "passed",
-       "seconds": 0.026
+       "seconds": 0.03
       }
      ],
      "status": "verified"
@@ -10863,25 +10907,25 @@
        "suite": "backend",
        "id": "tests.test_llm::test_rate_limited_then_succeeds_is_one_span_with_two_attempts",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.029
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_retry_after_is_honored",
        "status": "passed",
-       "seconds": 0.029
+       "seconds": 0.037
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_attempts_run_out_with_growing_waits",
        "status": "passed",
-       "seconds": 0.026
+       "seconds": 0.035
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_timeout_is_retried",
        "status": "passed",
-       "seconds": 0.027
+       "seconds": 0.041
       }
      ],
      "status": "verified"
@@ -10928,7 +10972,7 @@
        "suite": "backend",
        "id": "tests.test_llm::test_other_error_statuses_are_fatal[403]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -10946,25 +10990,25 @@
        "suite": "backend",
        "id": "tests.test_llm::test_permanent_failure_is_not_retried[400]",
        "status": "passed",
-       "seconds": 0.029
+       "seconds": 0.034
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_permanent_failure_is_not_retried[401]",
        "status": "passed",
-       "seconds": 0.026
+       "seconds": 0.166
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_permanent_failure_is_not_retried[402]",
        "status": "passed",
-       "seconds": 0.03
+       "seconds": 0.035
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_permanent_failure_is_not_retried[403]",
        "status": "passed",
-       "seconds": 0.027
+       "seconds": 0.037
       }
      ],
      "status": "verified"
@@ -10986,13 +11030,13 @@
        "suite": "backend",
        "id": "tests.test_llm::test_200_with_a_transient_provider_error_is_retried",
        "status": "passed",
-       "seconds": 0.026
+       "seconds": 0.033
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_200_with_a_permanent_provider_error_fails",
        "status": "passed",
-       "seconds": 0.036
+       "seconds": 0.031
       }
      ],
      "status": "verified"
@@ -11020,7 +11064,7 @@
        "suite": "backend",
        "id": "tests.test_llm::test_slow_attempt_is_cut_off_by_wall_clock",
        "status": "passed",
-       "seconds": 0.422
+       "seconds": 0.452
       }
      ],
      "status": "verified"
@@ -11061,13 +11105,13 @@
        "suite": "backend",
        "id": "tests.test_llm::test_api_key_is_sent_but_never_stored",
        "status": "passed",
-       "seconds": 0.054
+       "seconds": 0.059
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_span_stores_image_hash_not_image",
        "status": "passed",
-       "seconds": 0.028
+       "seconds": 0.026
       }
      ],
      "status": "verified"
@@ -11096,13 +11140,13 @@
        "suite": "backend",
        "id": "tests.test_llm::test_response_format_requires_supporting_endpoints",
        "status": "passed",
-       "seconds": 0.024
+       "seconds": 0.026
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_plain_request_has_no_routing_preferences",
        "status": "passed",
-       "seconds": 0.024
+       "seconds": 0.028
       }
      ],
      "status": "verified"
@@ -11131,13 +11175,13 @@
        "suite": "backend",
        "id": "tests.test_llm::test_model_requests_a_tool",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.031
       },
       {
        "suite": "backend",
        "id": "tests.test_llm::test_tools_require_supporting_endpoints",
        "status": "passed",
-       "seconds": 0.033
+       "seconds": 0.028
       }
      ],
      "status": "verified"
@@ -11166,31 +11210,31 @@
        "suite": "backend",
        "id": "tests.test_cassettes::test_record_then_replay",
        "status": "passed",
-       "seconds": 0.093
+       "seconds": 0.074
       },
       {
        "suite": "backend",
        "id": "tests.test_cassettes::test_images_are_never_written",
        "status": "passed",
-       "seconds": 0.043
+       "seconds": 0.039
       },
       {
        "suite": "backend",
        "id": "tests.test_cassettes::test_missing_recording_fails_without_retry",
        "status": "passed",
-       "seconds": 0.032
+       "seconds": 0.038
       },
       {
        "suite": "backend",
        "id": "tests.test_cassettes::test_a_changed_request_misses_the_recording",
        "status": "passed",
-       "seconds": 0.056
+       "seconds": 0.065
       },
       {
        "suite": "backend",
        "id": "tests.test_cassettes::test_recording_a_compressed_response",
        "status": "passed",
-       "seconds": 0.051
+       "seconds": 0.064
       }
      ],
      "status": "verified"
@@ -11219,13 +11263,13 @@
        "suite": "backend",
        "id": "tests.test_cassettes::test_en_dash_survives_record_and_replay",
        "status": "passed",
-       "seconds": 0.05
+       "seconds": 0.061
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_en_dash_in_a_tool_call_reaches_the_saved_step",
        "status": "passed",
-       "seconds": 0.288
+       "seconds": 0.511
       }
      ],
      "status": "verified"
@@ -11267,19 +11311,19 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_list_shows_cost_and_flag",
        "status": "passed",
-       "seconds": 0.579
+       "seconds": 0.421
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_detail_shows_the_whole_run",
        "status": "passed",
-       "seconds": 0.334
+       "seconds": 0.28
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_unknown_request_is_404",
        "status": "passed",
-       "seconds": 0.039
+       "seconds": 0.041
       }
      ],
      "status": "verified"
@@ -11308,13 +11352,13 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_progress_then_end",
        "status": "passed",
-       "seconds": 0.789
+       "seconds": 0.946
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_resting_request_gets_one_snapshot",
        "status": "passed",
-       "seconds": 0.244
+       "seconds": 0.416
       }
      ],
      "status": "verified"
@@ -11343,13 +11387,13 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_cost_per_step",
        "status": "passed",
-       "seconds": 0.47
+       "seconds": 0.463
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_flag_rate",
        "status": "passed",
-       "seconds": 0.621
+       "seconds": 0.624
       }
      ],
      "status": "verified"
@@ -11371,13 +11415,13 @@
        "suite": "backend",
        "id": "tests.test_eval_sample_cards::test_sample_card_reports_list_with_their_totals",
        "status": "passed",
-       "seconds": 0.003
+       "seconds": 0.004
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_reports_listed_in_date_order",
        "status": "passed",
-       "seconds": 0.042
+       "seconds": 0.041
       }
      ],
      "status": "verified"
@@ -11406,13 +11450,13 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_samples_include_an_injection_attempt",
        "status": "passed",
-       "seconds": 0.041
+       "seconds": 0.048
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_submit_the_injection_sample",
        "status": "passed",
-       "seconds": 0.291
+       "seconds": 0.396
       },
       {
        "suite": "backend",
@@ -11447,7 +11491,7 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_matched_pet_is_identified",
        "status": "passed",
-       "seconds": 0.263
+       "seconds": 0.297
       },
       {
        "suite": "backend",
@@ -11482,13 +11526,13 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_non_ascii_text_in_a_response",
        "status": "passed",
-       "seconds": 0.341
+       "seconds": 0.365
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_error_responses_declare_utf8_too",
        "status": "passed",
-       "seconds": 0.041
+       "seconds": 0.044
       }
      ],
      "status": "verified"
@@ -11552,13 +11596,13 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_no_two_samples_share_a_pet",
        "status": "passed",
-       "seconds": 0.147
+       "seconds": 0.184
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_the_injection_samples_card_is_the_same_each_time",
        "status": "passed",
-       "seconds": 0.034
+       "seconds": 0.033
       },
       {
        "suite": "backend",
@@ -11570,31 +11614,31 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_samples_card_is_served_as_committed[expired-vaccine]",
        "status": "passed",
-       "seconds": 0.034
+       "seconds": 0.033
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_samples_card_is_served_as_committed[injection]",
        "status": "passed",
-       "seconds": 0.031
+       "seconds": 0.036
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_committed_card_matches_a_fresh_drawing[clean]",
        "status": "passed",
-       "seconds": 0.211
+       "seconds": 0.248
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_committed_card_matches_a_fresh_drawing[expired-vaccine]",
        "status": "passed",
-       "seconds": 0.202
+       "seconds": 0.218
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_each_committed_card_matches_a_fresh_drawing[injection]",
        "status": "passed",
-       "seconds": 0.21
+       "seconds": 0.251
       },
       {
        "suite": "backend",
@@ -11612,7 +11656,7 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_no_card_shows_a_shot_from_the_future[injection]",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       }
      ],
      "status": "verified"
@@ -11648,25 +11692,25 @@
        "suite": "backend",
        "id": "tests.test_observability_api::test_earlier_runs_filled_the_kennels",
        "status": "passed",
-       "seconds": 0.283
+       "seconds": 0.277
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_seeded_reservations_stay",
        "status": "passed",
-       "seconds": 0.203
+       "seconds": 0.244
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_other_stays_stay",
        "status": "passed",
-       "seconds": 0.226
+       "seconds": 0.254
       },
       {
        "suite": "backend",
        "id": "tests.test_observability_api::test_non_boarding_samples_release_nothing",
        "status": "passed",
-       "seconds": 0.152
+       "seconds": 0.173
       }
      ],
      "status": "verified"
@@ -11709,25 +11753,25 @@
        "suite": "backend",
        "id": "tests.test_sample_outcomes::test_clean_sample_passes_on_its_records",
        "status": "passed",
-       "seconds": 0.085
+       "seconds": 0.14
       },
       {
        "suite": "backend",
        "id": "tests.test_sample_outcomes::test_injection_sample_passes_on_its_records",
        "status": "passed",
-       "seconds": 0.071
+       "seconds": 0.136
       },
       {
        "suite": "backend",
        "id": "tests.test_sample_outcomes::test_expired_vaccine_sample_fails_only_on_bordetella",
        "status": "passed",
-       "seconds": 0.069
+       "seconds": 0.129
       },
       {
        "suite": "backend",
        "id": "tests.test_sample_outcomes::test_clean_sample_does_not_hang_on_the_card_read",
        "status": "passed",
-       "seconds": 0.066
+       "seconds": 0.115
       }
      ],
      "status": "verified"
@@ -11769,19 +11813,19 @@
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a Beagle gets the Beagle photo",
        "status": "passed",
-       "seconds": 0.0018102
+       "seconds": 0.0024036
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::breed matching ignores case and surrounding spaces",
        "status": "passed",
-       "seconds": 0.0002249
+       "seconds": 0.0003206
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a cat never gets a dog's breed photo",
        "status": "passed",
-       "seconds": 0.0003764
+       "seconds": 0.0004237
       }
      ],
      "status": "verified"
@@ -11810,31 +11854,31 @@
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a breed without a photo gets a general photo of the species",
        "status": "passed",
-       "seconds": 0.0001989
+       "seconds": 0.0002991
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::a pet with no breed gets a general photo",
        "status": "passed",
-       "seconds": 0.0004136
+       "seconds": 0.0003883
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::the same pet gets the same photo every time",
        "status": "passed",
-       "seconds": 0.0004507
+       "seconds": 0.0004129
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::different pets spread across the general photos",
        "status": "passed",
-       "seconds": 0.0002993
+       "seconds": 0.0003547
       },
       {
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::the hash is the published FNV-1a",
        "status": "passed",
-       "seconds": 0.000227
+       "seconds": 0.0003402
       }
      ],
      "status": "verified"
@@ -11856,13 +11900,13 @@
        "suite": "frontend",
        "id": "lib/pet-photo.test.ts::no matched pet means no photo",
        "status": "passed",
-       "seconds": 0.000146
+       "seconds": 0.0002391
       },
       {
        "suite": "e2e",
        "id": "pet-photos.spec.ts::a pet not on file gets the paw placeholder",
        "status": "passed",
-       "seconds": 1.684
+       "seconds": 1.635
       }
      ],
      "status": "verified"
@@ -11891,7 +11935,7 @@
        "suite": "e2e",
        "id": "pet-photos.spec.ts::Biscuit's Beagle photo shows on the live run and the list",
        "status": "passed",
-       "seconds": 2.217
+       "seconds": 2.18
       }
      ],
      "status": "verified"
@@ -11951,31 +11995,31 @@
        "suite": "backend",
        "id": "tests.test_fetch_pet_photos::test_fetch_returns_clean_photos[CC0]",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_fetch_pet_photos::test_fetch_returns_clean_photos[Public domain]",
        "status": "passed",
-       "seconds": 0.009
+       "seconds": 0.011
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::every file has one manifest entry and every entry its file",
        "status": "passed",
-       "seconds": 0.0034971
+       "seconds": 0.003582
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::every photo is CC0 or public domain, from Commons",
        "status": "passed",
-       "seconds": 0.0033906
+       "seconds": 0.004315
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::every species has a general photo",
        "status": "passed",
-       "seconds": 0.000249
+       "seconds": 0.0004729
       }
      ],
      "status": "verified"
@@ -11997,31 +12041,31 @@
        "suite": "backend",
        "id": "tests.test_fetch_pet_photos::test_square_drops_exif_and_xmp",
        "status": "passed",
-       "seconds": 0.038
+       "seconds": 0.036
       },
       {
        "suite": "backend",
        "id": "tests.test_fetch_pet_photos::test_fetch_returns_clean_photos[CC0]",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_fetch_pet_photos::test_fetch_returns_clean_photos[Public domain]",
        "status": "passed",
-       "seconds": 0.009
+       "seconds": 0.011
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::no committed photo carries EXIF or XMP",
        "status": "passed",
-       "seconds": 0.02314
+       "seconds": 0.0069634
       },
       {
        "suite": "frontend",
        "id": "tests/pet-photos-manifest.test.ts::the scan does find metadata when it is there",
        "status": "passed",
-       "seconds": 0.0006625
+       "seconds": 0.000556
       }
      ],
      "status": "verified"
@@ -12057,13 +12101,13 @@
        "suite": "frontend",
        "id": "lib/demo.test.ts::a generated pet keeps its photo once sent",
        "status": "passed",
-       "seconds": 0.0003533
+       "seconds": 0.0008149
       },
       {
        "suite": "e2e",
        "id": "pet-photos.spec.ts::samples and a generated pet show their photos before sending",
        "status": "passed",
-       "seconds": 0.641
+       "seconds": 0.647
       }
      ],
      "status": "verified"
@@ -12105,37 +12149,37 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::parallel steps both show running",
        "status": "passed",
-       "seconds": 0.0030273
+       "seconds": 0.0044501
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a request routed straight to drafting skips the resolver",
        "status": "passed",
-       "seconds": 0.0003729
+       "seconds": 0.0006618
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a request waiting for review",
        "status": "passed",
-       "seconds": 0.0002214
+       "seconds": 0.0004024
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::steps without a span are skipped once their parent step ends",
        "status": "passed",
-       "seconds": 0.000268
+       "seconds": 0.0004709
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::failures show as errors, and a failed send as a send error",
        "status": "passed",
-       "seconds": 0.0002798
+       "seconds": 0.0004832
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::every node has a kind for its color",
        "status": "passed",
-       "seconds": 0.0002589
+       "seconds": 0.0004114
       }
      ],
      "status": "verified"
@@ -12164,19 +12208,19 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::concurrent spans overlap",
        "status": "passed",
-       "seconds": 0.0227953
+       "seconds": 0.0018542
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a child is drawn one level deeper",
        "status": "passed",
-       "seconds": 0.0008997
+       "seconds": 0.0003022
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::a running span extends to now",
        "status": "passed",
-       "seconds": 0.0005175
+       "seconds": 0.0003227
       }
      ],
      "status": "verified"
@@ -12219,43 +12263,43 @@
        "suite": "frontend",
        "id": "lib/proxy.test.ts::reads and staff actions are allowed",
        "status": "passed",
-       "seconds": 0.0017416
+       "seconds": 0.0042438
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::everything else is refused",
        "status": "passed",
-       "seconds": 0.0003894
+       "seconds": 0.0009513
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::an allowed path streams the backend response through",
        "status": "passed",
-       "seconds": 0.0054257
+       "seconds": 0.0086799
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::a refused path never contacts the backend",
        "status": "passed",
-       "seconds": 0.0019337
+       "seconds": 0.0029907
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::demo previews and certificate images are allowed",
        "status": "passed",
-       "seconds": 0.0002375
+       "seconds": 0.0003795
       },
       {
        "suite": "frontend",
        "id": "lib/proxy.test.ts::certificate images pass through unchanged",
        "status": "passed",
-       "seconds": 0.0010589
+       "seconds": 0.0021054
       },
       {
        "suite": "frontend",
        "id": "tests/no-backend-in-client.test.ts::no client component reads the backend address",
        "status": "passed",
-       "seconds": 0.0338591
+       "seconds": 0.0146547
       }
      ],
      "status": "verified"
@@ -12284,13 +12328,13 @@
        "suite": "frontend",
        "id": "lib/view.test.ts::the span inspector shows tokens, dollars, and seconds",
        "status": "passed",
-       "seconds": 0.0010802
+       "seconds": 0.0005396
       },
       {
        "suite": "frontend",
        "id": "lib/view.test.ts::submitting a demo sample opens its live run view",
        "status": "passed",
-       "seconds": 0.0236512
+       "seconds": 0.0314941
       }
      ],
      "status": "verified"
@@ -12326,31 +12370,31 @@
        "suite": "frontend",
        "id": "lib/demo.test.ts::generating fetches a request and points at its seed's certificate",
        "status": "passed",
-       "seconds": 0.0505227
+       "seconds": 0.0376758
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::a generated request is sent by its seed and opens its run",
        "status": "passed",
-       "seconds": 0.0008983
+       "seconds": 0.0016853
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::a failed generation says so",
        "status": "passed",
-       "seconds": 0.0013118
+       "seconds": 0.0025157
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::recent names go with each generation",
        "status": "passed",
-       "seconds": 0.0004152
+       "seconds": 0.0009789
       },
       {
        "suite": "frontend",
        "id": "lib/demo.test.ts::the page remembers the latest names, newest first, without repeats",
        "status": "passed",
-       "seconds": 0.0008082
+       "seconds": 0.001665
       }
      ],
      "status": "verified"
@@ -12386,43 +12430,43 @@
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::every step says what it does, whatever its status",
        "status": "passed",
-       "seconds": 0.0067192
+       "seconds": 0.0052033
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::a clean run says what each step found",
        "status": "passed",
-       "seconds": 0.0006594
+       "seconds": 0.0006768
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::a failing vaccine and a full kennel are named",
        "status": "passed",
-       "seconds": 0.0006015
+       "seconds": 0.0005803
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::the resolver, the reply, and staff review report this run",
        "status": "passed",
-       "seconds": 0.0005853
+       "seconds": 0.0007226
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::skipped and unchecked steps say why",
        "status": "passed",
-       "seconds": 0.0005147
+       "seconds": 0.0004266
       },
       {
        "suite": "frontend",
        "id": "lib/step-summary.test.ts::missing or odd fields fall back to plain text, never the message",
        "status": "passed",
-       "seconds": 0.0005885
+       "seconds": 0.0008065
       },
       {
        "suite": "e2e",
        "id": "demo.spec.ts::hovering or focusing a step explains it and what it found",
        "status": "passed",
-       "seconds": 2.36
+       "seconds": 2.59
       }
      ],
      "status": "verified"
@@ -12465,19 +12509,19 @@
        "suite": "e2e",
        "id": "home.spec.ts::the home page explains PawDesk and shows the Try panel",
        "status": "passed",
-       "seconds": 0.815
+       "seconds": 0.808
       },
       {
        "suite": "e2e",
        "id": "home.spec.ts::the old Try page address lands on the home page",
        "status": "passed",
-       "seconds": 0.534
+       "seconds": 0.616
       },
       {
        "suite": "e2e",
        "id": "home.spec.ts::the navigation's Requests link opens the list",
        "status": "passed",
-       "seconds": 1.067
+       "seconds": 1.06
       }
      ],
      "status": "verified"
@@ -12512,7 +12556,7 @@
        "suite": "backend",
        "id": "tests.test_home_page_rules::test_every_vaccine_shown_has_a_name",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -12530,13 +12574,13 @@
        "suite": "backend",
        "id": "tests.test_home_page_rules::test_booking_horizon_matches_intake",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "e2e",
        "id": "home.spec.ts::the services, the coverage rule, and kennel sizes are on the page",
        "status": "passed",
-       "seconds": 0.61
+       "seconds": 0.736
       }
      ],
      "status": "verified"
@@ -12579,19 +12623,19 @@
        "suite": "e2e",
        "id": "back-to-top.spec.ts::the button is hidden and unfocusable at the top",
        "status": "passed",
-       "seconds": 0.566
+       "seconds": 0.752
       },
       {
        "suite": "e2e",
        "id": "back-to-top.spec.ts::scrolling past the first screen shows it, pressing it returns to the top",
        "status": "passed",
-       "seconds": 1.904
+       "seconds": 1.95
       },
       {
        "suite": "e2e",
        "id": "back-to-top.spec.ts::with reduced motion the page jumps to the top at once",
        "status": "passed",
-       "seconds": 0.783
+       "seconds": 0.878
       }
      ],
      "status": "verified"
@@ -12627,7 +12671,7 @@
        "suite": "e2e",
        "id": "touch.spec.ts::moving with the keyboard shows the focus outline",
        "status": "passed",
-       "seconds": 0.519
+       "seconds": 0.543
       }
      ],
      "status": "verified"
@@ -12663,19 +12707,19 @@
        "suite": "e2e",
        "id": "architecture.spec.ts::the navigation's Architecture link opens the page with its six diagrams",
        "status": "passed",
-       "seconds": 3.247
+       "seconds": 3.072
       },
       {
        "suite": "e2e",
        "id": "architecture.spec.ts::each diagram has a description in words",
        "status": "passed",
-       "seconds": 0.913
+       "seconds": 1.006
       },
       {
        "suite": "e2e",
        "id": "architecture.spec.ts::at phone width the page doesn't scroll sideways",
        "status": "passed",
-       "seconds": 0.65
+       "seconds": 0.769
       }
      ],
      "status": "verified"
@@ -12717,31 +12761,31 @@
        "suite": "backend",
        "id": "tests.test_architecture_page::test_failable_states_match",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
        "id": "tests.test_architecture_page::test_step_table_matches_the_orchestrator",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "frontend",
        "id": "lib/architecture.test.ts::each transition has exactly one arrow, and each arrow is a transition",
        "status": "passed",
-       "seconds": 0.0035806
+       "seconds": 0.0032718
       },
       {
        "suite": "frontend",
        "id": "lib/architecture.test.ts::each state in the data has a place on the drawing",
        "status": "passed",
-       "seconds": 0.0005622
+       "seconds": 0.0003412
       },
       {
        "suite": "frontend",
        "id": "lib/architecture.test.ts::the description names the actor of each transition",
        "status": "passed",
-       "seconds": 0.0003445
+       "seconds": 0.0002298
       }
      ],
      "status": "verified"
@@ -12770,13 +12814,13 @@
        "suite": "e2e",
        "id": "nav-links.spec.ts::the Source code link opens https://github.com/Pohi11/PawDesk in a new tab",
        "status": "passed",
-       "seconds": 0.533
+       "seconds": 0.647
       },
       {
        "suite": "e2e",
        "id": "nav-links.spec.ts::the Portfolio link opens https://pohi.me/ in a new tab",
        "status": "passed",
-       "seconds": 0.588
+       "seconds": 0.602
       }
      ],
      "status": "verified"
@@ -12812,13 +12856,13 @@
        "suite": "e2e",
        "id": "home.spec.ts::the worked example shows the attached vaccine card",
        "status": "passed",
-       "seconds": 0.636
+       "seconds": 0.649
       },
       {
        "suite": "e2e",
        "id": "home.spec.ts::the worked example is labeled and its card expands",
        "status": "passed",
-       "seconds": 0.855
+       "seconds": 0.787
       }
      ],
      "status": "verified"
@@ -12840,7 +12884,7 @@
        "suite": "e2e",
        "id": "home.spec.ts::How it works scrolls to the booking rules",
        "status": "passed",
-       "seconds": 0.773
+       "seconds": 0.629
       }
      ],
      "status": "verified"
@@ -12862,7 +12906,7 @@
        "suite": "e2e",
        "id": "home.spec.ts::the coverage diagram describes a hypothetical dog, not a pet on file",
        "status": "passed",
-       "seconds": 0.632
+       "seconds": 0.615
       }
      ],
      "status": "verified"
@@ -12912,25 +12956,25 @@
        "suite": "e2e",
        "id": "demo.spec.ts::the page opens on a made-up request",
        "status": "passed",
-       "seconds": 0.803
+       "seconds": 0.907
       },
       {
        "suite": "e2e",
        "id": "demo.spec.ts::a sample's preview opens with its summary",
        "status": "passed",
-       "seconds": 0.651
+       "seconds": 0.639
       },
       {
        "suite": "e2e",
        "id": "demo.spec.ts::a sample chosen while the opening request is made up stays chosen",
        "status": "passed",
-       "seconds": 0.755
+       "seconds": 0.859
       },
       {
        "suite": "e2e",
        "id": "demo.spec.ts::going back to Make one up keeps the request, and Make another makes a new one",
        "status": "passed",
-       "seconds": 0.867
+       "seconds": 0.911
       }
      ],
      "status": "verified"
@@ -12966,7 +13010,7 @@
        "suite": "e2e",
        "id": "home.spec.ts::the worked example ends with the booking and the reply",
        "status": "passed",
-       "seconds": 0.713
+       "seconds": 0.733
       }
      ],
      "status": "verified"
@@ -12995,13 +13039,48 @@
        "suite": "e2e",
        "id": "home.spec.ts::the navigation's Try a request link scrolls to the Try panel",
        "status": "passed",
-       "seconds": 0.822
+       "seconds": 0.756
       },
       {
        "suite": "e2e",
        "id": "home.spec.ts::the navigation's Try a request link opens the Try panel from another page",
        "status": "passed",
-       "seconds": 1.154
+       "seconds": 1.161
+      }
+     ],
+     "status": "verified"
+    },
+    {
+     "name": "The Try panel is ready again after a run",
+     "text": "After the visitor sends a request from the Try panel and its run opens, coming back to the home page SHALL show the panel ready to send again: the send button SHALL read \"Send and watch it run\" and be enabled, whether the visitor comes back with the browser's Back button or the navigation's \"Try a request\" link.",
+     "scenarios": [
+      {
+       "name": "Back from a run",
+       "steps": [
+        "**WHEN** the visitor sends the clean boarding sample, its run opens, and the visitor goes back with the browser's Back button",
+        "**THEN** the send button reads \"Send and watch it run\" and is enabled, and no button reads \"Sending\""
+       ]
+      },
+      {
+       "name": "The Try link from a run",
+       "steps": [
+        "**WHEN** the visitor sends the clean boarding sample, its run opens, and the visitor clicks the navigation's \"Try a request\" link",
+        "**THEN** the send button reads \"Send and watch it run\" and is enabled, and no button reads \"Sending\""
+       ]
+      }
+     ],
+     "tests": [
+      {
+       "suite": "e2e",
+       "id": "demo.spec.ts::coming back with browser Back leaves the send button ready",
+       "status": "passed",
+       "seconds": 1.984
+      },
+      {
+       "suite": "e2e",
+       "id": "demo.spec.ts::coming back with the nav's Try link leaves the send button ready",
+       "status": "passed",
+       "seconds": 2.569
       }
      ],
      "status": "verified"
@@ -13029,7 +13108,7 @@
        "suite": "backend",
        "id": "tests.test_run_tracing::test_span_without_a_trace_is_rejected",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.01
       }
      ],
      "status": "verified"
@@ -13058,13 +13137,13 @@
        "suite": "backend",
        "id": "tests.test_run_tracing::test_nested_span_keeps_its_parent",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.015
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_parent_from_another_trace_is_rejected",
        "status": "passed",
-       "seconds": 0.012
+       "seconds": 0.015
       }
      ],
      "status": "verified"
@@ -13093,31 +13172,31 @@
        "suite": "backend",
        "id": "tests.test_run_tracing::test_unknown_kind_is_rejected",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_error_span_without_a_message_is_rejected[null]",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_error_span_without_a_message_is_rejected[empty]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_error_span_without_a_message_is_rejected[blank]",
        "status": "passed",
-       "seconds": 0.006
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_new_span_starts_running",
        "status": "passed",
-       "seconds": 0.007
+       "seconds": 0.012
       }
      ],
      "status": "verified"
@@ -13153,31 +13232,31 @@
        "suite": "backend",
        "id": "tests.test_run_tracing::test_model_call_span_round_trips_exactly",
        "status": "passed",
-       "seconds": 0.01
+       "seconds": 0.018
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_cost_is_exact_to_eight_decimal_places_when_summed",
        "status": "passed",
-       "seconds": 0.018
+       "seconds": 0.031
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_negative_token_count_is_rejected[prompt_tokens]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.01
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_negative_token_count_is_rejected[completion_tokens]",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.013
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_end_before_start_is_rejected",
        "status": "passed",
-       "seconds": 0.009
+       "seconds": 0.014
       }
      ],
      "status": "verified"
@@ -13213,25 +13292,25 @@
        "suite": "backend",
        "id": "tests.test_tracing::test_running_span_is_visible_from_another_connection",
        "status": "passed",
-       "seconds": 0.029
+       "seconds": 0.059
       },
       {
        "suite": "backend",
        "id": "tests.test_tracing::test_output_and_attributes_are_written_when_the_span_ends",
        "status": "passed",
-       "seconds": 0.023
+       "seconds": 0.045
       },
       {
        "suite": "backend",
        "id": "tests.test_tracing::test_failing_work_is_recorded_and_the_exception_reaches_the_caller",
        "status": "passed",
-       "seconds": 0.024
+       "seconds": 0.038
       },
       {
        "suite": "backend",
        "id": "tests.test_tracing::test_trace_gets_an_end_time",
        "status": "passed",
-       "seconds": 0.016
+       "seconds": 0.024
       },
       {
        "suite": "backend",
@@ -13243,7 +13322,7 @@
        "suite": "backend",
        "id": "tests.test_tracing::test_cancelled_work_is_recorded_as_an_error",
        "status": "passed",
-       "seconds": 0.023
+       "seconds": 0.034
       }
      ],
      "status": "verified"
@@ -13272,13 +13351,13 @@
        "suite": "backend",
        "id": "tests.test_tracing::test_nested_span_has_the_outer_span_as_parent",
        "status": "passed",
-       "seconds": 0.046
+       "seconds": 0.075
       },
       {
        "suite": "backend",
        "id": "tests.test_tracing::test_concurrent_siblings_share_the_parent",
        "status": "passed",
-       "seconds": 0.123
+       "seconds": 0.185
       }
      ],
      "status": "verified"
@@ -13300,7 +13379,7 @@
        "suite": "backend",
        "id": "tests.test_tracing::test_span_survives_a_rolled_back_business_transaction",
        "status": "passed",
-       "seconds": 0.03
+       "seconds": 0.062
       }
      ],
      "status": "verified"
@@ -13329,19 +13408,19 @@
        "suite": "backend",
        "id": "tests.test_run_tracing::test_attributes_default_to_an_empty_object",
        "status": "passed",
-       "seconds": 0.008
+       "seconds": 0.014
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_attributes_round_trip",
        "status": "passed",
-       "seconds": 0.009
+       "seconds": 0.015
       },
       {
        "suite": "backend",
        "id": "tests.test_run_tracing::test_attributes_must_be_an_object",
        "status": "passed",
-       "seconds": 0.007
+       "seconds": 0.014
       }
      ],
      "status": "verified"
@@ -13370,13 +13449,13 @@
        "suite": "backend",
        "id": "tests.test_orchestrator::test_span_left_running_by_a_killed_run_is_closed",
        "status": "passed",
-       "seconds": 0.255
+       "seconds": 0.409
       },
       {
        "suite": "backend",
        "id": "tests.test_orchestrator::test_finished_spans_are_left_untouched",
        "status": "passed",
-       "seconds": 0.245
+       "seconds": 0.413
       }
      ],
      "status": "verified"
@@ -13411,13 +13490,13 @@
        "suite": "backend",
        "id": "tests.test_seed::test_seed_populates_every_table",
        "status": "passed",
-       "seconds": 0.121
+       "seconds": 0.215
       },
       {
        "suite": "backend",
        "id": "tests.test_seed::test_seed_covers_vaccine_edge_cases",
        "status": "passed",
-       "seconds": 0.107
+       "seconds": 0.185
       }
      ],
      "status": "verified"
@@ -13439,7 +13518,7 @@
        "suite": "backend",
        "id": "tests.test_seed::test_running_seed_twice_gives_the_same_counts",
        "status": "passed",
-       "seconds": 0.256
+       "seconds": 0.486
       }
      ],
      "status": "verified"
@@ -13475,7 +13554,7 @@
        "suite": "backend",
        "id": "tests.test_seed::test_remote_database_is_refused_before_connecting[postgresql://pawdesk:secret@db.prod.example.com:5432/pawdesk]",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -13522,7 +13601,7 @@
        "suite": "backend",
        "id": "tests.test_seed::test_seed_without_requests_keeps_everything_else",
        "status": "passed",
-       "seconds": 0.227
+       "seconds": 0.36
       },
       {
        "suite": "backend",
@@ -13557,13 +13636,13 @@
        "suite": "backend",
        "id": "tests.test_seed::test_the_seed_command_anchors_to_the_demo_day",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.003
       },
       {
        "suite": "backend",
        "id": "tests.test_seed::test_records_are_placed_from_the_demo_day",
        "status": "passed",
-       "seconds": 0.098
+       "seconds": 0.195
       }
      ],
      "status": "verified"
@@ -13591,7 +13670,7 @@
        "suite": "backend",
        "id": "tests.test_approvals_api::test_queue_lists_only_waiting_requests",
        "status": "passed",
-       "seconds": 0.908
+       "seconds": 1.05
       }
      ],
      "status": "verified"
@@ -13641,43 +13720,43 @@
        "suite": "backend",
        "id": "tests.test_approvals_api::test_approve",
        "status": "passed",
-       "seconds": 0.179
+       "seconds": 0.146
       },
       {
        "suite": "backend",
        "id": "tests.test_approvals_api::test_edit_and_approve",
        "status": "passed",
-       "seconds": 0.137
+       "seconds": 0.178
       },
       {
        "suite": "backend",
        "id": "tests.test_approvals_api::test_reject_with_a_reason",
        "status": "passed",
-       "seconds": 0.116
+       "seconds": 0.152
       },
       {
        "suite": "backend",
        "id": "tests.test_approvals_api::test_reject_without_a_reason[]",
        "status": "passed",
-       "seconds": 0.088
+       "seconds": 0.107
       },
       {
        "suite": "backend",
        "id": "tests.test_approvals_api::test_reject_without_a_reason[   ]",
        "status": "passed",
-       "seconds": 0.084
+       "seconds": 0.088
       },
       {
        "suite": "backend",
        "id": "tests.test_approvals_api::test_acting_twice",
        "status": "passed",
-       "seconds": 0.112
+       "seconds": 0.125
       },
       {
        "suite": "backend",
        "id": "tests.test_approvals_api::test_request_that_was_never_flagged_is_refused",
        "status": "passed",
-       "seconds": 0.073
+       "seconds": 0.09
       }
      ],
      "status": "verified"
@@ -13740,7 +13819,7 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_expiry_boundaries[mar5]",
        "status": "passed",
-       "seconds": 0.002
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -13859,7 +13938,7 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_no_records_at_all_is_missing",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -13871,7 +13950,7 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_mid_stay_expiry_beats_an_older_expired_record",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -13938,13 +14017,13 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_everything_covered_is_compliant",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
        "id": "tests.test_compliance::test_unknown_expiry_alone_needs_review",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -13974,7 +14053,7 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_no_rules_for_the_service_is_compliant",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       }
      ],
      "status": "verified"
@@ -13996,7 +14075,7 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_extra_records_are_ignored",
        "status": "passed",
-       "seconds": 0.001
+       "seconds": 0.0
       },
       {
        "suite": "backend",
@@ -14024,7 +14103,7 @@
        "suite": "backend",
        "id": "tests.test_compliance::test_end_before_start_is_rejected",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       }
      ],
      "status": "verified"
@@ -14053,25 +14132,25 @@
        "suite": "backend",
        "id": "tests.test_compliance_db::test_seeded_pet_with_an_expired_vaccine",
        "status": "passed",
-       "seconds": 0.128
+       "seconds": 0.141
       },
       {
        "suite": "backend",
        "id": "tests.test_compliance_db::test_seeded_pet_with_unknown_expiry",
        "status": "passed",
-       "seconds": 0.115
+       "seconds": 0.154
       },
       {
        "suite": "backend",
        "id": "tests.test_compliance_db::test_seeded_pet_whose_rabies_expires_during_its_booked_stay",
        "status": "passed",
-       "seconds": 0.149
+       "seconds": 0.158
       },
       {
        "suite": "backend",
        "id": "tests.test_compliance_db::test_rules_follow_the_service",
        "status": "passed",
-       "seconds": 0.134
+       "seconds": 0.142
       }
      ],
      "status": "verified"
@@ -14113,19 +14192,19 @@
        "suite": "backend",
        "id": "tests.test_records::test_readable_certificate",
        "status": "passed",
-       "seconds": 0.057
+       "seconds": 0.093
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_invalid_output_repaired_once",
        "status": "passed",
-       "seconds": 0.063
+       "seconds": 0.111
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_invalid_twice",
        "status": "passed",
-       "seconds": 0.056
+       "seconds": 0.098
       },
       {
        "suite": "backend",
@@ -14167,7 +14246,7 @@
        "suite": "backend",
        "id": "tests.test_records_schema::test_missing_expiry_and_unmapped_vaccine_are_representable",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       },
       {
        "suite": "backend",
@@ -14195,7 +14274,7 @@
        "suite": "backend",
        "id": "tests.test_records::test_records_drive_compliance",
        "status": "passed",
-       "seconds": 0.043
+       "seconds": 0.09
       }
      ],
      "status": "verified"
@@ -14224,13 +14303,13 @@
        "suite": "backend",
        "id": "tests.test_records::test_missing_expiry_stays_missing_and_compliance_asks_a_person",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.103
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_request_tells_the_model_never_to_infer",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.091
       },
       {
        "suite": "backend",
@@ -14265,37 +14344,37 @@
        "suite": "backend",
        "id": "tests.test_records::test_oversized_image",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.057
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_unsupported_type[pdf]",
        "status": "passed",
-       "seconds": 0.033
+       "seconds": 0.045
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_unsupported_type[gif]",
        "status": "passed",
-       "seconds": 0.028
+       "seconds": 0.04
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_unsupported_type[text]",
        "status": "passed",
-       "seconds": 0.029
+       "seconds": 0.035
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_jpeg_and_webp_are_accepted[jpeg]",
        "status": "passed",
-       "seconds": 0.038
+       "seconds": 0.061
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_jpeg_and_webp_are_accepted[webp]",
        "status": "passed",
-       "seconds": 0.039
+       "seconds": 0.062
       }
      ],
      "status": "verified"
@@ -14345,43 +14424,43 @@
        "suite": "backend",
        "id": "tests.test_records::test_record_issues[future-given]",
        "status": "passed",
-       "seconds": 0.038
+       "seconds": 0.061
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_record_issues[expiry-before-given]",
        "status": "passed",
-       "seconds": 0.039
+       "seconds": 0.058
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_record_issues[unknown-label]",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.054
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_unknown_label_is_not_passed_to_compliance",
        "status": "passed",
-       "seconds": 0.042
+       "seconds": 0.049
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_certificate_for_another_pet",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.055
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_matching_pet_name",
        "status": "passed",
-       "seconds": 0.04
+       "seconds": 0.083
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_no_records_found",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.077
       }
      ],
      "status": "verified"
@@ -14410,25 +14489,25 @@
        "suite": "backend",
        "id": "tests.test_records::test_doubt_goes_to_review[unreadable]",
        "status": "passed",
-       "seconds": 0.037
+       "seconds": 0.069
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_doubt_goes_to_review[low-confidence]",
        "status": "passed",
-       "seconds": 0.038
+       "seconds": 0.076
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_doubt_goes_to_review[ambiguity]",
        "status": "passed",
-       "seconds": 0.035
+       "seconds": 0.073
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_clean_extraction",
        "status": "passed",
-       "seconds": 0.041
+       "seconds": 0.073
       }
      ],
      "status": "verified"
@@ -14450,7 +14529,7 @@
        "suite": "backend",
        "id": "tests.test_records::test_traced_without_the_image",
        "status": "passed",
-       "seconds": 0.046
+       "seconds": 0.072
       }
      ],
      "status": "verified"
@@ -14479,13 +14558,13 @@
        "suite": "backend",
        "id": "tests.test_records::test_request_tells_the_model_to_keep_printed_years",
        "status": "passed",
-       "seconds": 0.039
+       "seconds": 0.074
       },
       {
        "suite": "backend",
        "id": "tests.test_records::test_prompt_version_is_records_v2",
        "status": "passed",
-       "seconds": 0.0
+       "seconds": 0.001
       }
      ],
      "status": "verified"
