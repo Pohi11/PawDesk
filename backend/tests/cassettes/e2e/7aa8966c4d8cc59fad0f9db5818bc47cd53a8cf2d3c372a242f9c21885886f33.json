@@ -1,10 +1,10 @@
 {
- "id": "gen-1792112212-ognV8CprzUvbJZVt3F9o",
+ "id": "gen-1792238058-oXxcuc7msaik1vcQXPHQ",
  "object": "chat.completion",
- "created": 1792112212,
+ "created": 1792238058,
  "model": "deepseek/deepseek-v4.1-flash",
- "provider": "CoreWeave",
- "system_fingerprint": null,
+ "provider": "InferenceNet",
+ "system_fingerprint": "inference.net",
  "service_tier": null,
  "choices": [
   {
@@ -14,13 +14,13 @@
    "native_finish_reason": "stop",
    "message": {
     "role": "assistant",
-    "content": "{\"subject\":\"We've received your daycare request\",\"body\":\"Hi Mateo,\\n\\nThank you for your daycare request for March 15, 2027. A team member will review it and get back to you soon.\\n\\nIf anything changes on your end in the meantime, just let us know.\\n\\nThe Maple Hollow Pet Lodge team\"}",
+    "content": "{\n  \"subject\": \"Your daycare request is under review\",\n  \"body\": \"Hi Mateo,\\n\\nThank you for your daycare request for your pet on 2027-03-15. A team member will review the request and reply soon. We appreciate your patience.\\n\\nThe Maple Hollow Pet Lodge team\"\n}",
     "refusal": null,
-    "reasoning": "Under review. Don't confirm. Thank them, say team member will review and reply soon. Sign off \"The Maple Hollow Pet Lodge team\". Under 150 words. Pet name is \"your pet\" — odd, but use as given? Better to avoid awkwardness; can just say \"your daycare request\". Don't mention dates? Dates are in facts, allowed. Keep it simple.",
+    "reasoning": "We need answer JSON with subject and body. Under_review. Warm, clear, under 150 words. Use facts. No prices, no dates not in facts. Dates are start/end 2027-03-15. Pet name \"your pet\" weird. Owner first name Mateo. Facility Maple Hollow Pet Lodge. Service daycare. Situation under_review: thank them and say team member will review request and reply soon. Do not say booked confirmed reserved approved. Sign off \"The Maple Hollow Pet Lodge team\". Need JSON object with subject and body. Body can include greeting. Under 150 words. Ensure no mention internal checks/tools. No prices. No extra dates. Could mention daycare on 2027-03-15. Since end same date. \"Thanks for your daycare request for your pet on March 15, 2027.\" But date format? Facts use 2027-03-15. We can use that exact date. Maybe \"March 15, 2027\" is same date, but \"Never mention a date that is not in facts\" okay. But safer use 2027-03-15. Subject: \"Your daycare request is under review\". Body: \"Hi Mateo, Thank you for your daycare request for your pet on 2027-03-15. A team member will review it and reply soon. We appreciate your patience. The Maple Hollow Pet Lodge team\". That's under 150. Does \"under review\" okay? Situation under_review. We can say \"We've received your request\" but not confirmed. \"A team member will review the request and reply soon.\" Good. No mention booked etc. JSON. Ensure valid JSON.",
     "reasoning_details": [
      {
       "type": "reasoning.text",
-      "text": "Under review. Don't confirm. Thank them, say team member will review and reply soon. Sign off \"The Maple Hollow Pet Lodge team\". Under 150 words. Pet name is \"your pet\" — odd, but use as given? Better to avoid awkwardness; can just say \"your daycare request\". Don't mention dates? Dates are in facts, allowed. Keep it simple.",
+      "text": "We need answer JSON with subject and body. Under_review. Warm, clear, under 150 words. Use facts. No prices, no dates not in facts. Dates are start/end 2027-03-15. Pet name \"your pet\" weird. Owner first name Mateo. Facility Maple Hollow Pet Lodge. Service daycare. Situation under_review: thank them and say team member will review request and reply soon. Do not say booked confirmed reserved approved. Sign off \"The Maple Hollow Pet Lodge team\". Need JSON object with subject and body. Body can include greeting. Under 150 words. Ensure no mention internal checks/tools. No prices. No extra dates. Could mention daycare on 2027-03-15. Since end same date. \"Thanks for your daycare request for your pet on March 15, 2027.\" But date format? Facts use 2027-03-15. We can use that exact date. Maybe \"March 15, 2027\" is same date, but \"Never mention a date that is not in facts\" okay. But safer use 2027-03-15. Subject: \"Your daycare request is under review\". Body: \"Hi Mateo, Thank you for your daycare request for your pet on 2027-03-15. A team member will review it and reply soon. We appreciate your patience. The Maple Hollow Pet Lodge team\". That's under 150. Does \"under review\" okay? Situation under_review. We can say \"We've received your request\" but not confirmed. \"A team member will review the request and reply soon.\" Good. No mention booked etc. JSON. Ensure valid JSON.",
       "format": "unknown",
       "index": 0
      }
@@ -29,10 +29,10 @@
   }
  ],
  "usage": {
-  "prompt_tokens": 383,
-  "completion_tokens": 152,
-  "total_tokens": 535,
-  "cost": 0.00015625,
+  "prompt_tokens": 296,
+  "completion_tokens": 417,
+  "total_tokens": 713,
+  "cost": 0.000328643,
   "is_byok": false,
   "prompt_tokens_details": {
    "cached_tokens": 0,
@@ -41,12 +41,12 @@
    "video_tokens": 0
   },
   "cost_details": {
-   "upstream_inference_cost": 0.00015625,
-   "upstream_inference_prompt_cost": 5.745e-05,
-   "upstream_inference_completions_cost": 9.88e-05
+   "upstream_inference_cost": 0.000328643,
+   "upstream_inference_prompt_cost": 3.0488e-05,
+   "upstream_inference_completions_cost": 0.000298155
   },
   "completion_tokens_details": {
-   "reasoning_tokens": 82,
+   "reasoning_tokens": 348,
    "image_tokens": 0,
    "audio_tokens": 0
   }

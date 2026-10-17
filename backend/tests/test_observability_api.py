@@ -798,7 +798,7 @@ async def test_other_stays_stay(committed, full_seed):
     later = await hold(
         committed, "M1", CLEAN.end_date + timedelta(days=1), CLEAN.end_date + timedelta(days=3)
     )
-    large = await hold(committed, "L1", CLEAN.start_date, CLEAN.end_date)
+    large = await hold(committed, "L2", CLEAN.start_date, CLEAN.end_date)
 
     await submit_sample(committed, "clean")
 

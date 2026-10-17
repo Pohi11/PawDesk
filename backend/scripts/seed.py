@@ -3,8 +3,9 @@
 Run from backend/:  uv run python -m scripts.seed [--no-requests]
 
 Deletes every row in the domain tables, then loads a fixed, fictional dataset in one
-transaction. Dates are relative to today, so "expires during an upcoming stay" stays true
-whenever the seed is run. Refuses anything but a local database, or the one remote host
+transaction. Dates are relative to the demo day that demo requests are processed against,
+not the day the seed runs, so the data is the same on every run and each demo sample ends
+as it says (change records-year-fidelity, design D4). Refuses anything but a local database, or the one remote host
 named in PAWDESK_SEED_ALLOWED_HOST (the hosted demo resets itself on start).
 --no-requests leaves out the example booking requests (the hosted demo starts with none).
 """
@@ -21,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.db import make_engine, make_sessionmaker
+from app.demo import DEMO_TODAY
 from app.enums import ApprovalAction, Service, SizeClass, Species, Vaccine
 from app.lifecycle import Actor, State
 from app.models import (
@@ -174,12 +176,14 @@ async def load(session: AsyncSession, today: date, requests: bool = True) -> Non
                 (Vaccine.DHPP, -300, 60),
                 (Vaccine.BORDETELLA, -200, -20),
             ),
-            # Edge case: rabies expires partway through Moose's upcoming stay (days +7..+14).
+            # Edge case: rabies expires partway through Moose's upcoming stay (days +21..+28).
+            # His Bordetella is the one his sample card prints (2025-11-14 to 2026-11-14 from
+            # the demo day), so the expired-vaccine sample fails on it from either source.
             *records(
                 "Moose",
-                (Vaccine.RABIES, -3 * year + 10, 10),
+                (Vaccine.RABIES, -3 * year + 24, 24),
                 (Vaccine.DHPP, -50, year),
-                (Vaccine.BORDETELLA, -50, 130),
+                (Vaccine.BORDETELLA, -474, -109),
             ),
             # Edge case: certificate shows no expiry date for FVRCP.
             *records("Olive", (Vaccine.RABIES, -100, year), (Vaccine.FVRCP, -100, None)),
@@ -190,7 +194,7 @@ async def load(session: AsyncSession, today: date, requests: bool = True) -> Non
         [
             Reservation(
                 kennel_id=kennels["L1"].id, pet_id=pets["Moose"].id,
-                start_date=days(7), end_date=days(14),
+                start_date=days(21), end_date=days(28),
             ),
             # Every medium kennel is taken for days +4..+7, so a medium dog asking for those
             # nights has to be offered alternatives (exercised from Phase 7 on).
@@ -297,7 +301,7 @@ def main() -> None:
         counts = asyncio.run(
             run(
                 get_settings().database_url,
-                date.today(),
+                DEMO_TODAY,
                 os.environ.get("PAWDESK_SEED_ALLOWED_HOST"),
                 wants_requests(sys.argv[1:]),
             )

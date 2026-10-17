@@ -1,7 +1,7 @@
 {
- "id": "gen-1792012783-OWqUjQiTPFo1GwAYAJgO",
+ "id": "gen-1792238051-HqWkuGBNw68FaPdnzysJ",
  "object": "chat.completion",
- "created": 1792012783,
+ "created": 1792238051,
  "model": "deepseek/deepseek-v4.1-flash",
  "provider": "DigitalOcean",
  "system_fingerprint": null,
@@ -14,13 +14,13 @@
    "native_finish_reason": "stop",
    "message": {
     "role": "assistant",
-    "content": "{\n  \"ambiguities\": [],\n  \"confidence\": 0.98,\n  \"end_date\": \"2027-03-27\",\n  \"pet_name\": \"Biscuit\",\n  \"service\": \"boarding\",\n  \"special_notes\": \"Eats grain-free food twice a day; vaccine card attached.\",\n  \"start_date\": \"2027-03-24\"\n}",
+    "content": "{\n  \"ambiguities\": [],\n  \"confidence\": 0.97,\n  \"end_date\": \"2027-03-27\",\n  \"pet_name\": \"Biscuit\",\n  \"service\": \"boarding\",\n  \"special_notes\": \"Eats grain-free food twice a day; vaccine card attached.\",\n  \"start_date\": \"2027-03-24\"\n}",
     "refusal": null,
-    "reasoning": "We need answer JSON only likely. Need parse. Today 2027-03-03 Wednesday. Customer asks Biscuit board from March 24 to March 27. Dates without year => next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 upcoming. Check weekday? Not needed. Boarding start 2027-03-24 end 2027-03-27 checkout day. Pet name Biscuit. service boarding. special_notes: eats grain-free food twice a day; vaccine card attached maybe care detail? The field special_notes care details customer mentions (food, medication, behavior). Vaccine card attached is not care detail? Maybe not. Could include \"vaccine card attached\" as note? It mentions vaccine card attached. special_notes should be care details mentioned: food. Vaccine card is admin. But maybe special_notes includes \"vaccine card attached\" if relevant? The spec says care details (food, medication, behavior); empty if none. So include \"eats grain-free food twice a day\". Vaccine card attachment not care detail? Could add? Hmm likely special_notes: \"Eats grain-free food twice a day.\" Ambiguities: none. Confidence high. Ensure JSON.",
+    "reasoning": "We need answer JSON only. Need parse. Today 2027-03-03 Wednesday. Message: Biscuit board from March 24 to March 27. Need resolve dates without year means next occurrence on or after today. March 24 2027? Today March 3 2027, so next occurrence March 24 2027. End March 27 2027. Service boarding. Notes: eats grain-free food twice a day; vaccine card attached? Special notes care details food, maybe vaccine card attached is not care detail? Could include \"vaccine card attached\" maybe admin. We need special_notes: care details mentions food, medication, behavior; food yes. Vaccine card attached maybe not care detail but could include. Ambiguities? None? Need maybe no ambiguity. Confidence high. Pet name Biscuit. Output JSON. Ensure date format. Fields exactly.\n\nNeed determine end_date: \"board from March 24 to March 27\" start 24, end 27 checkout day. Yes.\n\nspecial_notes: \"eats grain-free food twice a day; vaccine card attached\" Maybe include both. The field says care details the customer mentions (food, medication, behavior); vaccine card attached isn't care detail. But can include? It says special_notes: care details customer mentions (food, medication, behavior); empty if none. We can put \"Eats grain-free food twice a day. Vaccine card attached.\" Is vaccine card a care detail? Not exactly but a booking note. But to avoid omitting maybe include \"Eats grain-free food twice a day; vaccine card attached.\" Does that violate? It's a note. The spec examples include food, medication, behavior, not exhaustive? \"care details\" vaccine card is documentation. Could be special_note. If not, only food. But the customer message includes vaccine card attached. Since special_notes are care details the customer mentions; vaccine card isn't care detail. I think include only food? However \"vaccine card is attached\" is a booking detail and useful. But field name special_notes, maybe okay. We need not guess. Since it is stated, can include. The instruction says care details the customer mentions (food, medication, behavior); empty if none. It doesn't explicitly forbid other notes. But maybe should include any special notes. I'll include \"Eats grain-free food twice a day; vaccine card attached.\" That seems safe.\n\nAmbiguities: none? The request asks \"Could Biscuit board with you...\" It is a booking request. Dates clear. No ambiguity. Confidence maybe 0.95 or 0.98. Since year inferred automatically. Maybe 0.95.\n\nNeed final JSON only. Ensure no markdown? likely final. Use double quotes. \n",
     "reasoning_details": [
      {
       "type": "reasoning.text",
-      "text": "We need answer JSON only likely. Need parse. Today 2027-03-03 Wednesday. Customer asks Biscuit board from March 24 to March 27. Dates without year => next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 upcoming. Check weekday? Not needed. Boarding start 2027-03-24 end 2027-03-27 checkout day. Pet name Biscuit. service boarding. special_notes: eats grain-free food twice a day; vaccine card attached maybe care detail? The field special_notes care details customer mentions (food, medication, behavior). Vaccine card attached is not care detail? Maybe not. Could include \"vaccine card attached\" as note? It mentions vaccine card attached. special_notes should be care details mentioned: food. Vaccine card is admin. But maybe special_notes includes \"vaccine card attached\" if relevant? The spec says care details (food, medication, behavior); empty if none. So include \"eats grain-free food twice a day\". Vaccine card attachment not care detail? Could add? Hmm likely special_notes: \"Eats grain-free food twice a day.\" Ambiguities: none. Confidence high. Ensure JSON.",
+      "text": "We need answer JSON only. Need parse. Today 2027-03-03 Wednesday. Message: Biscuit board from March 24 to March 27. Need resolve dates without year means next occurrence on or after today. March 24 2027? Today March 3 2027, so next occurrence March 24 2027. End March 27 2027. Service boarding. Notes: eats grain-free food twice a day; vaccine card attached? Special notes care details food, maybe vaccine card attached is not care detail? Could include \"vaccine card attached\" maybe admin. We need special_notes: care details mentions food, medication, behavior; food yes. Vaccine card attached maybe not care detail but could include. Ambiguities? None? Need maybe no ambiguity. Confidence high. Pet name Biscuit. Output JSON. Ensure date format. Fields exactly.\n\nNeed determine end_date: \"board from March 24 to March 27\" start 24, end 27 checkout day. Yes.\n\nspecial_notes: \"eats grain-free food twice a day; vaccine card attached\" Maybe include both. The field says care details the customer mentions (food, medication, behavior); vaccine card attached isn't care detail. But can include? It says special_notes: care details customer mentions (food, medication, behavior); empty if none. We can put \"Eats grain-free food twice a day. Vaccine card attached.\" Is vaccine card a care detail? Not exactly but a booking note. But to avoid omitting maybe include \"Eats grain-free food twice a day; vaccine card attached.\" Does that violate? It's a note. The spec examples include food, medication, behavior, not exhaustive? \"care details\" vaccine card is documentation. Could be special_note. If not, only food. But the customer message includes vaccine card attached. Since special_notes are care details the customer mentions; vaccine card isn't care detail. I think include only food? However \"vaccine card is attached\" is a booking detail and useful. But field name special_notes, maybe okay. We need not guess. Since it is stated, can include. The instruction says care details the customer mentions (food, medication, behavior); empty if none. It doesn't explicitly forbid other notes. But maybe should include any special notes. I'll include \"Eats grain-free food twice a day; vaccine card attached.\" That seems safe.\n\nAmbiguities: none? The request asks \"Could Biscuit board with you...\" It is a booking request. Dates clear. No ambiguity. Confidence maybe 0.95 or 0.98. Since year inferred automatically. Maybe 0.95.\n\nNeed final JSON only. Ensure no markdown? likely final. Use double quotes. \n",
       "format": "unknown",
       "index": 0
      }
@@ -30,9 +30,9 @@
  ],
  "usage": {
   "prompt_tokens": 434,
-  "completion_tokens": 347,
-  "total_tokens": 781,
-  "cost": 0.000239574,
+  "completion_tokens": 652,
+  "total_tokens": 1086,
+  "cost": 0.000520614,
   "is_byok": false,
   "prompt_tokens_details": {
    "cached_tokens": 384,
@@ -41,12 +41,12 @@
    "video_tokens": 0
   },
   "cost_details": {
-   "upstream_inference_cost": 0.000239574,
-   "upstream_inference_prompt_cost": 1.0554e-05,
-   "upstream_inference_completions_cost": 0.00022902
+   "upstream_inference_cost": 0.000520614,
+   "upstream_inference_prompt_cost": 1.2054e-05,
+   "upstream_inference_completions_cost": 0.00050856
   },
   "completion_tokens_details": {
-   "reasoning_tokens": 265,
+   "reasoning_tokens": 570,
    "image_tokens": 0,
    "audio_tokens": 0
   }

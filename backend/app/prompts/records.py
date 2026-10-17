@@ -4,7 +4,7 @@ every records span, so evaluation results can be compared across prompt versions
 import base64
 from datetime import date
 
-PROMPT_VERSION = "records-v1"
+PROMPT_VERSION = "records-v2"
 
 _SYSTEM = """\
 You read photos of pet vaccine certificates and list the vaccinations as JSON.
@@ -25,6 +25,10 @@ For each vaccination printed on the certificate, return one record:
 - expires_on: the expiry or "due" date printed for that vaccine, YYYY-MM-DD. It is the last \
 day the vaccine is valid. If the certificate does not print an expiry for that vaccine, use \
 null. NEVER calculate or estimate an expiry from the date given or from typical durations.
+
+Copy every date exactly as printed, including the year. Certificates often show dates after \
+today, such as expiries one to three years ahead; that is expected. Never change a date to \
+bring it closer to today or to any other year.
 
 Dates on these certificates are usually written month/day/year. If a date cannot be read \
 with certainty, leave that record out and add an ambiguity describing it.

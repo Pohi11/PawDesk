@@ -358,6 +358,8 @@ HEADLINES = {
         "sent_to_review",
         "errors",
     ),
+    # Repeated reads of the demo sample cards (change records-year-fidelity, design D2).
+    "sample": ("reads", "misreads", "decision_flips", "silent_flips", "failed"),
 }
 
 

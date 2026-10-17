@@ -56,7 +56,8 @@ Every number below comes from a dated report in [`backend/evals/results/`](backe
 | What | Result |
 |---|---|
 | Intake on 16 messy messages, including 3 injection attempts | 16/16 fully correct. All 3 injections were sent to a person. |
-| Vaccine certificate reading on a balanced benchmark of 36 synthetic certificates | 33/36 compliance decisions agree with ground truth. **2 silent disagreements** (handwritten month and year misread with confidence). 0 invented expiry dates. |
+| Vaccine certificate reading on a balanced benchmark of 36 synthetic certificates (prompt records-v2) | 34/36 compliance decisions agree with ground truth. **2 silent disagreements** (an expiry month and an expiry year misread with confidence). 0 invented expiry dates. |
+| The three demo sample cards, each read 200 times | 0 misread dates in 600 reads, on both records-v1 and records-v2. A single hosted read misread the clean card's years, which these runs did not reproduce. |
 | Hybrid workflow vs a single autonomous agent with every tool, 20 cases | **Hybrid: 0 unsafe confirmations**, 3/3 injections handed to a person. Autonomous: 1 unsafe confirmation (an injection it "ignored" and approved anyway), 0/3 handed to a person, and replies claiming reservations it couldn't make ([0015](docs/decisions/0015-hybrid-over-autonomous-measured.md)). |
 | Cost of a clean booking (3 model calls) | $0.0012–$0.0014 across two runs |
 

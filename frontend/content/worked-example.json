@@ -2,7 +2,7 @@
   "about": "The clean sample's outcome as its recorded run produces it (spec: run-dashboard 'The worked example shows what PawDesk did'). The clean-sample end-to-end test checks the run page shows this reply.",
   "kennel_size": "medium",
   "reply": {
-    "subject": "Biscuit's boarding stay is confirmed!",
-    "body": "Hi Avery,\n\nGreat news — Biscuit's boarding stay at Maple Hollow Pet Lodge is confirmed for March 24 to March 27, 2027. We're so glad Biscuit will be staying with us!\n\nIf anything changes or you'd like to add any details about Biscuit's routine, just let us know. We'll be ready to welcome your pup.\n\nWarmly,\nThe Maple Hollow Pet Lodge team"
+    "subject": "Biscuit's boarding stay is confirmed — March 24–27, 2027",
+    "body": "Hi Avery,\n\nGreat news — Biscuit's boarding stay at Maple Hollow Pet Lodge is confirmed for March 24–27, 2027.\n\nWe're looking forward to having Biscuit with us. If you have any questions before the stay, just reply to this message and we'll be glad to help.\n\nWarmly,\nThe Maple Hollow Pet Lodge team"
   }
 }
