@@ -2,8 +2,8 @@
 
 ## 1. Sample-card measurement (before the prompt changes)
 
-- [ ] 1.1 Add the pure scoring to `scripts/eval_sample_cards.py`: misread, decision flip (card records alone, sample stay), silent flip, and per-card and total counts. Verify with `tests/test_eval_sample_cards.py`, tagged `@spec("certificate-evaluation", "Sample cards are read repeatedly to measure misreads")` and covering the shifted-year, exact-read, decision-flip, and silent-flip scenarios.
-- [ ] 1.2 Add the runner: N reads per card (default 20) through `run_records` with `today=DEMO_TODAY`, the sample's pet as the booked pet, and truth from `draw_sample_cards.CARDS`. It is traced like `eval_records`, and the report records the prompt version, model, reads per card, and total cost. Verify the report-building test for the "Report names what it measured" scenario passes, and that `uv run python -m scripts.eval_sample_cards --help` (or a dry import) runs without calling the model.
+- [x] 1.1 Add the pure scoring to `scripts/eval_sample_cards.py`: misread, decision flip (card records alone, sample stay), silent flip, and per-card and total counts. Verify with `tests/test_eval_sample_cards.py`, tagged `@spec("certificate-evaluation", "Sample cards are read repeatedly to measure misreads")` and covering the shifted-year, exact-read, decision-flip, and silent-flip scenarios.
+- [x] 1.2 Add the runner: N reads per card (default 20) through `run_records` with `today=DEMO_TODAY`, the sample's pet as the booked pet, and truth from `draw_sample_cards.CARDS`. It is traced like `eval_records`, and the report records the prompt version, model, reads per card, and total cost. Verify the report-building test for the "Report names what it measured" scenario passes, and that `uv run python -m scripts.eval_sample_cards --help` (or a dry import) runs without calling the model.
 - [ ] 1.3 Run the measurement live on `records-v1` and commit the report to `evals/results/` unedited. Verify the report file exists and names `records-v1`.
 
 ## 2. Records prompt keeps printed years
