@@ -91,3 +91,20 @@ def test_report_names_what_it_measured():
     assert report["reads_per_card"] == 2
     assert report["total_cost_usd"] == "0.01"
     assert report["summary"]["by_card"]["clean"]["reads"] == 2
+
+
+@spec("observability-api", "Eval reports are listed over time")
+def test_sample_card_reports_list_with_their_totals(tmp_path):
+    import json
+
+    from app.observability import eval_reports
+
+    totals_ = {"reads": 60, "failed": 0, "misreads": 1, "decision_flips": 1, "silent_flips": 1}
+    (tmp_path / "sample-cards-records-v1-x.json").write_text(
+        json.dumps({"prompt_version": "records-v1", "summary": {"total": totals_}}),
+        encoding="utf-8",
+    )
+    [report] = eval_reports(tmp_path)
+    assert report["kind"] == "sample"
+    assert report["headline"] == {k: totals_[k] for k in report["headline"]}
+    assert set(report["headline"]) == set(totals_)
