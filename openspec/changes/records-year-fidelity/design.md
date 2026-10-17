@@ -68,6 +68,23 @@
 - **[Small run counts]** → 20 reads per card can't show rare errors. The report gives the counts, not only rates, so nobody reads more into them than they support.
 - **[Cost]** → About 60 reads per measurement, plus one benchmark run. The 36-certificate benchmark cost about two cents on 2026-10-14.
 
+## Measured outcome
+
+The prompt change shipped as a safeguard. It made no measurable difference to how often years are misread.
+
+- **The hosted misread didn't reproduce.** `records-v1` read every printed date correctly in all 660 reads of the three sample cards: 20 and then 200 reads per card (`sample-cards-records-v1-20261017T112643Z.json`, `sample-cards-records-v1-20261017T112830Z.json`). These reads used the same image bytes, prompt version, model, and provider as the hosted read that went wrong. So that read was a rare failure, under about one in 200 at this sample size, not a systematic one.
+- **`records-v2` also read all 600 correctly** (`sample-cards-records-v2-20261017T115136Z.json`). With no misreads before or after, these runs can't show whether the new wording lowers the rate.
+- **The benchmark shows no regression.** On benchmark v2 (`records-v2-20261017T115717Z.json`, against `records-v2-20261014T155439Z.json` on `records-v1`):
+  - decisions agree on 34/36 (was 33/36);
+  - vaccines found 115/115 (was 106/115);
+  - dates given right 108/115, expiries 105/115;
+  - no invented expiries;
+  - 2 silent disagreements (unchanged).
+
+  Each figure is from one run, so the small gains are within run-to-run variation.
+- **Year misreads still happen on harder cards.** One of the two silent disagreements is a three-year rabies expiry (2029-01-03) read as 2027-01-03. A second read that must agree (D3) remains the candidate fix if misreads need to come down.
+- **What fixes the demo is the seed (D4, D5).** The clean sample now passes on Biscuit's records on file, whatever the card read returns.
+
 ## Migration Plan
 
 - Merge, then deploy. The Space restart reseeds with demo-day dates. There is no schema change. Requests already stored keep their traces.

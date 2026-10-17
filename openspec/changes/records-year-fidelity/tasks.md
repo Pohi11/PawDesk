@@ -9,8 +9,8 @@
 ## 2. Records prompt keeps printed years
 
 - [x] 2.1 Add the copy-dates-as-printed wording to `app/prompts/records.py` and set `PROMPT_VERSION = "records-v2"` (design D1). Verify with a prompt test tagged `@spec("vaccine-records-extraction", "Printed dates are copied exactly")` for the "Prompt keeps printed years" scenario, plus a span test that the `records` span records `records-v2`.
-- [ ] 2.2 Run the sample-card measurement again on `records-v2` and commit its report. Verify the report names `records-v2`, and compare the misread, flip, and silent-flip counts with the 1.3 report.
-- [ ] 2.3 Run `uv run python -m scripts.eval_records v2` on `records-v2` and commit its report. Verify the report names benchmark `v2` and prompt `records-v2`, and compare given accuracy, expiry accuracy, and silent disagreements with `records-v2-20261014T155439Z.json`.
+- [x] 2.2 Run the sample-card measurement again on `records-v2` and commit its report. Verify the report names `records-v2`, and compare the misread, flip, and silent-flip counts with the 1.3 report.
+- [x] 2.3 Run `uv run python -m scripts.eval_records v2` on `records-v2` and commit its report. Verify the report names benchmark `v2` and prompt `records-v2`, and compare given accuracy, expiry accuracy, and silent disagreements with `records-v2-20261014T155439Z.json`.
 
 ## 3. Seed anchored to the demo day
 
