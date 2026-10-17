@@ -8,7 +8,7 @@
 
 ## 2. Records prompt keeps printed years
 
-- [ ] 2.1 Add the copy-dates-as-printed wording to `app/prompts/records.py` and set `PROMPT_VERSION = "records-v2"` (design D1). Verify with a prompt test tagged `@spec("vaccine-records-extraction", "Printed dates are copied exactly")` for the "Prompt keeps printed years" scenario, plus a span test that the `records` span records `records-v2`.
+- [x] 2.1 Add the copy-dates-as-printed wording to `app/prompts/records.py` and set `PROMPT_VERSION = "records-v2"` (design D1). Verify with a prompt test tagged `@spec("vaccine-records-extraction", "Printed dates are copied exactly")` for the "Prompt keeps printed years" scenario, plus a span test that the `records` span records `records-v2`.
 - [ ] 2.2 Run the sample-card measurement again on `records-v2` and commit its report. Verify the report names `records-v2`, and compare the misread, flip, and silent-flip counts with the 1.3 report.
 - [ ] 2.3 Run `uv run python -m scripts.eval_records v2` on `records-v2` and commit its report. Verify the report names benchmark `v2` and prompt `records-v2`, and compare given accuracy, expiry accuracy, and silent disagreements with `records-v2-20261014T155439Z.json`.
 
@@ -20,7 +20,7 @@
 
 ## 4. Recordings and end-to-end
 
-- [ ] 4.1 Record the end-to-end model responses again (`PAWDESK_E2E_RECORD=1 pnpm e2e`, with that worktree's own test database). Remove recordings that are no longer used. Verify that `pnpm e2e` passes on replay with no network calls to the model.
+- [x] 4.1 Record the end-to-end model responses again (`PAWDESK_E2E_RECORD=1 pnpm e2e`, with that worktree's own test database). Remove recordings that are no longer used. Verify that `pnpm e2e` passes on replay with no network calls to the model.
 - [ ] 4.2 Run the full backend suite, `ruff`, and the frontend unit tests, then regenerate the build walkthrough so the new spec tests appear. Verify everything passes and the walkthrough lists the new requirements.
 
 ## Workflow follow-up

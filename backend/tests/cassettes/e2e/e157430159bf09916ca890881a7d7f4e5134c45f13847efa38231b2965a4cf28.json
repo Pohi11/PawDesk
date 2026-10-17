@@ -1,0 +1,54 @@
+{
+ "id": "gen-1792238028-nzNYT2XNFgShDKC7WPNM",
+ "object": "chat.completion",
+ "created": 1792238028,
+ "model": "deepseek/deepseek-v4.1-flash",
+ "provider": "Wafer",
+ "system_fingerprint": null,
+ "service_tier": null,
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "stop",
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"pet_name\": \"Pepper\",\n  \"records\": [\n    {\n      \"label\": \"Rabies\",\n      \"vaccine\": \"rabies\",\n      \"administered_on\": \"2026-09-01\",\n      \"expires_on\": \"2028-09-01\"\n    },\n    {\n      \"label\": \"DHPP\",\n      \"vaccine\": \"dhpp\",\n      \"administered_on\": \"2026-09-01\",\n      \"expires_on\": \"2028-09-01\"\n    },\n    {\n      \"label\": \"Bordetella\",\n      \"vaccine\": \"bordetella\",\n      \"administered_on\": \"2026-09-01\",\n      \"expires_on\": \"2028-09-01\"\n    }\n  ],\n  \"readable\": true,\n  \"confidence\": 0.98,\n  \"ambiguities\": []\n}",
+    "refusal": null,
+    "reasoning": "The certificate is clear. Three vaccines: Rabies, DHPP, Bordetella. Dates given Sep 1, 2026; expires Sep 1, 2028.\n\nPet name: Pepper.\n\nNo ambiguities. Confidence high.\n\nNote: dates are in the future relative to today (2027-03-03)? Sep 1, 2026 is in the past actually. Expires Sep 1, 2028 is future. Fine.\n\nOutput JSON.",
+    "reasoning_details": [
+     {
+      "type": "reasoning.text",
+      "text": "The certificate is clear. Three vaccines: Rabies, DHPP, Bordetella. Dates given Sep 1, 2026; expires Sep 1, 2028.\n\nPet name: Pepper.\n\nNo ambiguities. Confidence high.\n\nNote: dates are in the future relative to today (2027-03-03)? Sep 1, 2026 is in the past actually. Expires Sep 1, 2028 is future. Fine.\n\nOutput JSON.",
+      "format": "unknown",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 965,
+  "completion_tokens": 290,
+  "total_tokens": 1255,
+  "cost": 0.00025428,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 768,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.00025428,
+   "upstream_inference_prompt_cost": 6.578e-05,
+   "upstream_inference_completions_cost": 0.0001885
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 98,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}

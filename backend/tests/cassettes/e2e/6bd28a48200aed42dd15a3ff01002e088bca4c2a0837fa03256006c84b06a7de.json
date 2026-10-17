@@ -1,7 +1,7 @@
 {
- "id": "gen-1792112211-FoKPbqJc5GmrrG1778GG",
+ "id": "gen-1792238057-b9ducBDaC1RBjl5t1jr9",
  "object": "chat.completion",
- "created": 1792112211,
+ "created": 1792238057,
  "model": "deepseek/deepseek-v4.1-flash",
  "provider": "Together",
  "system_fingerprint": "default",
@@ -16,11 +16,11 @@
     "role": "assistant",
     "content": "{\n  \"pet_name\": \"Rex\",\n  \"service\": \"daycare\",\n  \"start_date\": \"2027-03-15\",\n  \"end_date\": \"2027-03-15\",\n  \"special_notes\": \"\",\n  \"confidence\": 0.95,\n  \"ambiguities\": []\n}",
     "refusal": null,
-    "reasoning": "We need answer JSON. Need parse. Today 2027-03-03 Wednesday. Message: \"Can Rex come for daycare on March 15?\" Pet name Rex. Service daycare. Date March 15. No year means next occurrence on or after today. Today 2027-03-03. March 15 2027 is after today? Yes March 15 2027. Need weekday? 2027-03-15 maybe Monday? Let's check. 2027-03-03 Wednesday. March 15 is 12 days later: Wednesday +12 = Monday? Wed+7 Wed, +5 Monday. Yes Monday. start=end=2027-03-15. special_notes empty. confidence high maybe 0.95. Ambiguities? \"Can Rex come\" is request, no explicit confirmation? But booking request. No ambiguity. Maybe no year but resolved. Need output JSON only. Ensure fields. \n",
+    "reasoning": "We need answer JSON. Need parse. Today 2027-03-03 Wednesday. Message: \"Can Rex come for daycare on March 15?\" Pet name Rex. Service daycare. Date March 15. No year means next occurrence on or after today. Today 2027-03-03. March 15 2027 is after today? Yes March 15 2027. Need weekday? 2027-03-15 maybe Monday? Let's check. 2027-03-03 Wednesday. March 15 is 12 days later: Wednesday +12 = Monday? Wed+7 Wed, +5 Monday. Yes Monday. start=end=2027-03-15. special_notes empty. confidence high. ambiguities empty? Maybe \"Can Rex come\" is request, no ambiguity. Need output JSON only. Ensure fields.",
     "reasoning_details": [
      {
       "type": "reasoning.text",
-      "text": "We need answer JSON. Need parse. Today 2027-03-03 Wednesday. Message: \"Can Rex come for daycare on March 15?\" Pet name Rex. Service daycare. Date March 15. No year means next occurrence on or after today. Today 2027-03-03. March 15 2027 is after today? Yes March 15 2027. Need weekday? 2027-03-15 maybe Monday? Let's check. 2027-03-03 Wednesday. March 15 is 12 days later: Wednesday +12 = Monday? Wed+7 Wed, +5 Monday. Yes Monday. start=end=2027-03-15. special_notes empty. confidence high maybe 0.95. Ambiguities? \"Can Rex come\" is request, no explicit confirmation? But booking request. No ambiguity. Maybe no year but resolved. Need output JSON only. Ensure fields. \n",
+      "text": "We need answer JSON. Need parse. Today 2027-03-03 Wednesday. Message: \"Can Rex come for daycare on March 15?\" Pet name Rex. Service daycare. Date March 15. No year means next occurrence on or after today. Today 2027-03-03. March 15 2027 is after today? Yes March 15 2027. Need weekday? 2027-03-15 maybe Monday? Let's check. 2027-03-03 Wednesday. March 15 is 12 days later: Wednesday +12 = Monday? Wed+7 Wed, +5 Monday. Yes Monday. start=end=2027-03-15. special_notes empty. confidence high. ambiguities empty? Maybe \"Can Rex come\" is request, no ambiguity. Need output JSON only. Ensure fields.",
       "format": "unknown",
       "index": 0
      }
@@ -30,9 +30,9 @@
  ],
  "usage": {
   "prompt_tokens": 412,
-  "completion_tokens": 264,
-  "total_tokens": 676,
-  "cost": 0.0004404,
+  "completion_tokens": 245,
+  "total_tokens": 657,
+  "cost": 0.0004176,
   "is_byok": false,
   "prompt_tokens_details": {
    "cached_tokens": 0,
@@ -41,12 +41,12 @@
    "video_tokens": 0
   },
   "cost_details": {
-   "upstream_inference_cost": 0.0004404,
+   "upstream_inference_cost": 0.0004176,
    "upstream_inference_prompt_cost": 0.0001236,
-   "upstream_inference_completions_cost": 0.0003168
+   "upstream_inference_completions_cost": 0.000294
   },
   "completion_tokens_details": {
-   "reasoning_tokens": 195,
+   "reasoning_tokens": 176,
    "image_tokens": 0,
    "audio_tokens": 0
   }

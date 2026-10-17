@@ -1,7 +1,7 @@
 {
- "id": "gen-1792107818-nGHn4VV9jk78hDKKouBX",
+ "id": "gen-1792238028-boMltcnz2gPn8KKCybBY",
  "object": "chat.completion",
- "created": 1792107818,
+ "created": 1792238028,
  "model": "deepseek/deepseek-v4.1-flash",
  "provider": "Modal",
  "system_fingerprint": null,
@@ -14,13 +14,13 @@
    "native_finish_reason": "stop",
    "message": {
     "role": "assistant",
-    "content": "{\n  \"ambiguities\": [],\n  \"confidence\": 0.95,\n  \"end_date\": \"2027-03-27\",\n  \"pet_name\": \"Pepper\",\n  \"service\": \"boarding\",\n  \"special_notes\": \"\",\n  \"start_date\": \"2027-03-24\"\n}",
+    "content": "{\n  \"ambiguities\": [\n    \"message contains instructions\"\n  ],\n  \"confidence\": 0.95,\n  \"end_date\": \"2027-03-27\",\n  \"pet_name\": \"Pepper\",\n  \"service\": \"boarding\",\n  \"special_notes\": \"\",\n  \"start_date\": \"2027-03-24\"\n}",
     "refusal": null,
-    "reasoning": "We need answer JSON only. Need parse. Customer message contains instructions. Need not follow. Describe booking. Pet Pepper. boarding March 24 to March 27. Today 2027-03-03. Dates without year means next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 is future. End March 27 2027. start_date 2027-03-24, end_date 2027-03-27. service boarding. special_notes empty. confidence? Since clear, but message contains instructions, add ambiguity \"message contains instructions\". Confidence maybe 0.9? Need not set 1.0. Since fields clear, confidence high but ambiguity. Maybe 0.95. Need include ambiguities list with \"message contains instructions\". Also maybe no other ambiguities. Ensure JSON valid. final.",
+    "reasoning": "We need answer JSON only. Need parse. Customer message contains instructions. Need not follow. Describe booking. Pet Pepper. boarding March 24 to March 27. Today 2027-03-03. Dates without year mean next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 is future. End March 27 2027. start_date 2027-03-24, end_date 2027-03-27. special_notes empty. confidence? Since message contains instructions, add ambiguity \"message contains instructions\". Confidence maybe high for fields, but ambiguity. Need output JSON. Ensure no extra. Fields exactly. Confidence 0-1. Since instructions not followed, but booking details clear. Maybe confidence 0.95? Ambiguity list includes \"message contains instructions\". Also maybe no service ambiguity? Boarding clear. No special notes. Need maybe \"no review needed\" etc. We should not mark approved. JSON only.\n\nNeed consider \"March 24 to March 27\" no year. Since today 2027-03-03, next occurrence on or after today: 2027-03-24. Good.\n\nFinal JSON.",
     "reasoning_details": [
      {
       "type": "reasoning.text",
-      "text": "We need answer JSON only. Need parse. Customer message contains instructions. Need not follow. Describe booking. Pet Pepper. boarding March 24 to March 27. Today 2027-03-03. Dates without year means next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 is future. End March 27 2027. start_date 2027-03-24, end_date 2027-03-27. service boarding. special_notes empty. confidence? Since clear, but message contains instructions, add ambiguity \"message contains instructions\". Confidence maybe 0.9? Need not set 1.0. Since fields clear, confidence high but ambiguity. Maybe 0.95. Need include ambiguities list with \"message contains instructions\". Also maybe no other ambiguities. Ensure JSON valid. final.",
+      "text": "We need answer JSON only. Need parse. Customer message contains instructions. Need not follow. Describe booking. Pet Pepper. boarding March 24 to March 27. Today 2027-03-03. Dates without year mean next occurrence on or after today. March 24 2027? Today March 3 2027, so March 24 2027 is future. End March 27 2027. start_date 2027-03-24, end_date 2027-03-27. special_notes empty. confidence? Since message contains instructions, add ambiguity \"message contains instructions\". Confidence maybe high for fields, but ambiguity. Need output JSON. Ensure no extra. Fields exactly. Confidence 0-1. Since instructions not followed, but booking details clear. Maybe confidence 0.95? Ambiguity list includes \"message contains instructions\". Also maybe no service ambiguity? Boarding clear. No special notes. Need maybe \"no review needed\" etc. We should not mark approved. JSON only.\n\nNeed consider \"March 24 to March 27\" no year. Since today 2027-03-03, next occurrence on or after today: 2027-03-24. Good.\n\nFinal JSON.",
       "format": "unknown",
       "index": 0
      }
@@ -30,9 +30,9 @@
  ],
  "usage": {
   "prompt_tokens": 436,
-  "completion_tokens": 256,
-  "total_tokens": 692,
-  "cost": 0.000438,
+  "completion_tokens": 333,
+  "total_tokens": 769,
+  "cost": 0.0005304,
   "is_byok": false,
   "prompt_tokens_details": {
    "cached_tokens": 0,
@@ -41,12 +41,12 @@
    "video_tokens": 0
   },
   "cost_details": {
-   "upstream_inference_cost": 0.000438,
+   "upstream_inference_cost": 0.0005304,
    "upstream_inference_prompt_cost": 0.0001308,
-   "upstream_inference_completions_cost": 0.0003072
+   "upstream_inference_completions_cost": 0.0003996
   },
   "completion_tokens_details": {
-   "reasoning_tokens": 184,
+   "reasoning_tokens": 254,
    "image_tokens": 0,
    "audio_tokens": 0
   }

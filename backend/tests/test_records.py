@@ -157,6 +157,20 @@ async def test_request_tells_the_model_never_to_infer(records):
     assert "NEVER calculate or estimate an expiry" in system
 
 
+@spec("vaccine-records-extraction", "Printed dates are copied exactly")
+async def test_request_tells_the_model_to_keep_printed_years(records):
+    _, script, _ = await records(answer())
+
+    system = json.loads(script.requests[0].content)["messages"][0]["content"]
+    assert "Copy every date exactly as printed, including the year" in system
+    assert "Never change a date to bring it closer to today" in system
+
+
+@spec("vaccine-records-extraction", "Printed dates are copied exactly")
+def test_prompt_version_is_records_v2():
+    assert PROMPT_VERSION == "records-v2"
+
+
 # --- Only acceptable images reach the model -------------------------------------------
 
 

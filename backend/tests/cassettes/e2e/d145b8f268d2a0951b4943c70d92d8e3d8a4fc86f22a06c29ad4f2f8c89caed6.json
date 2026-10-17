@@ -1,10 +1,10 @@
 {
- "id": "gen-1792107821-jMCsHDL65UNl0h6nDyWb",
+ "id": "gen-1792238031-tqIEUcYotsYH4PZSvlYu",
  "object": "chat.completion",
- "created": 1792107821,
+ "created": 1792238031,
  "model": "deepseek/deepseek-v4.1-flash",
- "provider": "Together",
- "system_fingerprint": "default",
+ "provider": "Wafer",
+ "system_fingerprint": null,
  "service_tier": null,
  "choices": [
   {
@@ -14,13 +14,13 @@
    "native_finish_reason": "stop",
    "message": {
     "role": "assistant",
-    "content": "{\n  \"subject\": \"We've received your boarding request for Pepper\",\n  \"body\": \"Hi Priya,\\n\\nThank you for your boarding request for Pepper from March 24–27, 2027. A team member will review it and reply soon. We appreciate your patience.\\n\\nThe Maple Hollow Pet Lodge team\"\n}",
+    "content": "{\n  \"subject\": \"Thank you for your boarding request for Pepper\",\n  \"body\": \"Dear Priya,\\n\\nThank you for your request to board Pepper from March 24 to March 27, 2027. A team member will review your request and reply soon. We appreciate your patience.\\n\\nWarm regards,\\nThe Maple Hollow Pet Lodge team\"\n}",
     "refusal": null,
-    "reasoning": "We need answer JSON only. Need craft subject/body. Under_review: thank them and say team member will review request and reply soon. Do not say booked confirmed reserved approved. No prices. No dates not in facts. Can mention dates? Facts include start/end. Under review, can mention requested dates? It says never mention a date not in facts. Dates in facts okay. But under_review maybe mention request for Pepper boarding from 2027-03-24 to 2027-03-27. Need warm clear under 150 words. Sign off \"The Maple Hollow Pet Lodge team\". JSON object with subject and body. Ensure no internal checks/tools. No prices. No confirmation. Let's draft.\n\nSubject: We've received your boarding request for Pepper\nBody: Hi Priya, thank you for your boarding request for Pepper from March 24–27, 2027. A team member will review it and reply soon. We appreciate your patience. The Maple Hollow Pet Lodge team\n\nCheck under 150. Good. JSON. Need maybe \"We'll be in touch soon.\" Fine. Ensure no \"approved\". Good.",
+    "reasoning": "We need to write a short reply from pet care facility to pet parent about booking request. Situation: under_review. So thank them and say a team member will review the request and reply soon. Do not say anything is booked, confirmed, reserved, or approved. Never mention prices. Never mention a date not in facts. Dates are given: start 2027-03-24, end 2027-03-27. We can mention those dates? The instruction: \"Never mention a date that is not in the facts.\" So we can mention the dates that are in facts. But for under_review, we might not need to mention dates. But we can acknowledge the request for boarding for Pepper from March 24 to March 27, 2027. That's fine. But careful: we shouldn't say it's confirmed. Just thank them and say a team member will review and reply soon. Sign off as \"The Maple Hollow Pet Lodge team\". Return JSON with subject and body. Under 150 words. Warm and clear.\n\nSubject: something like \"We've received your boarding request for Pepper\" or \"Thank you for your boarding request\". Body: Dear Priya, thank you for your request to board Pepper from March 24 to March 27, 2027. A team member will review your request and reply soon. We appreciate your patience. Warm regards, The Maple Hollow Pet Lodge team.\n\nCheck: no prices, no internal checks, no confirmation. Good. Ensure under 150 words. That's fine.\n\nNow output JSON. Only JSON object. No extra text. So final answer should be a JSON string. Use proper escaping. Let's write.",
     "reasoning_details": [
      {
       "type": "reasoning.text",
-      "text": "We need answer JSON only. Need craft subject/body. Under_review: thank them and say team member will review request and reply soon. Do not say booked confirmed reserved approved. No prices. No dates not in facts. Can mention dates? Facts include start/end. Under review, can mention requested dates? It says never mention a date not in facts. Dates in facts okay. But under_review maybe mention request for Pepper boarding from 2027-03-24 to 2027-03-27. Need warm clear under 150 words. Sign off \"The Maple Hollow Pet Lodge team\". JSON object with subject and body. Ensure no internal checks/tools. No prices. No confirmation. Let's draft.\n\nSubject: We've received your boarding request for Pepper\nBody: Hi Priya, thank you for your boarding request for Pepper from March 24–27, 2027. A team member will review it and reply soon. We appreciate your patience. The Maple Hollow Pet Lodge team\n\nCheck under 150. Good. JSON. Need maybe \"We'll be in touch soon.\" Fine. Ensure no \"approved\". Good.",
+      "text": "We need to write a short reply from pet care facility to pet parent about booking request. Situation: under_review. So thank them and say a team member will review the request and reply soon. Do not say anything is booked, confirmed, reserved, or approved. Never mention prices. Never mention a date not in facts. Dates are given: start 2027-03-24, end 2027-03-27. We can mention those dates? The instruction: \"Never mention a date that is not in the facts.\" So we can mention the dates that are in facts. But for under_review, we might not need to mention dates. But we can acknowledge the request for boarding for Pepper from March 24 to March 27, 2027. That's fine. But careful: we shouldn't say it's confirmed. Just thank them and say a team member will review and reply soon. Sign off as \"The Maple Hollow Pet Lodge team\". Return JSON with subject and body. Under 150 words. Warm and clear.\n\nSubject: something like \"We've received your boarding request for Pepper\" or \"Thank you for your boarding request\". Body: Dear Priya, thank you for your request to board Pepper from March 24 to March 27, 2027. A team member will review your request and reply soon. We appreciate your patience. Warm regards, The Maple Hollow Pet Lodge team.\n\nCheck: no prices, no internal checks, no confirmation. Good. Ensure under 150 words. That's fine.\n\nNow output JSON. Only JSON object. No extra text. So final answer should be a JSON string. Use proper escaping. Let's write.",
       "format": "unknown",
       "index": 0
      }
@@ -30,9 +30,9 @@
  ],
  "usage": {
   "prompt_tokens": 295,
-  "completion_tokens": 305,
-  "total_tokens": 600,
-  "cost": 0.0004545,
+  "completion_tokens": 422,
+  "total_tokens": 717,
+  "cost": 0.0003038,
   "is_byok": false,
   "prompt_tokens_details": {
    "cached_tokens": 0,
@@ -41,12 +41,12 @@
    "video_tokens": 0
   },
   "cost_details": {
-   "upstream_inference_cost": 0.0004545,
-   "upstream_inference_prompt_cost": 8.85e-05,
-   "upstream_inference_completions_cost": 0.000366
+   "upstream_inference_cost": 0.0003038,
+   "upstream_inference_prompt_cost": 2.95e-05,
+   "upstream_inference_completions_cost": 0.0002743
   },
   "completion_tokens_details": {
-   "reasoning_tokens": 234,
+   "reasoning_tokens": 343,
    "image_tokens": 0,
    "audio_tokens": 0
   }
