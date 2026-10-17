@@ -143,3 +143,21 @@ test(`${TRY} going back to Make one up keeps the request, and Make another makes
   await another;
   expect(calls).toBe(2);
 });
+
+const BACK = specTag("run-dashboard", "The Try panel is ready again after a run");
+
+for (const [how, back] of [
+  ["browser Back", (page: Page) => page.goBack()],
+  ["the nav's Try link", (page: Page) => page.getByRole("link", { name: "Try a request" }).first().click()],
+] as const) {
+  test(`${BACK} coming back with ${how} leaves the send button ready`, async ({ page }) => {
+    await sendSample(page, "Clean boarding request");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Biscuit");
+
+    await back(page);
+    await page.waitForURL((url) => url.pathname === "/");
+    const send = page.getByRole("button", { name: "Send and watch it run" });
+    await expect(send).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Sending" })).toHaveCount(0);
+  });
+}
