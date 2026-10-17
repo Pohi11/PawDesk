@@ -21,8 +21,8 @@
 ## 4. Recordings and end-to-end
 
 - [x] 4.1 Record the end-to-end model responses again (`PAWDESK_E2E_RECORD=1 pnpm e2e`, with that worktree's own test database). Remove recordings that are no longer used. Verify that `pnpm e2e` passes on replay with no network calls to the model.
-- [ ] 4.2 Run the full backend suite, `ruff`, and the frontend unit tests, then regenerate the build walkthrough so the new spec tests appear. Verify everything passes and the walkthrough lists the new requirements.
+- [x] 4.2 Run the full backend suite, `ruff`, the frontend unit tests, and the end-to-end suite on replay, then regenerate the build walkthrough. Verify everything passes and `scripts.walkthrough --check` reports every requirement verified.
 
 ## Workflow follow-up
 
-- Archive the change, merge `records-year-fidelity` into `main`, and deploy after explicit approval. Then submit the clean sample on the hosted demo and confirm it ends approved without staff.
+- Archive the change and regenerate the build walkthrough, so the new requirements appear on it with their tests. Merge `records-year-fidelity` into `main`, and deploy after explicit approval. Then submit the clean sample on the hosted demo and confirm it ends approved without staff.
