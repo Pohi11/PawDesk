@@ -187,9 +187,10 @@ function Intro() {
           PawDesk handles pet care bookings and asks a person when it isn&apos;t sure.
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
-          PawDesk is a multi-agent workflow for a kennel&apos;s booking inbox. AI agents read each
-          request and the photo of the vaccine card, plain code checks the vaccines and finds a free
-          kennel, and another agent writes the reply.
+          PawDesk is a hybrid workflow for a kennel&apos;s booking inbox: plain code runs the steps in
+          a fixed order and calls AI agents only where the input is messy. Agents read each request
+          and the photo of the vaccine card, code checks the vaccines and finds a free kennel, and
+          another agent writes the reply.
         </p>
         <p className="mt-4 text-lg leading-relaxed text-muted">
           When every check passes, PawDesk books the stay and sends the reply. When something is

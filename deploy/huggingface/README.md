@@ -6,7 +6,7 @@ colorTo: green
 sdk: docker
 app_port: 7860
 pinned: false
-short_description: Multi-agent booking intake desk for pet care
+short_description: Hybrid workflow booking intake desk for pet care
 ---
 
 # PawDesk

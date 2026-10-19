@@ -10,6 +10,7 @@ const HOW = specTag("run-dashboard", "The hero's How it works link opens the boo
 const OUTCOME = specTag("run-dashboard", "The worked example shows what PawDesk did");
 const EXAMPLE = specTag("run-dashboard", "The coverage diagram is a hypothetical example");
 const NAV_TRY = specTag("run-dashboard", "The navigation's Try a request link opens the Try panel");
+const HYBRID = specTag("run-dashboard", "The home page describes PawDesk as a hybrid workflow");
 
 test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ page }) => {
   await page.goto("/");
@@ -28,6 +29,15 @@ test(`${HOME} the home page explains PawDesk and shows the Try panel`, async ({ 
   for (const section of ["Booking rules", "The agents", "How a request moves", "What the tests hold it to", "Working with an AI assistant", "Skills across the stack"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }
+});
+
+test(`${HYBRID} the introduction calls PawDesk a hybrid workflow`, async ({ page }) => {
+  await page.goto("/");
+
+  const intro = page.getByText(/^PawDesk is a /);
+  await expect(intro).toContainText("hybrid workflow");
+  await expect(intro).toContainText("fixed order");
+  await expect(intro).not.toContainText(/multi-agent/i);
 });
 
 test(`${CARD} the worked example shows the attached vaccine card`, async ({ page }) => {

@@ -296,3 +296,10 @@ After the visitor sends a request from the Try panel and its run opens, coming b
 #### Scenario: The Try link from a run
 - **WHEN** the visitor sends the clean boarding sample, its run opens, and the visitor clicks the navigation's "Try a request" link
 - **THEN** the send button reads "Send and watch it run" and is enabled, and no button reads "Sending"
+
+### Requirement: The home page describes PawDesk as a hybrid workflow
+The home page introduction SHALL describe PawDesk as a hybrid workflow, in which code runs the steps in a fixed order and agents are used only where the input is messy. It SHALL NOT call PawDesk a multi-agent workflow.
+
+#### Scenario: Reading the introduction
+- **WHEN** a visitor reads the home page introduction
+- **THEN** it calls PawDesk a hybrid workflow, says code runs the steps in a fixed order, and doesn't say "multi-agent"
