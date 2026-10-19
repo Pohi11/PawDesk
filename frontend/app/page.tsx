@@ -504,7 +504,7 @@ function Agents() {
   const cell = "block align-top leading-relaxed text-muted lg:table-cell lg:py-5 lg:pr-6";
   const label = "block text-xs font-medium text-faint lg:hidden";
   return (
-    <Section id="agents" title="The agents">
+    <Section id="agents" title="Model Use">
       <p className="mt-3 max-w-2xl leading-relaxed text-muted">
         Four parts of PawDesk use a model. Each one reads something, returns a fixed set of fields,
         and hands them to code that checks them before they count. None of them can approve a
